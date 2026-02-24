@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LIN YU-FAN — Dancer / Educator</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;700;900&family=Noto+Sans+TC:wght@300;400;700;900&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--black:#0a0a0a;--white:#f5f4f0;--gray:#888;--light:#e8e6e0;--accent:#ff3c00}
+html{scroll-behavior:smooth;font-size:16px}
+body{background:var(--black);color:var(--white);font-family:'Inter','Noto Sans TC',sans-serif;overflow-x:hidden;cursor:none}
+
+/* CURSOR */
+.cursor{position:fixed;width:8px;height:8px;background:var(--white);border-radius:50%;pointer-events:none;z-index:9999;transition:transform .15s ease;mix-blend-mode:difference}
+.cursor-follower{position:fixed;width:40px;height:40px;border:1px solid rgba(245,244,240,0.4);border-radius:50%;pointer-events:none;z-index:9998;transition:all .12s ease;mix-blend-mode:difference}
+
+/* NAV */
+nav{position:fixed;top:0;left:0;right:0;z-index:100;padding:2rem 3rem;display:flex;justify-content:space-between;align-items:center;mix-blend-mode:difference}
+.nav-name{font-size:.7rem;letter-spacing:.3em;text-transform:uppercase;color:var(--white);font-weight:500}
+.nav-right{display:flex;gap:2.5rem;align-items:center}
+.nav-right a{font-size:.65rem;letter-spacing:.25em;text-transform:uppercase;color:var(--white);text-decoration:none;opacity:.5;transition:opacity .3s}
+.nav-right a:hover{opacity:1}
+
+/* HERO */
+#hero{height:100vh;display:flex;flex-direction:column;justify-content:flex-end;padding:3rem;position:relative;overflow:hidden;border-bottom:1px solid rgba(255,255,255,0.08)}
+.hero-bg{position:absolute;inset:0;background:var(--black)}
+.hero-number{position:absolute;top:8rem;right:3rem;font-size:.65rem;letter-spacing:.3em;color:rgba(255,255,255,0.2);text-transform:uppercase}
+.hero-main{position:relative;z-index:2}
+.hero-label{font-size:.65rem;letter-spacing:.35em;text-transform:uppercase;color:rgba(255,255,255,0.4);margin-bottom:1.5rem}
+.hero-h1{font-size:clamp(5rem,13vw,14rem);font-weight:900;line-height:.9;letter-spacing:-.02em;text-transform:uppercase;color:var(--white)}
+.hero-h1 .line2{display:block;color:transparent;-webkit-text-stroke:1px rgba(255,255,255,0.4)}
+.hero-sub{display:flex;justify-content:space-between;align-items:flex-end;margin-top:3rem;padding-top:2rem;border-top:1px solid rgba(255,255,255,0.1)}
+.hero-desc{font-size:.8rem;color:rgba(255,255,255,0.4);letter-spacing:.08em;max-width:300px;line-height:1.8}
+.hero-scroll{font-size:.6rem;letter-spacing:.3em;text-transform:uppercase;color:rgba(255,255,255,0.3);display:flex;align-items:center;gap:1rem}
+.hero-scroll::before{content:'';display:block;width:40px;height:1px;background:rgba(255,255,255,0.2)}
+
+/* MARQUEE */
+.marquee-wrap{overflow:hidden;border-bottom:1px solid rgba(255,255,255,0.08);padding:1.2rem 0;background:var(--black)}
+.marquee-track{display:flex;gap:4rem;animation:marquee 20s linear infinite;white-space:nowrap}
+.marquee-track span{font-size:.65rem;letter-spacing:.3em;text-transform:uppercase;color:rgba(255,255,255,0.25)}
+.marquee-track .dot{color:var(--accent)}
+@keyframes marquee{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+
+/* ABOUT */
+#about{padding:8rem 3rem;display:grid;grid-template-columns:1fr 1fr;gap:6rem;border-bottom:1px solid rgba(255,255,255,0.08)}
+.about-left .index{font-size:.6rem;letter-spacing:.3em;color:rgba(255,255,255,0.25);margin-bottom:4rem;text-transform:uppercase}
+.about-left h2{font-size:clamp(2.5rem,5vw,5rem);font-weight:900;line-height:.95;text-transform:uppercase;letter-spacing:-.02em}
+.about-left h2 em{display:block;font-style:normal;color:transparent;-webkit-text-stroke:1px rgba(255,255,255,0.3)}
+.about-right{padding-top:5rem}
+.about-right p{font-size:1rem;line-height:1.9;color:rgba(255,255,255,0.6);margin-bottom:1.5rem;font-weight:300}
+.about-right p strong{color:var(--white);font-weight:500}
+.skills{display:flex;flex-wrap:wrap;gap:.5rem;margin-top:2.5rem}
+.skill{font-size:.65rem;letter-spacing:.2em;text-transform:uppercase;padding:.4rem .9rem;border:1px solid rgba(255,255,255,0.15);color:rgba(255,255,255,0.5);transition:all .3s}
+.skill:hover{border-color:var(--white);color:var(--white)}
+
+/* WORK / EXPERIENCE */
+#experience{padding:0 3rem 8rem;border-bottom:1px solid rgba(255,255,255,0.08)}
+.exp-header{display:flex;justify-content:space-between;align-items:baseline;padding:3rem 0 2rem;border-bottom:1px solid rgba(255,255,255,0.08);margin-bottom:0}
+.exp-header h2{font-size:.65rem;letter-spacing:.3em;text-transform:uppercase;color:rgba(255,255,255,0.3)}
+.exp-count{font-size:.65rem;letter-spacing:.2em;color:rgba(255,255,255,0.2)}
+.exp-item{display:grid;grid-template-columns:80px 1fr 1fr auto;gap:2rem;align-items:center;padding:2rem 0;border-bottom:1px solid rgba(255,255,255,0.06);transition:all .3s;cursor:default}
+.exp-item:hover{padding-left:1rem}
+.exp-item:hover .exp-title{color:var(--white)}
+.exp-num{font-size:.65rem;letter-spacing:.2em;color:rgba(255,255,255,0.2)}
+.exp-title{font-size:1.1rem;font-weight:500;color:rgba(255,255,255,0.8);transition:color .3s}
+.exp-place{font-size:.8rem;color:rgba(255,255,255,0.35);letter-spacing:.05em}
+.exp-year{font-size:.65rem;letter-spacing:.2em;color:rgba(255,255,255,0.25);text-align:right}
+
+/* INTERNATIONAL */
+#international{padding:8rem 3rem;border-bottom:1px solid rgba(255,255,255,0.08)}
+.intl-header{margin-bottom:5rem}
+.intl-header .label{font-size:.65rem;letter-spacing:.3em;text-transform:uppercase;color:rgba(255,255,255,0.3);margin-bottom:1.5rem}
+.intl-header h2{font-size:clamp(2.5rem,5vw,5rem);font-weight:900;text-transform:uppercase;letter-spacing:-.02em}
+.intl-grid{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:rgba(255,255,255,0.08)}
+.intl-card{background:var(--black);padding:3rem;transition:background .3s}
+.intl-card:hover{background:#111}
+.intl-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:3rem}
+.intl-flag{font-size:2rem}
+.intl-year-tag{font-size:.6rem;letter-spacing:.25em;color:rgba(255,255,255,0.25);text-transform:uppercase}
+.intl-country{font-size:.6rem;letter-spacing:.3em;text-transform:uppercase;color:rgba(255,255,255,0.3);margin-bottom:.8rem}
+.intl-name{font-size:1.6rem;font-weight:700;line-height:1.2;margin-bottom:1.2rem;letter-spacing:-.01em}
+.intl-desc{font-size:.85rem;color:rgba(255,255,255,0.45);line-height:1.9;font-weight:300}
+
+/* COURSES */
+#courses{padding:8rem 3rem;border-bottom:1px solid rgba(255,255,255,0.08)}
+.courses-header{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:4rem}
+.courses-header h2{font-size:clamp(2.5rem,5vw,5rem);font-weight:900;text-transform:uppercase;letter-spacing:-.02em}
+.courses-header .label{font-size:.65rem;letter-spacing:.3em;text-transform:uppercase;color:rgba(255,255,255,0.3)}
+.course-list{display:grid;grid-template-columns:1fr 1fr 1fr;gap:1px;background:rgba(255,255,255,0.08)}
+.course-item{background:var(--black);padding:2.5rem;transition:background .3s;position:relative;overflow:hidden}
+.course-item:hover{background:#0f0f0f}
+.course-item::after{content:'';position:absolute;bottom:0;left:0;width:0;height:1px;background:var(--white);transition:width .4s}
+.course-item:hover::after{width:100%}
+.course-num{font-size:.6rem;letter-spacing:.25em;color:rgba(255,255,255,0.2);margin-bottom:1.5rem;display:block}
+.course-name{font-size:1rem;font-weight:600;margin-bottom:.5rem;line-height:1.3}
+.course-school{font-size:.7rem;letter-spacing:.15em;color:rgba(255,255,255,0.3);text-transform:uppercase}
+
+/* CONTACT */
+#contact{padding:8rem 3rem;display:grid;grid-template-columns:1fr 1fr;gap:6rem;align-items:center}
+.contact-left h2{font-size:clamp(3rem,7vw,8rem);font-weight:900;text-transform:uppercase;letter-spacing:-.03em;line-height:.9}
+.contact-left h2 em{display:block;font-style:normal;color:transparent;-webkit-text-stroke:1px rgba(255,255,255,0.3)}
+.contact-right .label{font-size:.65rem;letter-spacing:.3em;text-transform:uppercase;color:rgba(255,255,255,0.3);margin-bottom:2rem}
+.contact-right p{font-size:.9rem;color:rgba(255,255,255,0.5);line-height:1.9;margin-bottom:2.5rem;font-weight:300}
+.contact-links{display:flex;flex-direction:column;gap:1rem}
+.contact-link{display:flex;align-items:center;justify-content:space-between;padding:1.2rem 1.5rem;border:1px solid rgba(255,255,255,0.1);font-size:.8rem;letter-spacing:.1em;color:rgba(255,255,255,0.6);text-decoration:none;transition:all .3s;text-transform:uppercase}
+.contact-link:hover{border-color:var(--white);color:var(--white);padding-left:2rem}
+.contact-link span{font-size:.6rem;opacity:.4}
+
+footer{padding:2rem 3rem;display:flex;justify-content:space-between;border-top:1px solid rgba(255,255,255,0.08)}
+footer p{font-size:.6rem;letter-spacing:.2em;text-transform:uppercase;color:rgba(255,255,255,0.2)}
+
+@media(max-width:768px){
+  #about,#contact{grid-template-columns:1fr;gap:3rem}
+  .intl-grid,.course-list{grid-template-columns:1fr}
+  .exp-item{grid-template-columns:1fr 1fr}
+  .exp-num,.exp-year{display:none}
+  nav{padding:1.5rem}
+  #hero,.about-left h2,.contact-left h2{padding:1.5rem}
+  #hero{padding:1.5rem}
+  #about,#experience,#international,#courses,#contact{padding-left:1.5rem;padding-right:1.5rem}
+}
+</style>
+</head>
+<body>
+
+<div class="cursor" id="cursor"></div>
+<div class="cursor-follower" id="cursor-follower"></div>
+
+<nav>
+  <div class="nav-name">Lin Yu-Fan</div>
+  <div class="nav-right">
+    <a href="#about">About</a>
+    <a href="#experience">Work</a>
+    <a href="#international">Global</a>
+    <a href="#contact">Contact</a>
+  </div>
+</nav>
+
+<section id="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-number">Portfolio — 2026</div>
+  <div class="hero-main">
+    <div class="hero-label">Dancer · Educator · Creator</div>
+    <h1 class="hero-h1">
+      Lin<br>
+      <span class="line2">Yu-Fan</span>
+    </h1>
+    <div class="hero-sub">
+      <p class="hero-desc">萬能科技大學時尚造型設計系專任講師<br>舞蹈藝術家 · 表演藝術教育者</p>
+      <div class="hero-scroll">Scroll to explore</div>
+    </div>
+  </div>
+</section>
+
+<div class="marquee-wrap">
+  <div class="marquee-track">
+    <span>Dance</span><span class="dot">✦</span>
+    <span>Performance Art</span><span class="dot">✦</span>
+    <span>Education</span><span class="dot">✦</span>
+    <span>Digital Media</span><span class="dot">✦</span>
+    <span>International Collaboration</span><span class="dot">✦</span>
+    <span>Hip-Hop</span><span class="dot">✦</span>
+    <span>Choreography</span><span class="dot">✦</span>
+    <span>Social Media</span><span class="dot">✦</span>
+    <span>Dance</span><span class="dot">✦</span>
+    <span>Performance Art</span><span class="dot">✦</span>
+    <span>Education</span><span class="dot">✦</span>
+    <span>Digital Media</span><span class="dot">✦</span>
+    <span>International Collaboration</span><span class="dot">✦</span>
+    <span>Hip-Hop</span><span class="dot">✦</span>
+    <span>Choreography</span><span class="dot">✦</span>
+    <span>Social Media</span><span class="dot">✦</span>
+  </div>
+</div>
+
+<section id="about">
+  <div class="about-left">
+    <div class="index">001 — About</div>
+    <h2>Who<br>I <em>Am</em></h2>
+  </div>
+  <div class="about-right">
+    <p>現任<strong>萬能科技大學時尚造型設計系</strong>專任講師，深耕表演藝術教育超過十年。</p>
+    <p>專精舞蹈藝術、表演訓練與數位媒體應用，致力於培���具備<strong>國際視野</strong>的表演藝術人才。</p>
+    <p>曾主持<strong>學海築夢國際實習計畫</strong>，帶領學生前往法國、日本進行海外實習，推動台灣表演藝術的國際交流。</p>
+    <div class="skills">
+      <span class="skill">舞蹈藝術</span>
+      <span class="skill">表演訓練</span>
+      <span class="skill">Hip-Hop</span>
+      <span class="skill">編舞</span>
+      <span class="skill">自媒體</span>
+      <span class="skill">數位音樂</span>
+      <span class="skill">國際合作</span>
+      <span class="skill">影音製作</span>
+    </div>
+  </div>
+</section>
+
+<section id="experience">
+  <div class="exp-header">
+    <h2>002 — Experience</h2>
+    <span class="exp-count">04 Positions</span>
+  </div>
+  <div class="exp-item">
+    <span class="exp-num">01</span>
+    <span class="exp-title">專任講師</span>
+    <span class="exp-place">萬能科技大學 時尚造型設計系</span>
+    <span class="exp-year">2024 — Now</span>
+  </div>
+  <div class="exp-item">
+    <span class="exp-num">02</span>
+    <span class="exp-title">舞蹈教師</span>
+    <span class="exp-place">啟英高中</span>
+    <span class="exp-year">2024 — Now</span>
+  </div>
+  <div class="exp-item">
+    <span class="exp-num">03</span>
+    <span class="exp-title">街舞教師</span>
+    <span class="exp-place">踢踢兒童街舞中心</span>
+    <span class="exp-year">2024 — Now</span>
+  </div>
+  <div class="exp-item">
+    <span class="exp-num">04</span>
+    <span class="exp-title">國際合作專案</span>
+    <span class="exp-place">RIZIN DANCE STUDIO × Swipe App, Japan</span>
+    <span class="exp-year">2021</span>
+  </div>
+</section>
+
+<section id="international">
+  <div class="intl-header">
+    <div class="label">003 — Global</div>
+    <h2>International</h2>
+  </div>
+  <div class="intl-grid">
+    <div class="intl-card">
+      <div class="intl-top">
+        <div class="intl-flag">🇯🇵</div>
+        <span class="intl-year-tag">2021</span>
+      </div>
+      <div class="intl-country">Japan · Osaka</div>
+      <div class="intl-name">RIZIN DANCE STUDIO</div>
+      <div class="intl-desc">與日本大阪知名舞蹈工作室合作開發 Swipe 舞蹈教學應用程式，結合數位科技與傳統舞蹈教學，推動台日舞蹈藝術教育深度交流。</div>
+    </div>
+    <div class="intl-card">
+      <div class="intl-top">
+        <div class="intl-flag">🇫🇷</div>
+        <span class="intl-year-tag">2025</span>
+      </div>
+      <div class="intl-country">France</div>
+      <div class="intl-name">學海築夢計畫</div>
+      <div class="intl-desc">擔任計畫主持人，帶領時尚造型設計系學生赴法國進行海外實習，拓展學生國際視野，深化台法表演藝術文化交流。</div>
+    </div>
+  </div>
+</section>
+
+<section id="courses">
+  <div class="courses-header">
+    <h2>Courses</h2>
+    <span class="label">004 — Teaching</span>
+  </div>
+  <div class="course-list">
+    <div class="course-item"><span class="course-num">01</span><div class="course-name">表演基礎訓練</div><div class="course-school">萬能科技大學</div></div>
+    <div class="course-item"><span class="course-num">02</span><div class="course-name">舞蹈基礎訓練</div><div class="course-school">萬能科技大學</div></div>
+    <div class="course-item"><span class="course-num">03</span><div class="course-name">舞蹈創意編排</div><div class="course-school">萬能科技大學</div></div>
+    <div class="course-item"><span class="course-num">04</span><div class="course-name">自媒體經營與行銷</div><div class="course-school">萬能科技大學</div></div>
+    <div class="course-item"><span class="course-num">05</span><div class="course-name">數位音樂錄音與剪輯</div><div class="course-school">萬能科技大學</div></div>
+    <div class="course-item"><span class="course-num">06</span><div class="course-name">基礎嘻哈街舞</div><div class="course-school">踢踢兒童街舞中心</div></div>
+  </div>
+</section>
+
+<section id="contact">
+  <div class="contact-left">
+    <h2>Let's<br><em>Talk</em></h2>
+  </div>
+  <div class="contact-right">
+    <div class="label">005 — Contact</div>
+    <p>無論是課程合作、演出邀約或國際交流計畫，歡迎與我聯繫。</p>
+    <div class="contact-links">
+      <a href="mailto:rino1133@gmail.com" class="contact-link">rino1133@gmail.com <span>Email →</span></a>
+      <a href="https://www.instagram.com/waterboy_rix" target="_blank" class="contact-link">@waterboy_rix <span>Instagram →</span></a>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <p>© 2026 Lin Yu-Fan</p>
+  <p>Dancer · Educator · Creator</p>
+</footer>
+
+<script>
+// Custom cursor
+const cursor = document.getElementById('cursor');
+const follower = document.getElementById('cursor-follower');
+let fx=0,fy=0,cx=0,cy=0;
+document.addEventListener('mousemove', e=>{
+  cx=e.clientX; cy=e.clientY;
+  cursor.style.left=cx-4+'px'; cursor.style.top=cy-4+'px';
+});
+function animFollower(){
+  fx+=(cx-fx-20)*.12; fy+=(cy-fy-20)*.12;
+  follower.style.left=fx+'px'; follower.style.top=fy+'px';
+  requestAnimationFrame(animFollower);
+}
+animFollower();
+
+document.querySelectorAll('a,button,.exp-item,.course-item,.intl-card').forEach(el=>{
+  el.addEventListener('mouseenter',()=>{
+    cursor.style.transform='scale(3)';
+    follower.style.transform='scale(1.5)';
+  });
+  el.addEventListener('mouseleave',()=>{
+    cursor.style.transform='scale(1)';
+    follower.style.transform='scale(1)';
+  });
+});
+
+// Scroll reveal
+const observer = new IntersectionObserver(entries=>{
+  entries.forEach(e=>{
+    if(e.isIntersecting) e.target.style.opacity='1', e.target.style.transform='translateY(0)';
+  });
+},{threshold:.1});
+
+document.querySelectorAll('.exp-item,.course-item,.intl-card,.about-right p').forEach(el=>{
+  el.style.opacity='0';
+  el.style.transform='translateY(20px)';
+  el.style.transition='opacity .7s ease, transform .7s ease';
+  observer.observe(el);
+});
+</script>
+</body>
+</html>

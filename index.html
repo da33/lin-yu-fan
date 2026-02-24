@@ -418,6 +418,88 @@ footer p{font-size:.6rem;letter-spacing:.2em;text-transform:uppercase;color:rgba
     </div>
   </div>
 </section>
+
+<section style="position:relative;height:400px;overflow:hidden;background:#000;display:flex;align-items:center;justify-content:center">
+  <canvas id="energy-canvas" style="position:absolute;inset:0;width:100%;height:100%"></canvas>
+  <div style="position:relative;z-index:2;text-align:center">
+    <p style="font-size:.65rem;letter-spacing:.5em;text-transform:uppercase;color:rgba(255,255,255,0.2)">Energy in Motion</p>
+  </div>
+  <script>
+  (function(){
+    const canvas = document.getElementById('energy-canvas');
+    const renderer = new THREE.WebGLRenderer({canvas, alpha:false, antialias:true});
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio,2));
+    renderer.setSize(canvas.parentElement.offsetWidth, 400);
+    renderer.setClearColor(0x000000);
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(60, canvas.parentElement.offsetWidth/400, 0.1, 100);
+    camera.position.z = 5;
+
+    // Core energy sphere
+    const coreGeo = new THREE.SphereGeometry(0.8, 32, 32);
+    const coreMat = new THREE.MeshBasicMaterial({color:0xffffff, wireframe:true, opacity:0.08, transparent:true});
+    scene.add(new THREE.Mesh(coreGeo, coreMat));
+
+    // Orbiting rings
+    const rings = [];
+    for(let i=0;i<3;i++){
+      const rGeo = new THREE.TorusGeometry(1.5+i*0.6, 0.008, 8, 80);
+      const rMat = new THREE.MeshBasicMaterial({color:0xffffff, opacity:0.15-i*0.03, transparent:true});
+      const ring = new THREE.Mesh(rGeo, rMat);
+      ring.rotation.x = Math.random()*Math.PI;
+      ring.rotation.y = Math.random()*Math.PI;
+      scene.add(ring);
+      rings.push(ring);
+    }
+
+    // Energy particles
+    const pCount = 1500;
+    const pGeo = new THREE.BufferGeometry();
+    const pPos = new Float32Array(pCount*3);
+    const pPhase = new Float32Array(pCount);
+    for(let i=0;i<pCount;i++){
+      const theta = Math.random()*Math.PI*2;
+      const phi = Math.acos(2*Math.random()-1);
+      const r = 1.8+Math.random()*2.5;
+      pPos[i*3] = r*Math.sin(phi)*Math.cos(theta);
+      pPos[i*3+1] = r*Math.sin(phi)*Math.sin(theta);
+      pPos[i*3+2] = r*Math.cos(phi);
+      pPhase[i] = Math.random()*Math.PI*2;
+    }
+    pGeo.setAttribute('position', new THREE.BufferAttribute(pPos,3));
+    const pMat = new THREE.PointsMaterial({color:0xffffff, size:0.025, transparent:true, opacity:0.5});
+    const particles = new THREE.Points(pGeo, pMat);
+    scene.add(particles);
+
+    let t=0;
+    function animate(){
+      requestAnimationFrame(animate);
+      t+=0.008;
+      rings[0].rotation.z += 0.004;
+      rings[1].rotation.x += 0.003;
+      rings[2].rotation.y += 0.005;
+      particles.rotation.y += 0.001;
+      particles.rotation.x += 0.0005;
+      // Pulse particles
+      const pos = pGeo.attributes.position.array;
+      for(let i=0;i<pCount;i++){
+        const pulse = 1 + Math.sin(t*2+pPhase[i])*0.05;
+        const ox = pos[i*3]/Math.sqrt(pos[i*3]**2+pos[i*3+1]**2+pos[i*3+2]**2);
+        pos[i*3] *= pulse; pos[i*3+1] *= pulse; pos[i*3+2] *= pulse;
+      }
+      pGeo.attributes.position.needsUpdate = true;
+      renderer.render(scene, camera);
+    }
+    animate();
+
+    window.addEventListener('resize',()=>{
+      renderer.setSize(canvas.parentElement.offsetWidth, 400);
+      camera.aspect = canvas.parentElement.offsetWidth/400;
+      camera.updateProjectionMatrix();
+    });
+  })();
+  </script>
+</section>
 <footer>
   <p>© 2026 Lin Yu-Fan</p>
   <p>Dancer · Educator · Creator</p>

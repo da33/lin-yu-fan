@@ -139,6 +139,50 @@ footer p{font-size:.6rem;letter-spacing:.2em;text-transform:uppercase;color:rgba
 
 <section id="hero">
   <div class="hero-bg"></div>
+  <canvas id="three-canvas" style="position:absolute;top:0;right:0;width:50%;height:100%;opacity:0.35;pointer-events:none"></canvas>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script>
+  (function(){
+    const canvas = document.getElementById('three-canvas');
+    const renderer = new THREE.WebGLRenderer({canvas, alpha:true, antialias:true});
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio,2));
+    function resize(){ renderer.setSize(canvas.parentElement.offsetWidth*0.5, canvas.parentElement.offsetHeight); camera.aspect=canvas.parentElement.offsetWidth*0.5/canvas.parentElement.offsetHeight; camera.updateProjectionMatrix(); }
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(60, 1, 0.1, 100);
+    camera.position.set(0, 0, 4);
+    // Wireframe icosahedron
+    const geo = new THREE.IcosahedronGeometry(1.5, 1);
+    const mat = new THREE.MeshBasicMaterial({color:0xffffff, wireframe:true, opacity:0.15, transparent:true});
+    const mesh = new THREE.Mesh(geo, mat);
+    scene.add(mesh);
+    // Solid inner
+    const geo2 = new THREE.IcosahedronGeometry(1.2, 0);
+    const mat2 = new THREE.MeshBasicMaterial({color:0xffffff, wireframe:true, opacity:0.06, transparent:true});
+    const mesh2 = new THREE.Mesh(geo2, mat2);
+    scene.add(mesh2);
+    // Particles
+    const pGeo = new THREE.BufferGeometry();
+    const pts = new Float32Array(600);
+    for(let i=0;i<600;i++) pts[i]=(Math.random()-0.5)*8;
+    pGeo.setAttribute('position', new THREE.BufferAttribute(pts,3));
+    const pMat = new THREE.PointsMaterial({color:0xffffff,size:0.02,transparent:true,opacity:0.3});
+    scene.add(new THREE.Points(pGeo,pMat));
+    let mouseX=0,mouseY=0;
+    document.addEventListener('mousemove',e=>{ mouseX=(e.clientX/window.innerWidth-0.5)*2; mouseY=(e.clientY/window.innerHeight-0.5)*2; });
+    window.addEventListener('resize', resize);
+    resize();
+    function animate(){
+      requestAnimationFrame(animate);
+      mesh.rotation.x += 0.003; mesh.rotation.y += 0.005;
+      mesh2.rotation.x -= 0.002; mesh2.rotation.y -= 0.004;
+      mesh.rotation.x += (mouseY*0.1 - mesh.rotation.x)*0.02;
+      mesh.rotation.y += (mouseX*0.1 - mesh.rotation.y)*0.02;
+      renderer.render(scene,camera);
+    }
+    animate();
+  })();
+  </script>
+
   <div class="hero-number">Portfolio — 2026</div>
   <div class="hero-main">
     <div class="hero-label">Dancer · Educator · Creator</div>

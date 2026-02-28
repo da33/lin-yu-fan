@@ -25,80 +25,93 @@ body { font-family:'Microsoft JhengHei','Noto Sans TC',sans-serif; }
   justify-content:center; align-items:center;
   padding:5vw 8vw;
   opacity:0; pointer-events:none;
-  transition:opacity 0.45s ease;
-  background:var(--bg);
+  transition:opacity 0.5s ease;
   text-align:center;
+  overflow:hidden;
 }
 .slide.active { opacity:1; pointer-events:all; }
 .slide.left { align-items:flex-start; text-align:left; }
-.slide::before {
-  content:''; position:absolute; inset:0; pointer-events:none;
+
+/* 背景圖層 */
+.slide-bg {
+  position:absolute; inset:0; z-index:0;
+  background-size:cover; background-position:center;
+}
+.slide-bg::after {
+  content:''; position:absolute; inset:0;
+  background:linear-gradient(135deg, rgba(8,8,8,0.88) 0%, rgba(8,8,8,0.72) 100%);
+}
+/* 無圖片時的格線背景 */
+.slide-grid {
+  position:absolute; inset:0; z-index:0;
   background-image:
-    linear-gradient(rgba(201,168,76,0.03) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(201,168,76,0.03) 1px, transparent 1px);
+    linear-gradient(rgba(201,168,76,0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(201,168,76,0.04) 1px, transparent 1px);
   background-size:80px 80px;
 }
 
+.slide-content { position:relative; z-index:1; width:100%; max-width:1000px; }
+
 #progress { position:fixed; bottom:0; left:0; right:0; height:2px; background:var(--gold-dim); z-index:100; }
 #progress-fill { height:100%; background:var(--gold); transition:width 0.4s ease; }
-#slide-num { position:fixed; bottom:1.4rem; right:2rem; font-size:0.62rem; letter-spacing:3px; color:var(--text-dim); z-index:100; }
+#slide-num { position:fixed; bottom:1.4rem; right:2rem; font-size:0.62rem; letter-spacing:3px; color:rgba(201,168,76,0.5); z-index:100; }
 
 .nav-btn {
   position:fixed; top:50%; z-index:100; transform:translateY(-50%);
   background:none; border:none; cursor:pointer;
-  color:var(--gold-dim); font-size:1.8rem; padding:1rem;
+  color:rgba(201,168,76,0.3); font-size:2rem; padding:1rem;
   transition:color 0.2s; line-height:1;
 }
 .nav-btn:hover { color:var(--gold); }
 #nav-prev { left:0.5rem; }
 #nav-next { right:0.5rem; }
 
-.eyebrow { font-size:0.62rem; letter-spacing:6px; color:var(--text-dim); margin-bottom:2rem; }
-.slide-title { font-size:clamp(2.8rem,7vw,5.5rem); font-weight:900; color:var(--gold); letter-spacing:6px; line-height:1.15; margin-bottom:1.2rem; }
-.slide-title-md { font-size:clamp(1.8rem,4vw,3rem); font-weight:900; color:var(--gold); letter-spacing:4px; line-height:1.2; margin-bottom:1.2rem; }
+.eyebrow { font-size:0.62rem; letter-spacing:6px; color:var(--text-dim); margin-bottom:1.8rem; }
+.slide-title { font-size:clamp(2.8rem,7vw,5.5rem); font-weight:900; color:var(--gold); letter-spacing:6px; line-height:1.15; margin-bottom:1.2rem; text-shadow:0 2px 20px rgba(0,0,0,0.8); }
+.slide-title-md { font-size:clamp(1.8rem,4vw,3rem); font-weight:900; color:var(--gold); letter-spacing:4px; line-height:1.2; margin-bottom:1rem; text-shadow:0 2px 20px rgba(0,0,0,0.8); }
 .slide-sub { font-size:clamp(0.88rem,1.8vw,1.05rem); color:var(--text-mid); letter-spacing:2px; max-width:680px; line-height:1.9; }
-.divider { width:50px; height:1px; background:var(--gold); margin:2rem auto; }
-.divider.left { margin:2rem 0; }
+.divider { width:50px; height:1px; background:var(--gold); margin:1.8rem auto; }
+.divider.left { margin:1.8rem 0; }
 
-.grid-2 { display:grid; grid-template-columns:1fr 1fr; gap:1px; background:var(--gold-dim); border:1px solid var(--gold-dim); width:100%; max-width:860px; }
-.grid-3 { display:grid; grid-template-columns:repeat(3,1fr); gap:1px; background:var(--gold-dim); border:1px solid var(--gold-dim); width:100%; max-width:860px; }
-.gcell { background:var(--bg); padding:1.8rem 1.6rem; }
-.gcell-label { font-size:0.6rem; letter-spacing:4px; color:var(--text-dim); margin-bottom:0.5rem; }
-.gcell-title { font-size:0.95rem; color:var(--gold); font-weight:700; margin-bottom:0.4rem; }
-.gcell-desc { font-size:0.8rem; color:var(--text-dim); line-height:1.7; }
+.grid-2 { display:grid; grid-template-columns:1fr 1fr; gap:1px; background:rgba(74,58,24,0.6); border:1px solid rgba(74,58,24,0.8); width:100%; max-width:860px; }
+.grid-3 { display:grid; grid-template-columns:repeat(3,1fr); gap:1px; background:rgba(74,58,24,0.6); border:1px solid rgba(74,58,24,0.8); width:100%; max-width:860px; }
+.gcell { background:rgba(8,8,8,0.75); padding:1.6rem 1.4rem; backdrop-filter:blur(4px); }
+.gcell-label { font-size:0.58rem; letter-spacing:4px; color:var(--text-dim); margin-bottom:0.4rem; }
+.gcell-title { font-size:0.92rem; color:var(--gold); font-weight:700; margin-bottom:0.3rem; }
+.gcell-desc { font-size:0.78rem; color:var(--text-dim); line-height:1.7; }
 
-.path-row { display:grid; grid-template-columns:170px 1fr; border-bottom:1px solid var(--gold-dim); width:100%; max-width:860px; }
-.path-row:first-child { border-top:1px solid var(--gold-dim); }
-.path-left { padding:1.6rem 1.4rem; border-right:1px solid var(--gold-dim); }
-.path-num { font-size:0.58rem; letter-spacing:3px; color:var(--text-dim); display:block; margin-bottom:0.3rem; }
-.path-name { font-size:0.88rem; color:var(--gold); font-weight:700; letter-spacing:2px; }
-.path-right { padding:1.6rem 1.4rem; }
-.path-tagline { font-size:0.92rem; color:var(--text); font-weight:700; margin-bottom:0.3rem; }
-.path-desc { font-size:0.78rem; color:var(--text-dim); line-height:1.7; }
+.path-row { display:grid; grid-template-columns:170px 1fr; border-bottom:1px solid rgba(74,58,24,0.7); width:100%; max-width:860px; }
+.path-row:first-child { border-top:1px solid rgba(74,58,24,0.7); }
+.path-left { padding:1.4rem 1.2rem; border-right:1px solid rgba(74,58,24,0.7); background:rgba(8,8,8,0.5); }
+.path-num { font-size:0.56rem; letter-spacing:3px; color:var(--text-dim); display:block; margin-bottom:0.3rem; }
+.path-name { font-size:0.85rem; color:var(--gold); font-weight:700; letter-spacing:2px; }
+.path-right { padding:1.4rem 1.2rem; background:rgba(8,8,8,0.4); }
+.path-tagline { font-size:0.9rem; color:var(--text); font-weight:700; margin-bottom:0.3rem; }
+.path-desc { font-size:0.76rem; color:var(--text-dim); line-height:1.7; }
 
-.stat-num { font-size:clamp(5rem,14vw,10rem); font-weight:900; color:var(--gold); letter-spacing:4px; line-height:1; }
+.stat-num { font-size:clamp(5rem,14vw,10rem); font-weight:900; color:var(--gold); letter-spacing:4px; line-height:1; text-shadow:0 0 60px rgba(201,168,76,0.3); }
 .stat-unit { font-size:1rem; color:var(--text-dim); letter-spacing:4px; margin-top:0.5rem; }
 
 .achieve-list { width:100%; max-width:780px; }
-.achieve-row { display:grid; grid-template-columns:180px 1fr; padding:1.1rem 0; border-bottom:1px solid rgba(201,168,76,0.1); }
+.achieve-row { display:grid; grid-template-columns:180px 1fr; padding:1rem 0; border-bottom:1px solid rgba(201,168,76,0.1); }
 .achieve-row:first-child { border-top:1px solid rgba(201,168,76,0.1); }
-.achieve-year { font-size:0.68rem; letter-spacing:3px; color:var(--text-dim); }
-.achieve-title { font-size:0.92rem; color:var(--text); font-weight:700; margin-bottom:0.2rem; }
-.achieve-note { font-size:0.76rem; color:var(--text-dim); }
+.achieve-year { font-size:0.66rem; letter-spacing:3px; color:var(--text-dim); }
+.achieve-title { font-size:0.9rem; color:var(--text); font-weight:700; margin-bottom:0.15rem; }
+.achieve-note { font-size:0.74rem; color:var(--text-dim); }
 
 .video-grid { display:grid; grid-template-columns:1fr 1fr; gap:2rem; width:100%; max-width:860px; }
-.video-label { font-size:0.62rem; letter-spacing:4px; color:var(--text-dim); margin-bottom:0.6rem; }
+.video-label { font-size:0.6rem; letter-spacing:4px; color:var(--text-dim); margin-bottom:0.5rem; }
 .video-wrap { position:relative; padding-bottom:56.25%; height:0; overflow:hidden; border:1px solid var(--gold-dim); }
 .video-wrap iframe { position:absolute; top:0; left:0; width:100%; height:100%; }
 
-.closing-info { display:flex; gap:5rem; justify-content:center; flex-wrap:wrap; margin-top:3rem; }
-.ci-label { font-size:0.6rem; letter-spacing:4px; color:var(--text-dim); margin-bottom:0.3rem; }
+.closing-info { display:flex; gap:5rem; justify-content:center; flex-wrap:wrap; margin-top:2.5rem; }
+.ci-label { font-size:0.58rem; letter-spacing:4px; color:var(--text-dim); margin-bottom:0.3rem; }
 .ci-val { font-size:0.88rem; color:var(--text-mid); }
 
 @media(max-width:700px) {
   .grid-2,.grid-3 { grid-template-columns:1fr; }
   .path-row { grid-template-columns:1fr; }
-  .path-left { border-right:none; border-bottom:1px solid var(--gold-dim); }
+  .path-left { border-right:none; border-bottom:1px solid rgba(74,58,24,0.7); }
   .achieve-row { grid-template-columns:1fr; }
   .video-grid { grid-template-columns:1fr; }
   .nav-btn { display:none; }
@@ -108,223 +121,126 @@ body { font-family:'Microsoft JhengHei','Noto Sans TC',sans-serif; }
 <body>
 <div id="deck">
 
-<!-- SLIDE 1: 封面 -->
-<div class="slide active" id="s1">
-  <div class="eyebrow">VANUNG UNIVERSITY · 114學年度招生</div>
-  <div class="slide-title">時尚造型設計<br>暨表演藝術系</div>
-  <div class="divider"></div>
-  <div class="slide-sub">萬能科技大學 · 桃園航空城</div>
-</div>
-
-<!-- SLIDE 2: 你想要什麼樣的人生 -->
-<div class="slide" id="s2">
-  <div class="eyebrow">01 · VISION</div>
-  <div class="slide-title-md">你想要什麼樣的人生？</div>
-  <div class="slide-sub" style="margin-bottom:2.5rem;">這些不是夢，是我們學生正在做的事。</div>
-  <div class="grid-3">
-    <div class="gcell">
-      <div class="gcell-label">造型師</div>
-      <div class="gcell-title">金馬頒獎典禮後台</div>
-      <div class="gcell-desc">第60屆金馬獎整體造型團隊，就是我們的學生</div>
-    </div>
-    <div class="gcell">
-      <div class="gcell-label">創業</div>
-      <div class="gcell-title">開自己的工作室</div>
-      <div class="gcell-desc">美甲、美睫、紋繡，畢業就能執業，一個客人就回本</div>
-    </div>
-    <div class="gcell">
-      <div class="gcell-label">藝人 / 表演者</div>
-      <div class="gcell-title">上舞台、發音樂</div>
-      <div class="gcell-desc">2025年，我們的學生音樂正式上架串流平台</div>
-    </div>
-    <div class="gcell">
-      <div class="gcell-label">設計師</div>
-      <div class="gcell-title">從布料到品牌</div>
-      <div class="gcell-desc">服飾、金工、珠寶、配件，你就是設計師</div>
-    </div>
-    <div class="gcell">
-      <div class="gcell-label">自媒體</div>
-      <div class="gcell-title">懂美又懂行銷</div>
-      <div class="gcell-desc">自媒體網紅行銷是正式課程，不是選修</div>
-    </div>
-    <div class="gcell">
-      <div class="gcell-label">國際舞台</div>
-      <div class="gcell-title">去首爾學習</div>
-      <div class="gcell-desc">少女時代、Twice、Blackpink 合作教室</div>
-    </div>
-  </div>
-</div>
-
-<!-- SLIDE 3: 四個方向 -->
-<div class="slide left" id="s3">
-  <div class="eyebrow">02 · DIRECTIONS</div>
-  <div class="slide-title-md">四個方向，找到你的位置</div>
-  <div class="divider left"></div>
-  <div class="path-row">
-    <div class="path-left"><span class="path-num">01</span><div class="path-name">時尚造型設計</div></div>
-    <div class="path-right"><div class="path-tagline">讓人變美，讓自己賺錢</div><div class="path-desc">彩妝、髮型、整體造型、新娘秘書、半永久妝。出口最多，也最快能看到收入。</div></div>
-  </div>
-  <div class="path-row">
-    <div class="path-left"><span class="path-num">02</span><div class="path-name">時尚服飾設計</div></div>
-    <div class="path-right"><div class="path-tagline">從布料到品牌，你就是設計師</div><div class="path-desc">流行服飾、婚紗禮服、金工珠寶、配件飾品。學做衣服，也學品牌經營。</div></div>
-  </div>
-  <div class="path-row">
-    <div class="path-left"><span class="path-num">03</span><div class="path-name">時尚經營暨美妝保健</div></div>
-    <div class="path-right"><div class="path-tagline">懂美又懂生意，最難被取代</div><div class="path-desc">創業輔導、品牌企劃、網路網紅整合行銷，加上養生保健和頭皮管理。</div></div>
-  </div>
-  <div class="path-row">
-    <div class="path-left"><span class="path-num">04</span><div class="path-name">時尚表演藝術</div></div>
-    <div class="path-right"><div class="path-tagline">舞台、音樂、鏡頭，全方位藝人培訓</div><div class="path-desc">街舞、現代舞、歌唱、詞曲創作、表演藝術、導演實務。幕前幕後都訓練。</div></div>
-  </div>
-</div>
-
-
-<!-- SLIDE 4: 錢的問題 -->
-<div class="slide" id="s4">
-  <div class="eyebrow">03 · VALUE</div>
-  <div class="slide-title-md">錢的問題</div>
-  <div class="slide-sub" style="margin-bottom:2.5rem;">這些技術在業界學費很貴。在萬能，含在學費裡。</div>
-  <div class="grid-3" style="max-width:860px;">
-    <div class="gcell">
-      <div class="gcell-label">紋繡眉</div>
-      <div class="gcell-title" style="color:#c0392b;">業界 9.8萬 / 人</div>
-      <div class="gcell-desc">在萬能含在學費內，專任師資授課</div>
-    </div>
-    <div class="gcell">
-      <div class="gcell-label">美甲 · 美睫</div>
-      <div class="gcell-title" style="color:#c0392b;">業界 數萬 / 人</div>
-      <div class="gcell-desc">在萬能含在學費內</div>
-    </div>
-    <div class="gcell">
-      <div class="gcell-label">畢業後執業行情</div>
-      <div class="gcell-title">紋繡眉 1萬～1.5萬 / 人</div>
-      <div class="gcell-desc">眉睫 1,500～2,000元 · 美甲 500～2,000元</div>
-    </div>
-  </div>
-</div>
-
-<!-- SLIDE 5: 實習廠商 -->
-<div class="slide" id="s5">
-  <div class="eyebrow">03 · VALUE</div>
-  <div class="stat-num">100<span style="font-size:0.4em;">+</span></div>
-  <div class="stat-unit">實習合作廠商</div>
-  <div class="divider"></div>
-  <div class="slide-sub">在校期間即可累積業界實戰經驗<br>畢業前你已經不是新人</div>
-</div>
-
-<!-- SLIDE 6: 成績 -->
-<div class="slide left" id="s6">
-  <div class="eyebrow">04 · ACHIEVEMENTS</div>
-  <div class="slide-title-md">我們的成績</div>
-  <div class="divider left"></div>
-  <div class="achieve-list">
-    <div class="achieve-row">
-      <div class="achieve-year">2023 · 法國巴黎</div>
-      <div><div class="achieve-title">新娘妝世界銀牌</div><div class="achieve-note">林明惠副教授 · 教育界奧斯卡「技職之光」得主</div></div>
-    </div>
-    <div class="achieve-row">
-      <div class="achieve-year">全國技能競賽</div>
-      <div><div class="achieve-title">美髮冠軍 · ONC WORLD CUP 晚宴髮型冠軍</div><div class="achieve-note">謝翔宇同學 · 第20屆技職之光得主</div></div>
-    </div>
-    <div class="achieve-row">
-      <div class="achieve-year">第60屆金馬獎</div>
-      <div><div class="achieve-title">整體造型團隊</div><div class="achieve-note">學生實際參與頂級頒獎典禮造型工作</div></div>
-    </div>
-    <div class="achieve-row">
-      <div class="achieve-year">第35屆金曲獎</div>
-      <div><div class="achieve-title">整體造型團隊</div><div class="achieve-note">學生實際參與頂級頒獎典禮造型工作</div></div>
-    </div>
-    <div class="achieve-row">
-      <div class="achieve-year">JASMINE GALLERIA</div>
-      <div><div class="achieve-title">頂級訂製禮服品牌國際服裝發表秀</div><div class="achieve-note">妝髮造型團隊實戰演出</div></div>
-    </div>
-    <div class="achieve-row">
-      <div class="achieve-year">2025</div>
-      <div><div class="achieve-title">VNU 音樂發行串流計畫</div><div class="achieve-note">表藝組學生自製音樂正式上架串流平台</div></div>
-    </div>
-  </div>
-</div>
-
-
 <!-- SLIDE 7: 師資 -->
 <div class="slide" id="s7">
-  <div class="eyebrow">05 · FACULTY</div>
-  <div class="slide-title-md">你的老師是什麼人</div>
-  <div class="slide-sub" style="margin-bottom:2.5rem;">不是只會教書的人。每一位都有業界實戰背景。</div>
-  <div class="grid-3" style="max-width:900px;">
-    <div class="gcell">
-      <div class="gcell-title">林明惠 副教授</div>
-      <div class="gcell-label" style="margin-bottom:0.4rem;">設計學院副院長</div>
-      <div class="gcell-desc">2023法國巴黎世界銀牌 · 整體造型 · 新娘秘書 · 出國競賽培訓</div>
-    </div>
-    <div class="gcell">
-      <div class="gcell-title">蔡春恩 教授</div>
-      <div class="gcell-label" style="margin-bottom:0.4rem;">設計學院院長 · 台灣科技大學化工博士</div>
-      <div class="gcell-desc">化妝品調製 · 頭皮管理 · 美容科學</div>
-    </div>
-    <div class="gcell">
-      <div class="gcell-title">范姜慧珍 副教授</div>
-      <div class="gcell-label" style="margin-bottom:0.4rem;">萬能科技大學經營管理碩士</div>
-      <div class="gcell-desc">造型藝術 · 新娘秘書 · 雕眉 · 美甲美睫 · 競賽國手培訓</div>
-    </div>
-    <div class="gcell">
-      <div class="gcell-title">林祐凡 講師</div>
-      <div class="gcell-label" style="margin-bottom:0.4rem;">踢踢文化股份有限公司負責人</div>
-      <div class="gcell-desc">曾任羅志祥、林俊傑、王力宏等藝人專屬舞者 · 旅居上海五年擔任影像主管</div>
-    </div>
-    <div class="gcell">
-      <div class="gcell-title">李敏惠 助理教授</div>
-      <div class="gcell-label" style="margin-bottom:0.4rem;">國立臺南藝術大學碩士</div>
-      <div class="gcell-desc">金屬工藝 · 珠寶飾品設計 · 文創產業 · 創業與經營</div>
-    </div>
-    <div class="gcell">
-      <div class="gcell-title">徐珍娟 教授</div>
-      <div class="gcell-label" style="margin-bottom:0.4rem;">美國印第安那博爾大學音研所碩士</div>
-      <div class="gcell-desc">音樂表演藝術 · 聲樂 · 音樂教育</div>
+  <div class="slide-grid"></div>
+  <div class="slide-content">
+    <div class="eyebrow">05 · FACULTY</div>
+    <div class="slide-title-md" style="text-align:center;">你的老師是什麼人</div>
+    <div class="slide-sub" style="text-align:center; margin:0 auto 2rem;">不是只會教書的人。每一位都有業界實戰背景。</div>
+    <div class="grid-3">
+      <div class="gcell"><div class="gcell-title">林明惠 副教授</div><div class="gcell-label" style="margin-bottom:0.3rem;">設計學院副院長</div><div class="gcell-desc">2023法國巴黎世界銀牌 · 整體造型 · 新娘秘書 · 出國競賽培訓</div></div>
+      <div class="gcell"><div class="gcell-title">蔡春恩 教授</div><div class="gcell-label" style="margin-bottom:0.3rem;">設計學院院長 · 台灣科技大學化工博士</div><div class="gcell-desc">化妝品調製 · 頭皮管理 · 美容科學</div></div>
+      <div class="gcell"><div class="gcell-title">范姜慧珍 副教授</div><div class="gcell-label" style="margin-bottom:0.3rem;">萬能科技大學經營管理碩士</div><div class="gcell-desc">造型藝術 · 新娘秘書 · 雕眉 · 美甲美睫 · 競賽國手培訓</div></div>
+      <div class="gcell"><div class="gcell-title">林祐凡 講師</div><div class="gcell-label" style="margin-bottom:0.3rem;">踢踢文化股份有限公司負責人</div><div class="gcell-desc">曾任羅志祥、林俊傑、王力宏等藝人專屬舞者 · 旅居上海五年擔任影像主管</div></div>
+      <div class="gcell"><div class="gcell-title">李敏惠 助理教授</div><div class="gcell-label" style="margin-bottom:0.3rem;">國立臺南藝術大學碩士</div><div class="gcell-desc">金屬工藝 · 珠寶飾品設計 · 文創產業 · 創業與經營</div></div>
+      <div class="gcell"><div class="gcell-title">徐珍娟 教授</div><div class="gcell-label" style="margin-bottom:0.3rem;">美國印第安那博爾大學音研所碩士</div><div class="gcell-desc">音樂表演藝術 · 聲樂 · 音樂教育</div></div>
     </div>
   </div>
 </div>
 
 <!-- SLIDE 8: 教室 -->
 <div class="slide" id="s8">
-  <div class="eyebrow">06 · FACILITIES</div>
-  <div class="slide-title-md">你在哪裡學</div>
-  <div class="slide-sub" style="margin-bottom:2.5rem;">每間教室都是真實的業界工作環境。</div>
-  <div class="grid-3" style="max-width:900px;">
-    <div class="gcell"><div class="gcell-desc">藝術美甲・眉睫・半永久妝專業教室</div></div>
-    <div class="gcell"><div class="gcell-desc">時尚展演走秀多功能教室</div></div>
-    <div class="gcell"><div class="gcell-desc">美髮造型沙龍</div></div>
-    <div class="gcell"><div class="gcell-desc">成音配樂暨圖案藝術設計教室</div></div>
-    <div class="gcell"><div class="gcell-desc">時尚工藝・服裝・配件・飾品設計教室</div></div>
-    <div class="gcell"><div class="gcell-desc">金工珠寶設計教室</div></div>
-    <div class="gcell"><div class="gcell-desc">時尚舞蹈教室・演舞室</div></div>
-    <div class="gcell"><div class="gcell-desc">影音錄製暨流行樂團教室</div></div>
-    <div class="gcell"><div class="gcell-desc">演藝時尚微劇場・主控室・演員化妝間</div></div>
+  <div class="slide-grid"></div>
+  <div class="slide-content">
+    <div class="eyebrow">06 · FACILITIES</div>
+    <div class="slide-title-md" style="text-align:center;">你在哪裡學</div>
+    <div class="slide-sub" style="text-align:center; margin:0 auto 2rem;">每間教室都是真實的業界工作環境。</div>
+    <div class="grid-3">
+      <div class="gcell"><div class="gcell-desc">藝術美甲・眉睫・半永久妝專業教室</div></div>
+      <div class="gcell"><div class="gcell-desc">時尚展演走秀多功能教室</div></div>
+      <div class="gcell"><div class="gcell-desc">美髮造型沙龍</div></div>
+      <div class="gcell"><div class="gcell-desc">成音配樂暨圖案藝術設計教室</div></div>
+      <div class="gcell"><div class="gcell-desc">時尚工藝・服裝・配件・飾品設計教室</div></div>
+      <div class="gcell"><div class="gcell-desc">金工珠寶設計教室</div></div>
+      <div class="gcell"><div class="gcell-desc">時尚舞蹈教室・演舞室</div></div>
+      <div class="gcell"><div class="gcell-desc">影音錄製暨流行樂團教室</div></div>
+      <div class="gcell"><div class="gcell-desc">演藝時尚微劇場・主控室・演員化妝間</div></div>
+    </div>
+  </div>
+</div>
+
+
+<!-- SLIDE 1: 封面 -->
+<div class="slide active" id="s1">
+  <div class="slide-bg" style="background-image:url('img/cover.jpg')"></div>
+  <div class="slide-content" style="text-align:center;">
+    <div class="eyebrow">VANUNG UNIVERSITY · 114學年度招生</div>
+    <div class="slide-title">時尚造型設計<br>暨表演藝術系</div>
+    <div class="divider"></div>
+    <div class="slide-sub">萬能科技大學 · 桃園航空城</div>
+  </div>
+</div>
+
+<!-- SLIDE 2: 你想要什麼樣的人生 -->
+<div class="slide" id="s2">
+  <div class="slide-bg" style="background-image:url('img/makeup.jpg')"></div>
+  <div class="slide-content">
+    <div class="eyebrow" style="text-align:center;">01 · VISION</div>
+    <div class="slide-title-md" style="text-align:center;">你想要什麼樣的人生？</div>
+    <div class="slide-sub" style="text-align:center; margin:0 auto 2rem;">這些不是夢，是我們學生正在做的事。</div>
+    <div class="grid-3" style="margin:0 auto;">
+      <div class="gcell"><div class="gcell-label">造型師</div><div class="gcell-title">金馬頒獎典禮後台</div><div class="gcell-desc">第60屆金馬獎整體造型團隊，就是我們的學生</div></div>
+      <div class="gcell"><div class="gcell-label">創業</div><div class="gcell-title">開自己的工作室</div><div class="gcell-desc">美甲、美睫、紋繡，畢業就能執業，一個客人就回本</div></div>
+      <div class="gcell"><div class="gcell-label">藝人 / 表演者</div><div class="gcell-title">上舞台、發音樂</div><div class="gcell-desc">2025年，我們的學生音樂正式上架串流平台</div></div>
+      <div class="gcell"><div class="gcell-label">設計師</div><div class="gcell-title">從布料到品牌</div><div class="gcell-desc">服飾、金工、珠寶、配件，你就是設計師</div></div>
+      <div class="gcell"><div class="gcell-label">自媒體</div><div class="gcell-title">懂美又懂行銷</div><div class="gcell-desc">自媒體網紅行銷是正式課程，不是選修</div></div>
+      <div class="gcell"><div class="gcell-label">國際舞台</div><div class="gcell-title">去首爾學習</div><div class="gcell-desc">少女時代、Twice、Blackpink 合作教室</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- SLIDE 3: 四個方向 -->
+<div class="slide left" id="s3">
+  <div class="slide-grid"></div>
+  <div class="slide-content">
+    <div class="eyebrow">02 · DIRECTIONS</div>
+    <div class="slide-title-md">四個方向，找到你的位置</div>
+    <div class="divider left"></div>
+    <div class="path-row">
+      <div class="path-left"><span class="path-num">01</span><div class="path-name">時尚造型設計</div></div>
+      <div class="path-right"><div class="path-tagline">讓人變美，讓自己賺錢</div><div class="path-desc">彩妝、髮型、整體造型、新娘秘書、半永久妝。出口最多，也最快能看到收入。</div></div>
+    </div>
+    <div class="path-row">
+      <div class="path-left"><span class="path-num">02</span><div class="path-name">時尚服飾設計</div></div>
+      <div class="path-right"><div class="path-tagline">從布料到品牌，你就是設計師</div><div class="path-desc">流行服飾、婚紗禮服、金工珠寶、配件飾品。學做衣服，也學品牌經營。</div></div>
+    </div>
+    <div class="path-row">
+      <div class="path-left"><span class="path-num">03</span><div class="path-name">時尚經營暨美妝保健</div></div>
+      <div class="path-right"><div class="path-tagline">懂美又懂生意，最難被取代</div><div class="path-desc">創業輔導、品牌企劃、網路網紅整合行銷，加上養生保健和頭皮管理。</div></div>
+    </div>
+    <div class="path-row">
+      <div class="path-left"><span class="path-num">04</span><div class="path-name">時尚表演藝術</div></div>
+      <div class="path-right"><div class="path-tagline">舞台、音樂、鏡頭，全方位藝人培訓</div><div class="path-desc">街舞、現代舞、歌唱、詞曲創作、表演藝術、導演實務。幕前幕後都訓練。</div></div>
+    </div>
   </div>
 </div>
 
 
 <!-- SLIDE 9: 韓國遊學 -->
 <div class="slide" id="s9">
-  <div class="eyebrow">07 · KOREA STUDY TOUR</div>
-  <div class="slide-title-md">去首爾，特別補助</div>
-  <div class="slide-sub" style="margin-bottom:2.5rem;">不是觀光，是真的去業界學習。</div>
-  <div class="grid-2" style="max-width:860px;">
-    <div class="gcell" style="padding:2rem;">
-      <div class="gcell-label" style="margin-bottom:1.2rem;">時尚類行程</div>
-      <div class="gcell-desc" style="line-height:2;">
-        首爾當地大學學習最新韓國彩妝技巧<br>
-        參訪時尚美妝企業、醫美企業<br>
-        東大門等時尚景點參觀
+  <div class="slide-bg" style="background-image:url('https://v3b.fal.media/files/b/0a904da1/-Maw0x6XeDFeazqvbAvyG.jpg')"></div>
+  <div class="slide-content">
+    <div class="eyebrow">07 · KOREA STUDY TOUR</div>
+    <div class="slide-title-md" style="text-align:center;">去首爾，特別補助</div>
+    <div class="slide-sub" style="text-align:center; margin:0 auto 2rem;">不是觀光，是真的去業界學習。</div>
+    <div class="grid-2">
+      <div class="gcell" style="padding:2rem;">
+        <div class="gcell-label" style="margin-bottom:1rem;">時尚類行程</div>
+        <div class="gcell-desc" style="line-height:2.2;">
+          首爾當地大學學習最新韓國彩妝技巧<br>
+          參訪時尚美妝企業、醫美企業<br>
+          東大門等時尚景點參觀
+        </div>
       </div>
-    </div>
-    <div class="gcell" style="padding:2rem;">
-      <div class="gcell-label" style="margin-bottom:1.2rem;">表藝類行程</div>
-      <div class="gcell-desc" style="line-height:2;">
-        韓國練習生訓練課程<br>
-        前往首爾三大舞蹈教室<br>
-        少女時代、Twice、Blackpink 合作教室<br>
-        After party 與韓國當地舞者交流
+      <div class="gcell" style="padding:2rem;">
+        <div class="gcell-label" style="margin-bottom:1rem;">表藝類行程</div>
+        <div class="gcell-desc" style="line-height:2.2;">
+          韓國練習生訓練課程<br>
+          前往首爾三大舞蹈教室<br>
+          少女時代、Twice、Blackpink 合作教室<br>
+          After party 與韓國當地舞者交流
+        </div>
       </div>
     </div>
   </div>
@@ -332,20 +248,23 @@ body { font-family:'Microsoft JhengHei','Noto Sans TC',sans-serif; }
 
 <!-- SLIDE 10: 影片 -->
 <div class="slide" id="s10">
-  <div class="eyebrow">08 · WATCH</div>
-  <div class="slide-title-md">看看我們在做什麼</div>
-  <div class="slide-sub" style="margin-bottom:2rem;">說再多不如自己看。</div>
-  <div class="video-grid">
-    <div>
-      <div class="video-label">VNU GIRLS · 最強女團</div>
-      <div class="video-wrap">
-        <iframe src="https://www.youtube.com/embed/z6ulsn2Wg-0" frameborder="0" allowfullscreen></iframe>
+  <div class="slide-grid"></div>
+  <div class="slide-content">
+    <div class="eyebrow">08 · WATCH</div>
+    <div class="slide-title-md" style="text-align:center;">看看我們在做什麼</div>
+    <div class="slide-sub" style="text-align:center; margin:0 auto 2rem;">說再多不如自己看。</div>
+    <div class="video-grid">
+      <div>
+        <div class="video-label">VNU GIRLS · 最強女團</div>
+        <div class="video-wrap">
+          <iframe src="https://www.youtube.com/embed/z6ulsn2Wg-0" frameborder="0" allowfullscreen></iframe>
+        </div>
       </div>
-    </div>
-    <div>
-      <div class="video-label">咖啡廣場廣告拍攝</div>
-      <div class="video-wrap">
-        <iframe src="https://www.youtube.com/embed/gOR1IKXKrQ8" frameborder="0" allowfullscreen></iframe>
+      <div>
+        <div class="video-label">咖啡廣場廣告拍攝</div>
+        <div class="video-wrap">
+          <iframe src="https://www.youtube.com/embed/gOR1IKXKrQ8" frameborder="0" allowfullscreen></iframe>
+        </div>
       </div>
     </div>
   </div>
@@ -353,29 +272,22 @@ body { font-family:'Microsoft JhengHei','Noto Sans TC',sans-serif; }
 
 <!-- SLIDE 11: 結尾 -->
 <div class="slide" id="s11">
-  <div class="eyebrow">VANUNG UNIVERSITY · 114學年度招生</div>
-  <div class="slide-title">給你一個<br>時尚新人生</div>
-  <div class="divider"></div>
-  <div class="slide-sub" style="margin-bottom:3rem;">時尚造型設計暨表演藝術系</div>
-  <div class="closing-info">
-    <div>
-      <div class="ci-label">地址</div>
-      <div class="ci-val">桃園市中壢區萬能路1號</div>
-    </div>
-    <div>
-      <div class="ci-label">電話</div>
-      <div class="ci-val">03-4581196</div>
-    </div>
-    <div>
-      <div class="ci-label">網站</div>
-      <div class="ci-val">www.vnu.edu.tw</div>
+  <div class="slide-bg" style="background-image:url('https://v3b.fal.media/files/b/0a904da1/Ovh_nF9MCqJ4VLGooq1oC.jpg')"></div>
+  <div class="slide-content" style="text-align:center;">
+    <div class="eyebrow">VANUNG UNIVERSITY · 114學年度招生</div>
+    <div class="slide-title">給你一個<br>時尚新人生</div>
+    <div class="divider"></div>
+    <div class="slide-sub" style="margin-bottom:2.5rem;">時尚造型設計暨表演藝術系</div>
+    <div class="closing-info">
+      <div><div class="ci-label">地址</div><div class="ci-val">桃園市中壢區萬能路1號</div></div>
+      <div><div class="ci-label">電話</div><div class="ci-val">03-4581196</div></div>
+      <div><div class="ci-label">網站</div><div class="ci-val">www.vnu.edu.tw</div></div>
     </div>
   </div>
 </div>
 
 </div><!-- #deck -->
 
-<!-- PROGRESS + NAV -->
 <div id="progress"><div id="progress-fill"></div></div>
 <div id="slide-num"></div>
 <button class="nav-btn" id="nav-prev">&#8249;</button>
@@ -402,7 +314,6 @@ document.addEventListener('keydown', e => {
   if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') go(cur - 1);
 });
 
-// Touch swipe
 let tx = 0;
 document.addEventListener('touchstart', e => tx = e.touches[0].clientX);
 document.addEventListener('touchend', e => {

@@ -3,289 +3,683 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>時尚造型設計系 — 萬能科技大學招生</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800;900&family=Noto+Sans+TC:wght@300;400;700;900&display=swap" rel="stylesheet">
+<title>萬能科技大學 時尚造型設計暨表演藝術系</title>
 <style>
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-:root{--bg:#0d0d0d;--white:#f0ede8;--accent:#e8c84a;--gray:#555;--card:#161616;--border:rgba(255,255,255,0.07)}
-html{scroll-behavior:smooth}
-body{background:var(--bg);color:var(--white);font-family:'Inter','Noto Sans TC',sans-serif;overflow-x:hidden}
-.progress{position:fixed;top:0;left:0;height:3px;background:var(--accent);z-index:999;width:0}
-nav{position:fixed;top:0;left:0;right:0;z-index:100;padding:1.2rem 3rem;display:flex;justify-content:space-between;align-items:center;background:rgba(13,13,13,0.9);backdrop-filter:blur(12px);border-bottom:1px solid var(--border)}
-.nav-logo{font-size:.7rem;letter-spacing:.3em;text-transform:uppercase;opacity:.6}
-.nav-links{display:flex;gap:2rem}
-.nav-links a{font-size:.65rem;letter-spacing:.2em;text-transform:uppercase;color:var(--white);text-decoration:none;opacity:.4;transition:opacity .3s}
-.nav-links a:hover{opacity:1}
-section{min-height:100vh;display:flex;flex-direction:column;justify-content:center;padding:8rem 3rem 5rem;border-bottom:1px solid var(--border)}
-/* HERO */
-#hero{position:relative;overflow:hidden;justify-content:flex-end;padding-bottom:6rem}
-.hero-bg-text{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:22vw;font-weight:900;color:rgba(255,255,255,0.02);white-space:nowrap;pointer-events:none}
-.hero-tag{font-size:.65rem;letter-spacing:.4em;text-transform:uppercase;color:var(--accent);margin-bottom:1.5rem}
-.hero-title{font-size:clamp(3rem,8vw,7rem);font-weight:900;line-height:.95;letter-spacing:-.03em;margin-bottom:2rem}
-.hero-title span{color:var(--accent)}
-.hero-sub{font-size:1rem;color:rgba(255,255,255,0.4);max-width:480px;line-height:1.8;margin-bottom:3rem}
-.hero-cta{display:inline-flex;align-items:center;gap:.8rem;background:var(--accent);color:#000;padding:.9rem 2rem;font-size:.75rem;font-weight:700;letter-spacing:.2em;text-transform:uppercase;text-decoration:none;transition:transform .2s}
-.hero-cta:hover{transform:translateY(-2px)}
-.hero-stats{display:flex;gap:3rem;margin-top:4rem;padding-top:3rem;border-top:1px solid var(--border)}
-.stat-num{font-size:2.5rem;font-weight:900;color:var(--accent);line-height:1}
-.stat-label{font-size:.65rem;letter-spacing:.2em;text-transform:uppercase;color:rgba(255,255,255,0.35);margin-top:.4rem}
-/* SECTION COMMON */
-.sec-tag{font-size:.6rem;letter-spacing:.4em;text-transform:uppercase;color:var(--accent);margin-bottom:1rem}
-.sec-title{font-size:clamp(2rem,5vw,3.5rem);font-weight:900;line-height:1.05;letter-spacing:-.02em;margin-bottom:1rem}
-.sec-title span{color:var(--accent)}
-.sec-desc{font-size:.95rem;color:rgba(255,255,255,0.4);max-width:560px;line-height:1.8;margin-bottom:3rem}
-/* TRACKS */
-.tracks-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:1.5rem}
-.track-card{background:var(--card);border:1px solid var(--border);padding:2.5rem;transition:border-color .3s,transform .3s;cursor:default}
-.track-card:hover{border-color:var(--accent);transform:translateY(-4px)}
-.track-icon{font-size:2.5rem;margin-bottom:1.5rem}
-.track-name{font-size:1.2rem;font-weight:700;margin-bottom:.8rem}
-.track-desc{font-size:.85rem;color:rgba(255,255,255,0.45);line-height:1.7;margin-bottom:1.5rem}
-.track-tags{display:flex;flex-wrap:wrap;gap:.5rem}
-.tag{font-size:.6rem;letter-spacing:.15em;text-transform:uppercase;padding:.3rem .7rem;border:1px solid var(--border);color:rgba(255,255,255,0.4)}
-/* CAREER */
-.career-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:1px;background:var(--border)}
-.career-item{background:var(--bg);padding:2.5rem 2rem;transition:background .3s}
-.career-item:hover{background:var(--card)}
-.career-icon{font-size:1.8rem;margin-bottom:1rem}
-.career-title{font-size:.9rem;font-weight:700;margin-bottom:.5rem}
-.career-desc{font-size:.78rem;color:rgba(255,255,255,0.35);line-height:1.6}
-/* TEACHER */
-.teacher-layout{display:grid;grid-template-columns:1fr 1.5fr;gap:5rem;align-items:center}
-.teacher-card{background:var(--card);border:1px solid var(--border);padding:3rem}
-.teacher-name{font-size:2rem;font-weight:900;margin-bottom:.3rem}
-.teacher-role{font-size:.7rem;letter-spacing:.3em;text-transform:uppercase;color:var(--accent);margin-bottom:2rem}
-.teacher-bio{font-size:.85rem;color:rgba(255,255,255,0.45);line-height:1.9}
-.highlight{display:flex;align-items:flex-start;gap:1rem;font-size:.82rem;color:rgba(255,255,255,0.5);line-height:1.6;margin-top:1rem}
-.highlight-dot{color:var(--accent);flex-shrink:0}
-/* APPLY */
-.apply-grid{display:grid;grid-template-columns:1fr 1fr;gap:4rem;align-items:start}
-.apply-steps{display:flex;flex-direction:column;gap:1.5rem}
-.step{display:flex;gap:1.5rem;align-items:flex-start}
-.step-num{font-size:2rem;font-weight:900;color:var(--accent);line-height:1;min-width:50px}
-.step-title{font-size:.9rem;font-weight:700;margin-bottom:.3rem}
-.step-desc{font-size:.78rem;color:rgba(255,255,255,0.35);line-height:1.6}
-.apply-box{background:var(--card);border:1px solid var(--border);padding:3rem;position:sticky;top:6rem}
-.apply-box h3{font-size:1.5rem;font-weight:900;margin-bottom:.5rem}
-.apply-box p{font-size:.82rem;color:rgba(255,255,255,0.4);line-height:1.7;margin-bottom:2rem}
-.btn-primary{display:block;text-align:center;background:var(--accent);color:#000;padding:1rem;font-size:.75rem;font-weight:700;letter-spacing:.2em;text-transform:uppercase;text-decoration:none;margin-bottom:1rem;transition:opacity .2s}
-.btn-primary:hover{opacity:.85}
-.btn-secondary{display:block;text-align:center;border:1px solid var(--border);color:var(--white);padding:1rem;font-size:.75rem;letter-spacing:.2em;text-transform:uppercase;text-decoration:none;transition:border-color .2s}
-.btn-secondary:hover{border-color:var(--accent)}
-.info-row{display:flex;justify-content:space-between;padding:.8rem 0;border-bottom:1px solid var(--border);font-size:.78rem}
-.info-row:last-child{border-bottom:none}
-.info-label{color:rgba(255,255,255,0.35)}
-.info-val{color:var(--accent);font-weight:600}
-footer{padding:3rem;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:1rem}
-.footer-left,.footer-right{font-size:.7rem;color:rgba(255,255,255,0.25);letter-spacing:.1em}
-.fade-up{opacity:0;transform:translateY(30px);transition:opacity .8s ease,transform .8s ease}
-.fade-up.visible{opacity:1;transform:translateY(0)}
-@media(max-width:768px){
-  section{padding:6rem 1.5rem 4rem}
-  nav{padding:1rem 1.5rem}
-  .nav-links{display:none}
-  .teacher-layout,.apply-grid{grid-template-columns:1fr}
-  .hero-stats{gap:1.5rem;flex-wrap:wrap}
+:root {
+  --gold: #c9a84c; --gold-light: #e8c97a; --gold-dim: #8a6f2e;
+  --bg: #0a0a0a; --bg2: #111111; --bg3: #1a1a1a;
+  --text: #f0e6cc; --text-dim: #a89060;
 }
+* { margin:0; padding:0; box-sizing:border-box; }
+html { scroll-behavior:smooth; }
+body { background:var(--bg); color:var(--text); font-family:'Microsoft JhengHei',sans-serif; line-height:1.7; }
+
+nav {
+  position:fixed; top:0; left:0; right:0; z-index:100;
+  background:rgba(10,10,10,0.96); border-bottom:1px solid var(--gold-dim);
+  display:flex; align-items:center; justify-content:space-between;
+  padding:0 2rem; height:54px;
+}
+.nav-logo { color:var(--gold); font-size:0.9rem; font-weight:700; letter-spacing:2px; }
+.nav-links { display:flex; gap:1.5rem; list-style:none; }
+.nav-links a { color:var(--text-dim); text-decoration:none; font-size:0.82rem; letter-spacing:1px; transition:color 0.2s; }
+.nav-links a:hover { color:var(--gold); }
+
+.hero {
+  min-height:100vh; display:flex; flex-direction:column;
+  align-items:center; justify-content:center; text-align:center;
+  background:radial-gradient(ellipse at center,#1a1200 0%,#0a0a0a 70%);
+  padding:80px 2rem 4rem; position:relative; overflow:hidden;
+}
+.hero::before {
+  content:''; position:absolute; inset:0;
+  background:repeating-linear-gradient(0deg,transparent,transparent 60px,rgba(201,168,76,0.03) 60px,rgba(201,168,76,0.03) 61px),
+             repeating-linear-gradient(90deg,transparent,transparent 60px,rgba(201,168,76,0.03) 60px,rgba(201,168,76,0.03) 61px);
+}
+.hero-badge {
+  display:inline-block; border:1px solid var(--gold-dim); color:var(--gold);
+  font-size:0.72rem; letter-spacing:4px; padding:5px 18px; margin-bottom:2rem;
+}
+.hero h1 {
+  font-size:clamp(2rem,6vw,4rem); font-weight:900; color:var(--gold);
+  letter-spacing:4px; line-height:1.2; margin-bottom:1rem;
+  text-shadow:0 0 40px rgba(201,168,76,0.4);
+}
+.hero h2 { font-size:clamp(1rem,3vw,1.5rem); color:var(--text-dim); letter-spacing:5px; margin-bottom:2rem; }
+.hero-tagline { font-size:clamp(1rem,2.5vw,1.3rem); color:var(--gold-light); letter-spacing:2px; margin-bottom:3rem; }
+.hero-divider { width:120px; height:1px; background:linear-gradient(90deg,transparent,var(--gold),transparent); margin:0 auto 3rem; }
+.hero-stats { display:flex; gap:3rem; flex-wrap:wrap; justify-content:center; }
+.stat { text-align:center; }
+.stat-num { font-size:2rem; font-weight:900; color:var(--gold); display:block; }
+.stat-label { font-size:0.78rem; color:var(--text-dim); letter-spacing:2px; }
+
+section { padding:80px 2rem; max-width:1100px; margin:0 auto; }
+.section-bg { background:var(--bg2); }
+.section-bg .section-inner { max-width:1100px; margin:0 auto; padding:80px 2rem; }
+.section-label { font-size:0.68rem; letter-spacing:6px; color:var(--gold-dim); text-transform:uppercase; margin-bottom:0.5rem; }
+.section-title { font-size:clamp(1.5rem,4vw,2.2rem); font-weight:900; color:var(--gold); letter-spacing:3px; margin-bottom:1rem; }
+.section-sub { color:var(--text-dim); font-size:0.95rem; margin-bottom:3rem; max-width:600px; }
+.gold-line { width:60px; height:2px; background:var(--gold); margin-bottom:3rem; }
+
+.features-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:1.5rem; }
+.feature-card {
+  background:var(--bg3); border:1px solid var(--gold-dim);
+  padding:2rem 1.5rem; text-align:center; transition:border-color 0.3s,transform 0.3s;
+}
+.feature-card:hover { border-color:var(--gold); transform:translateY(-4px); }
+.feature-icon { font-size:2.2rem; margin-bottom:1rem; }
+.feature-title { color:var(--gold); font-weight:700; margin-bottom:0.5rem; font-size:0.95rem; }
+.feature-desc { color:var(--text-dim); font-size:0.82rem; }
+
+.tabs { display:flex; gap:0; flex-wrap:wrap; margin-bottom:3rem; border-bottom:1px solid var(--gold-dim); }
+.tab-btn {
+  background:none; border:none; color:var(--text-dim);
+  padding:0.9rem 1.6rem; cursor:pointer; font-size:0.88rem;
+  letter-spacing:2px; transition:all 0.2s;
+  border-bottom:2px solid transparent; margin-bottom:-1px; font-family:inherit;
+}
+.tab-btn:hover { color:var(--gold); }
+.tab-btn.active { color:var(--gold); border-bottom-color:var(--gold); }
+.tab-content { display:none; }
+.tab-content.active { display:block; }
+
+.module-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(300px,1fr)); gap:2rem; }
+.module-card { background:var(--bg); border:1px solid var(--gold-dim); padding:2rem; }
+.module-tag {
+  display:inline-block; background:var(--gold); color:#000;
+  font-size:0.68rem; font-weight:700; letter-spacing:2px; padding:3px 12px; margin-bottom:1rem;
+}
+.module-title { color:var(--gold-light); font-size:1.05rem; font-weight:700; margin-bottom:1.2rem; }
+.module-section { margin-bottom:1rem; }
+.module-section-title { color:var(--gold-dim); font-size:0.72rem; letter-spacing:3px; margin-bottom:0.4rem; }
+.module-section p { color:var(--text-dim); font-size:0.85rem; }
+.tag-list { display:flex; flex-wrap:wrap; gap:0.4rem; margin-top:0.5rem; }
+.tag { background:rgba(201,168,76,0.1); border:1px solid var(--gold-dim); color:var(--text); font-size:0.75rem; padding:2px 9px; }
+
+.achieve-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(250px,1fr)); gap:1.5rem; }
+.achieve-card { background:var(--bg3); border-left:3px solid var(--gold); padding:1.5rem; }
+.achieve-year { color:var(--gold-dim); font-size:0.72rem; letter-spacing:3px; margin-bottom:0.3rem; }
+.achieve-title { color:var(--gold-light); font-weight:700; margin-bottom:0.3rem; }
+.achieve-desc { color:var(--text-dim); font-size:0.83rem; }
+
+.teacher-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:1.5rem; }
+.teacher-card { background:var(--bg3); border:1px solid var(--gold-dim); padding:1.5rem; transition:border-color 0.3s; }
+.teacher-card:hover { border-color:var(--gold); }
+.teacher-name { color:var(--gold); font-size:1.05rem; font-weight:700; margin-bottom:0.2rem; }
+.teacher-title { color:var(--gold-dim); font-size:0.75rem; letter-spacing:2px; margin-bottom:0.8rem; }
+.teacher-spec { color:var(--text-dim); font-size:0.82rem; }
+
+.rooms-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:1rem; }
+.room-card { background:var(--bg3); border:1px solid var(--gold-dim); padding:1.5rem 1rem; text-align:center; }
+.room-icon { font-size:2rem; margin-bottom:0.5rem; }
+.room-name { color:var(--gold); font-size:0.88rem; font-weight:700; }
+
+.price-table { width:100%; border-collapse:collapse; margin-top:1.5rem; }
+.price-table th { background:var(--gold); color:#000; padding:0.8rem 1rem; text-align:left; font-size:0.83rem; letter-spacing:2px; }
+.price-table td { padding:0.8rem 1rem; border-bottom:1px solid rgba(201,168,76,0.15); color:var(--text-dim); font-size:0.85rem; }
+.price-table tr:hover td { background:rgba(201,168,76,0.05); color:var(--text); }
+
+.korea-grid { display:grid; grid-template-columns:1fr 1fr; gap:2rem; }
+.korea-card { background:var(--bg3); border:1px solid var(--gold-dim); padding:2rem; }
+.korea-card h4 { color:var(--gold); font-size:0.95rem; margin-bottom:1rem; letter-spacing:2px; }
+.korea-card ul { list-style:none; }
+.korea-card li { color:var(--text-dim); font-size:0.85rem; padding:0.3rem 0 0.3rem 1rem; position:relative; }
+.korea-card li::before { content:'▸'; color:var(--gold); position:absolute; left:0; }
+
+.video-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(300px,1fr)); gap:2rem; }
+.video-wrap { position:relative; padding-bottom:56.25%; height:0; overflow:hidden; border:1px solid var(--gold-dim); }
+.video-wrap iframe { position:absolute; top:0; left:0; width:100%; height:100%; }
+
+.cta-section {
+  background:radial-gradient(ellipse at center,#1a1200 0%,#0a0a0a 70%);
+  text-align:center; padding:100px 2rem;
+  border-top:1px solid var(--gold-dim);
+}
+.cta-title { font-size:clamp(1.8rem,5vw,3rem); color:var(--gold); font-weight:900; letter-spacing:4px; margin-bottom:1rem; }
+.cta-sub { color:var(--text-dim); font-size:1rem; margin-bottom:3rem; }
+.cta-info { display:flex; gap:3rem; justify-content:center; flex-wrap:wrap; margin-top:2rem; }
+.cta-info-item { text-align:center; }
+.cta-info-label { color:var(--gold-dim); font-size:0.72rem; letter-spacing:3px; margin-bottom:0.3rem; }
+.cta-info-val { color:var(--gold-light); font-size:1rem; font-weight:700; }
+
+hr.divider { border:none; border-top:1px solid rgba(201,168,76,0.12); }
+@media(max-width:600px){ .korea-grid{grid-template-columns:1fr;} .nav-links{display:none;} }
 </style>
 </head>
 <body>
 
-<div class="progress" id="progress"></div>
-
 <nav>
-  <div class="nav-logo">萬能科技大學 · 時尚造型設計系</div>
-  <div class="nav-links">
-    <a href="#tracks">學習方向</a>
-    <a href="#career">出路</a>
-    <a href="#teacher">師資</a>
-    <a href="#apply">報名</a>
-  </div>
+  <div class="nav-logo">萬能科技大學 ✦ 時尚造型設計暨表演藝術系</div>
+  <ul class="nav-links">
+    <li><a href="#school">學校環境</a></li>
+    <li><a href="#dept">系所介紹</a></li>
+    <li><a href="#achieve">亮眼成績</a></li>
+    <li><a href="#teachers">師資陣容</a></li>
+    <li><a href="#rooms">專業教室</a></li>
+    <li><a href="#korea">韓國遊學</a></li>
+    <li><a href="#video">精彩影片</a></li>
+  </ul>
 </nav>
 
 <!-- HERO -->
-<section id="hero">
-  <div class="hero-bg-text">FASHION</div>
-  <div class="hero-tag fade-up">萬能科技大學 · 115學年度招生</div>
-  <h1 class="hero-title fade-up">時尚<br><span>造型設計系</span></h1>
-  <p class="hero-sub fade-up">不只學穿搭，更學創作。<br>從造型、舞台、影像到自媒體，打造你的時尚語言。</p>
-  <a href="#apply" class="hero-cta fade-up">立即了解 →</a>
-  <div class="hero-stats fade-up">
-    <div><div class="stat-num">4</div><div class="stat-label">年制學士班</div></div>
-    <div><div class="stat-num">2</div><div class="stat-label">核心學習方向</div></div>
-    <div><div class="stat-num">桃園</div><div class="stat-label">航空城核心</div></div>
+<div class="hero">
+  <div class="hero-badge">VANUNG UNIVERSITY · 114學年度招生</div>
+  <h1>時尚造型設計<br>暨表演藝術系</h1>
+  <h2>萬能科技大學</h2>
+  <p class="hero-tagline">給你一個時尚新人生</p>
+  <div class="hero-divider"></div>
+  <div class="hero-stats">
+    <div class="stat"><span class="stat-num">100+</span><span class="stat-label">實習合作廠商</span></div>
+    <div class="stat"><span class="stat-num">4</span><span class="stat-label">專業學習方向</span></div>
+    <div class="stat"><span class="stat-num">🥈</span><span class="stat-label">法國巴黎世界銀牌</span></div>
+    <div class="stat"><span class="stat-num">🏆</span><span class="stat-label">技職之光最高榮譽</span></div>
   </div>
-</section>
+</div>
 
-<!-- TRACKS -->
-<section id="tracks">
-  <div class="sec-tag fade-up">學習方向</div>
-  <h2 class="sec-title fade-up">你想成為<span>哪種人？</span></h2>
-  <p class="sec-desc fade-up">兩大方向，讓你從興趣出發，找到屬於自己的時尚定位。</p>
-  <div class="tracks-grid">
-    <div class="track-card fade-up">
-      <div class="track-icon">✂️</div>
-      <div class="track-name">時尚造型組</div>
-      <div class="track-desc">學習服裝搭配、彩妝造型、髮型設計，培養專業造型師的眼光與技術。從基礎美學到實戰演練，讓你走進時尚產業的核心。</div>
-      <div class="track-tags">
-        <span class="tag">服裝搭配</span>
-        <span class="tag">彩妝</span>
-        <span class="tag">髮型設計</span>
-        <span class="tag">形象顧問</span>
-      </div>
+<hr class="divider">
+
+<!-- 學校介紹 -->
+<section id="school">
+  <div class="section-label">VANUNG UNIVERSITY</div>
+  <div class="section-title">為什麼選擇萬能？</div>
+  <p class="section-sub">國立收費。國際品質。學習就業。全國第一</p>
+  <div class="gold-line"></div>
+  <div class="features-grid">
+    <div class="feature-card">
+      <div class="feature-icon">🏨</div>
+      <div class="feature-title">五星級套房宿舍</div>
+      <div class="feature-desc">榮獲國家金質獎<br>單/雙人套房學生宿舍</div>
     </div>
-    <div class="track-card fade-up">
-      <div class="track-icon">🎭</div>
-      <div class="track-name">表演藝術組</div>
-      <div class="track-desc">結合舞蹈、表演、舞台造型，培養具備全方位舞台能力的表演者。從基礎訓練到創意編排，讓你站上舞台發光。</div>
-      <div class="track-tags">
-        <span class="tag">舞蹈訓練</span>
-        <span class="tag">舞台表演</span>
-        <span class="tag">創意編排</span>
-        <span class="tag">舞台造型</span>
-      </div>
+    <div class="feature-card">
+      <div class="feature-icon">🚉</div>
+      <div class="feature-title">全國唯一三鐵交匯</div>
+      <div class="feature-desc">鄰近機捷A18站及高鐵桃園站<br>車程僅10分鐘</div>
     </div>
-    <div class="track-card fade-up">
-      <div class="track-icon">📱</div>
-      <div class="track-name">自媒體經營</div>
-      <div class="track-desc">學習影像製作、社群行銷、內容創作，打造個人品牌。在 IG、Threads、YouTube 時代，讓你的創意被看見。</div>
-      <div class="track-tags">
-        <span class="tag">影像製作</span>
-        <span class="tag">社群行銷</span>
-        <span class="tag">內容創作</span>
-        <span class="tag">個人品牌</span>
-      </div>
+    <div class="feature-card">
+      <div class="feature-icon">🍽️</div>
+      <div class="feature-title">美食廣場15間</div>
+      <div class="feature-desc">萬大花園景觀餐廳<br>7-ELEVEN 2間</div>
     </div>
-    <div class="track-card fade-up">
-      <div class="track-icon">🎵</div>
-      <div class="track-name">數位音樂製作</div>
-      <div class="track-desc">從錄音、剪輯到混音，掌握數位音樂製作全流程。結合時尚與音樂，成為跨界創作者。</div>
-      <div class="track-tags">
-        <span class="tag">錄音剪輯</span>
-        <span class="tag">音樂製作</span>
-        <span class="tag">DJ技術</span>
-        <span class="tag">跨界創作</span>
-      </div>
+    <div class="feature-card">
+      <div class="feature-icon">🌿</div>
+      <div class="feature-title">五星級校園環境</div>
+      <div class="feature-desc">桃園航空城核心<br>600個汽車停車位</div>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">✈️</div>
+      <div class="feature-title">航空城地段</div>
+      <div class="feature-desc">象徵連結、起飛<br>與跨越邊界</div>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">🎓</div>
+      <div class="feature-title">國立收費標準</div>
+      <div class="feature-desc">國際品質教育<br>學習就業全方位</div>
     </div>
   </div>
 </section>
 
-<!-- CAREER -->
-<section id="career">
-  <div class="sec-tag fade-up">畢業出路</div>
-  <h2 class="sec-title fade-up">你的未來<span>不只一條路</span></h2>
-  <p class="sec-desc fade-up">時尚產業橫跨造型、表演、媒體、教育，畢業生遍布各領域。</p>
-  <div class="career-grid">
-    <div class="career-item fade-up">
-      <div class="career-icon">💄</div>
-      <div class="career-title">專業造型師</div>
-      <div class="career-desc">服裝造型、彩妝師、髮型師、形象顧問，服務藝人、品牌、婚禮市場</div>
+<hr class="divider">
+
+<!-- 系所介紹 -->
+<div class="section-bg">
+<div class="section-inner" id="dept">
+  <div class="section-label">DEPARTMENT</div>
+  <div class="section-title">四大學習方向</div>
+  <p class="section-sub">時尚 × 造型 × 服飾 × 表演藝術，找到你的舞台</p>
+  <div class="gold-line"></div>
+
+  <div class="tabs">
+    <button class="tab-btn active" onclick="showTab('fashion')">💄 時尚造型設計</button>
+    <button class="tab-btn" onclick="showTab('clothing')">👗 時尚服飾設計</button>
+    <button class="tab-btn" onclick="showTab('business')">💼 時尚經營暨美妝保健</button>
+    <button class="tab-btn" onclick="showTab('perform')">🎤 時尚表演藝術</button>
+  </div>
+
+  <!-- 時尚造型設計 -->
+  <div class="tab-content active" id="tab-fashion">
+    <div class="module-grid">
+      <div class="module-card">
+        <div class="module-tag">模組一</div>
+        <div class="module-title">整體造型設計師模組</div>
+        <div class="module-section">
+          <div class="module-section-title">特色課程</div>
+          <div class="tag-list">
+            <span class="tag">時尚彩妝設計應用</span>
+            <span class="tag">美髮設計應用</span>
+            <span class="tag">影視整體造型設計</span>
+            <span class="tag">新娘秘書</span>
+          </div>
+        </div>
+        <div class="module-section">
+          <div class="module-section-title">就業方向</div>
+          <p>整體造型設計師、藝人造型師、新娘秘書、髮型設計師、服裝與飾品設計師</p>
+        </div>
+        <div class="module-section">
+          <div class="module-section-title">證照輔導</div>
+          <div class="tag-list">
+            <span class="tag">美容乙丙級</span>
+            <span class="tag">美髮乙丙級</span>
+            <span class="tag">男子理髮乙丙級</span>
+            <span class="tag">女裝乙丙級</span>
+            <span class="tag">新娘秘書</span>
+          </div>
+        </div>
+      </div>
+      <div class="module-card">
+        <div class="module-tag">模組二</div>
+        <div class="module-title">時尚美業創業模組</div>
+        <div class="module-section">
+          <div class="module-section-title">特色課程</div>
+          <div class="tag-list">
+            <span class="tag">美甲設計應用</span>
+            <span class="tag">美睫設計應用</span>
+            <span class="tag">美容護膚</span>
+            <span class="tag">時尚產業經營</span>
+            <span class="tag">公關行銷</span>
+            <span class="tag">自媒體網紅行銷</span>
+          </div>
+        </div>
+        <div class="module-section">
+          <div class="module-section-title">就業方向</div>
+          <p>自行創業（美甲、紋繡、美睫、護膚美容、新秘）、時尚美業高階經營人才、醫美顧問</p>
+        </div>
+        <div class="module-section">
+          <div class="module-section-title">證照輔導</div>
+          <div class="tag-list">
+            <span class="tag">美容丙級</span>
+            <span class="tag">新娘秘書</span>
+            <span class="tag">美甲</span>
+            <span class="tag">紋繡</span>
+            <span class="tag">美睫</span>
+            <span class="tag">藝術療愈</span>
+          </div>
+        </div>
+      </div>
     </div>
-    <div class="career-item fade-up">
-      <div class="career-icon">🕺</div>
-      <div class="career-title">表演藝術工作者</div>
-      <div class="career-desc">職業舞者、舞蹈老師、編舞師、舞台表演者，進入演藝圈或教育體系</div>
+
+    <div style="margin-top:2.5rem; background:var(--bg3); border:1px solid var(--gold-dim); padding:2rem;">
+      <div class="section-label" style="margin-bottom:1rem;">為什麼在萬能學最划算？</div>
+      <table class="price-table">
+        <tr><th>項目</th><th>業界學費</th><th>在萬能</th></tr>
+        <tr><td>紋繡眉（初/中階）</td><td>9.8萬/人</td><td>✅ 含在學費內，專任師資授課</td></tr>
+        <tr><td>美甲課程</td><td>數萬/人</td><td>✅ 含在學費內</td></tr>
+        <tr><td>半永久妝行情</td><td>1萬~1.5萬/次</td><td>✅ 在校即可實作練習</td></tr>
+        <tr><td>眉睫服務行情</td><td>1,500~2,000元/次</td><td>✅ 畢業即可執業</td></tr>
+        <tr><td>美甲服務行情</td><td>500~2,000元/次</td><td>✅ 容易創業的行業</td></tr>
+      </table>
     </div>
-    <div class="career-item fade-up">
-      <div class="career-icon">🎬</div>
-      <div class="career-title">影像創作者</div>
-      <div class="career-desc">影片導演、剪輯師、攝影師、內容創作者，活躍於廣告、媒體、自媒體</div>
+  </div>
+
+  <!-- 時尚服飾設計 -->
+  <div class="tab-content" id="tab-clothing">
+    <div class="module-grid">
+      <div class="module-card">
+        <div class="module-tag">服飾設計</div>
+        <div class="module-title">流行服飾 × 婚紗禮服</div>
+        <div class="module-section">
+          <div class="module-section-title">學習內容</div>
+          <div class="tag-list">
+            <span class="tag">流行服飾設計</span>
+            <span class="tag">婚紗禮服</span>
+            <span class="tag">文創精品設計</span>
+            <span class="tag">品牌經營</span>
+          </div>
+        </div>
+      </div>
+      <div class="module-card">
+        <div class="module-tag">工藝配飾設計</div>
+        <div class="module-title">金工 × 珠寶 × 配件</div>
+        <div class="module-section">
+          <div class="module-section-title">學習內容</div>
+          <div class="tag-list">
+            <span class="tag">包袋設計</span>
+            <span class="tag">鞋設計</span>
+            <span class="tag">金工</span>
+            <span class="tag">配件飾品</span>
+            <span class="tag">珠寶設計</span>
+            <span class="tag">金工證照培訓</span>
+          </div>
+        </div>
+      </div>
+      <div class="module-card">
+        <div class="module-tag">創新設計</div>
+        <div class="module-title">複合媒材 × 文創商品</div>
+        <div class="module-section">
+          <div class="module-section-title">學習內容</div>
+          <div class="tag-list">
+            <span class="tag">複合媒材</span>
+            <span class="tag">圖案藝術設計</span>
+            <span class="tag">文創商品設計</span>
+            <span class="tag">美學素養與創作</span>
+          </div>
+        </div>
+      </div>
     </div>
-    <div class="career-item fade-up">
-      <div class="career-icon">📣</div>
-      <div class="career-title">社群行銷</div>
-      <div class="career-desc">品牌行銷、社群經理、KOL、網紅，在數位時代打造個人或品牌影響力</div>
+  </div>
+
+  <!-- 時尚經營暨美妝保健 -->
+  <div class="tab-content" id="tab-business">
+    <div class="module-grid">
+      <div class="module-card">
+        <div class="module-tag">時尚產業經營管理</div>
+        <div class="module-title">創業 × 行銷 × 品牌</div>
+        <div class="module-section">
+          <div class="module-section-title">學習內容</div>
+          <div class="tag-list">
+            <span class="tag">創業輔導</span>
+            <span class="tag">行銷經營</span>
+            <span class="tag">網路網紅整合行銷</span>
+            <span class="tag">品牌企劃</span>
+            <span class="tag">流行趨勢分析</span>
+          </div>
+        </div>
+      </div>
+      <div class="module-card">
+        <div class="module-tag">美妝保健</div>
+        <div class="module-title">養生 × 頭皮管理 × 芳療</div>
+        <div class="module-section">
+          <div class="module-section-title">特色課程</div>
+          <div class="tag-list">
+            <span class="tag">美妝</span>
+            <span class="tag">養生保健</span>
+            <span class="tag">頭皮管理</span>
+            <span class="tag">芳療</span>
+            <span class="tag">超保濕水嫩面膜</span>
+          </div>
+        </div>
+        <div class="module-section">
+          <div class="module-section-title">特色技術</div>
+          <p>改善白髮與禿頭的標準養護流程、不含有機染料的銀離子光能護髮染髮霜、結合產業提供實習與就業</p>
+        </div>
+      </div>
     </div>
-    <div class="career-item fade-up">
-      <div class="career-icon">🎓</div>
-      <div class="career-title">藝術教育</div>
-      <div class="career-desc">舞蹈教師、才藝班講師、學校體育教師，將熱情傳承給下一代</div>
+  </div>
+
+  <!-- 時尚表演藝術 -->
+  <div class="tab-content" id="tab-perform">
+    <div class="module-grid">
+      <div class="module-card">
+        <div class="module-tag">舞蹈</div>
+        <div class="module-title">全方位舞蹈訓練</div>
+        <div class="module-section">
+          <div class="tag-list">
+            <span class="tag">基礎舞蹈</span>
+            <span class="tag">街舞</span>
+            <span class="tag">現代舞</span>
+            <span class="tag">熱舞</span>
+            <span class="tag">民俗舞</span>
+            <span class="tag">國標舞</span>
+          </div>
+        </div>
+      </div>
+      <div class="module-card">
+        <div class="module-tag">音樂與歌唱</div>
+        <div class="module-title">流行音樂 × 成音配樂</div>
+        <div class="module-section">
+          <div class="tag-list">
+            <span class="tag">音樂基礎</span>
+            <span class="tag">歌唱</span>
+            <span class="tag">流行音樂</span>
+            <span class="tag">成音配樂</span>
+            <span class="tag">音樂劇</span>
+            <span class="tag">詞曲創作</span>
+          </div>
+        </div>
+      </div>
+      <div class="module-card">
+        <div class="module-tag">表演</div>
+        <div class="module-title">跨界展演 × 演藝製作</div>
+        <div class="module-section">
+          <div class="tag-list">
+            <span class="tag">跨界展演</span>
+            <span class="tag">表演藝術</span>
+            <span class="tag">模特兒訓練</span>
+            <span class="tag">表演創作</span>
+            <span class="tag">演藝企劃與製作</span>
+            <span class="tag">導演實務</span>
+          </div>
+        </div>
+      </div>
+      <div class="module-card">
+        <div class="module-tag">演藝造型與場景</div>
+        <div class="module-title">幕前幕後完整培訓</div>
+        <div class="module-section">
+          <div class="tag-list">
+            <span class="tag">專業形象包裝</span>
+            <span class="tag">藝人造型</span>
+            <span class="tag">燈光設計</span>
+            <span class="tag">舞台設計</span>
+          </div>
+        </div>
+      </div>
     </div>
-    <div class="career-item fade-up">
-      <div class="career-icon">🚀</div>
-      <div class="career-title">創業</div>
-      <div class="career-desc">開設造型工作室、舞蹈教室、自媒體頻道，成為自己的老闆</div>
+    <div style="margin-top:2rem; background:var(--bg3); border:1px solid var(--gold); padding:1.5rem 2rem;">
+      <div class="section-label" style="margin-bottom:0.5rem;">2025 VNU 音樂發行串流計畫</div>
+      <p style="color:var(--text-dim); font-size:0.9rem;">表藝組學生自製音樂，正式上架串流平台。從創作、錄音、製作到發行，全程在校完成。</p>
+    </div>
+  </div>
+</div>
+</div>
+
+<hr class="divider">
+
+<!-- 亮眼成績 -->
+<section id="achieve">
+  <div class="section-label">ACHIEVEMENTS</div>
+  <div class="section-title">亮眼成績</div>
+  <p class="section-sub">學生與師資在國內外競賽屢獲殊榮</p>
+  <div class="gold-line"></div>
+  <div class="achieve-grid">
+    <div class="achieve-card">
+      <div class="achieve-year">2023 · 法國巴黎</div>
+      <div class="achieve-title">🥈 新娘妝世界銀牌</div>
+      <div class="achieve-desc">教師組 林明惠副教授<br>教育界奧斯卡獎，國內技職最高榮譽</div>
+    </div>
+    <div class="achieve-card">
+      <div class="achieve-year">2023 · 全國</div>
+      <div class="achieve-title">🏆 ONC WORLD CUP 晚宴髮型冠軍</div>
+      <div class="achieve-desc">金牌選手 謝翔宇<br>全國技能競賽美髮冠軍</div>
+    </div>
+    <div class="achieve-card">
+      <div class="achieve-year">技職之光</div>
+      <div class="achieve-title">🌟 第20屆技職之光</div>
+      <div class="achieve-desc">謝翔宇同學榮獲<br>國內技職教育最高榮譽</div>
+    </div>
+    <div class="achieve-card">
+      <div class="achieve-year">屈臣氏彩妝大賽</div>
+      <div class="achieve-title">🥈🥉 亞軍 × 季軍</div>
+      <div class="achieve-desc">學生參賽屈臣氏全國彩妝大賽<br>榮獲亞軍與季軍</div>
+    </div>
+    <div class="achieve-card">
+      <div class="achieve-year">金馬 · 金曲</div>
+      <div class="achieve-title">🎬 頂級頒獎典禮造型團隊</div>
+      <div class="achieve-desc">第60屆金馬獎整體造型團隊<br>第35屆金曲獎整體造型團隊</div>
+    </div>
+    <div class="achieve-card">
+      <div class="achieve-year">國際品牌</div>
+      <div class="achieve-title">👗 JASMINE GALLERIA 時尚秀</div>
+      <div class="achieve-desc">頂級訂製禮服品牌服裝發表秀<br>妝髮造型團隊實戰演出</div>
     </div>
   </div>
 </section>
 
-<!-- TEACHER -->
-<section id="teacher">
-  <div class="sec-tag fade-up">師資介紹</div>
-  <h2 class="sec-title fade-up">業界實戰<span>直接傳授</span></h2>
-  <div class="teacher-layout">
-    <div class="teacher-card fade-up">
-      <div class="teacher-name">林祐凡 Rino</div>
-      <div class="teacher-role">專任講師 · 時尚造型設計系</div>
-      <div class="teacher-bio">從街頭練舞起家，走上國際舞台。曾任羅志祥、林俊傑、王力宏、蕭亞軒、潘瑋柏專屬舞者，足跡遍及香港、上海、東京、澳洲、美國。</div>
-      <div class="highlight"><span class="highlight-dot">▸</span>Dance Soul 職業舞者 10 年</div>
-      <div class="highlight"><span class="highlight-dot">▸</span>上海 FLUX STUDIO 影像主管</div>
-      <div class="highlight"><span class="highlight-dot">▸</span>台灣首個互動舞蹈 APP「Swipe」共同創辦人</div>
-      <div class="highlight"><span class="highlight-dot">▸</span>霹靂舞國手紀實片《Break the Limit》執行製作</div>
-      <div class="highlight"><span class="highlight-dot">▸</span>踢踢兒童街舞培訓中心 創辦人</div>
+<hr class="divider">
+
+<!-- 師資陣容 -->
+<div class="section-bg">
+<div class="section-inner" id="teachers">
+  <div class="section-label">FACULTY</div>
+  <div class="section-title">頂尖專業師資</div>
+  <p class="section-sub">每位老師都是業界實戰出身，帶你直接接軌產業</p>
+  <div class="gold-line"></div>
+  <div class="teacher-grid">
+    <div class="teacher-card">
+      <div class="teacher-name">蔡春恩 教授</div>
+      <div class="teacher-title">設計學院院長 · 台灣科技大學化工博士</div>
+      <div class="teacher-spec">化妝品調製、頭皮管理、美容科學、創作與專利實務</div>
     </div>
-    <div class="fade-up">
-      <p style="font-size:.95rem;color:rgba(255,255,255,0.4);line-height:1.9;margin-bottom:2rem">我們的老師不是只會教書的學者，而是真正在業界打滾過的實戰者。你學到的每一個技能，都是從真實的舞台、真實的鏡頭、真實的市場淬煉出來的。</p>
-      <p style="font-size:.95rem;color:rgba(255,255,255,0.4);line-height:1.9">在這裡，老師帶你看見的不只是課本，而是整個產業的可能性。</p>
+    <div class="teacher-card">
+      <div class="teacher-name">林明惠 副教授</div>
+      <div class="teacher-title">設計學院副院長 · 2023法國巴黎世界銀牌</div>
+      <div class="teacher-spec">整體造型設計、彩妝設計、服裝設計、髮型設計、新娘秘書、出國競賽培訓</div>
+    </div>
+    <div class="teacher-card">
+      <div class="teacher-name">范姜慧珍 副教授</div>
+      <div class="teacher-title">萬能科技大學經營管理碩士</div>
+      <div class="teacher-spec">造型藝術設計、新娘秘書、雕眉、芳香療法、護膚、美體學、美甲、美睫、證照及競賽國手培訓</div>
+    </div>
+    <div class="teacher-card">
+      <div class="teacher-name">劉一勛 助理教授</div>
+      <div class="teacher-title">化妝品應用與管理碩士</div>
+      <div class="teacher-spec">整體造型設計、彩妝設計、特效化妝、新娘秘書、飾品配件設計、美容乙丙級培訓</div>
+    </div>
+    <div class="teacher-card">
+      <div class="teacher-name">陳育睿 副教授</div>
+      <div class="teacher-title">技職之光得主 · 明道大學化妝品應用系</div>
+      <div class="teacher-spec">剪燙染專業技能、髮型設計、彩妝造型、整體造型、髮型藝術設計</div>
+    </div>
+    <div class="teacher-card">
+      <div class="teacher-name">李敏惠 助理教授</div>
+      <div class="teacher-title">國立臺南藝術大學應用藝術研究所碩士</div>
+      <div class="teacher-spec">金屬工藝、珠寶飾品設計、文創產業、創業與經營、流行服飾包袋設計</div>
+    </div>
+    <div class="teacher-card">
+      <div class="teacher-name">林禧唯 助理教授</div>
+      <div class="teacher-title">副系主任 · 樹德科技大學應用設計碩士</div>
+      <div class="teacher-spec">流行服飾設計、文創精品設計、品牌經營</div>
+    </div>
+    <div class="teacher-card">
+      <div class="teacher-name">林祐凡 講師</div>
+      <div class="teacher-title">踢踢文化股份有限公司負責人</div>
+      <div class="teacher-spec">熱門舞蹈、影音設計、行銷專業。曾任羅志祥、林俊傑、王力宏等藝人專屬舞者</div>
+    </div>
+    <div class="teacher-card">
+      <div class="teacher-name">徐珍娟 教授</div>
+      <div class="teacher-title">美國印第安那博爾大學音研所碩士</div>
+      <div class="teacher-spec">音樂表演藝術、聲樂、音樂教育</div>
+    </div>
+    <div class="teacher-card">
+      <div class="teacher-name">許秋玚 助理教授</div>
+      <div class="teacher-title">美國密西根州立大學音樂教育碩士</div>
+      <div class="teacher-spec">音樂教育、流行音樂、表演藝術</div>
+    </div>
+  </div>
+</div>
+</div>
+
+<hr class="divider">
+
+<!-- 專業教室 -->
+<section id="rooms">
+  <div class="section-label">FACILITIES</div>
+  <div class="section-title">專業教室設備</div>
+  <p class="section-sub">每間教室都是真實的業界工作環境</p>
+  <div class="gold-line"></div>
+  <div class="rooms-grid">
+    <div class="room-card"><div class="room-icon">💅</div><div class="room-name">藝術美甲・眉睫<br>半永久妝專業教室</div></div>
+    <div class="room-card"><div class="room-icon">👗</div><div class="room-name">時尚展演走秀<br>多功能教室</div></div>
+    <div class="room-card"><div class="room-icon">✂️</div><div class="room-name">美髮造型沙龍</div></div>
+    <div class="room-card"><div class="room-icon">🎵</div><div class="room-name">成音配樂暨<br>圖案藝術設計教室</div></div>
+    <div class="room-card"><div class="room-icon">🧵</div><div class="room-name">時尚工藝<br>服裝・配件・飾品設計教室</div></div>
+    <div class="room-card"><div class="room-icon">💍</div><div class="room-name">金工珠寶<br>設計教室</div></div>
+    <div class="room-card"><div class="room-icon">💃</div><div class="room-name">時尚舞蹈教室<br>演舞室 H107</div></div>
+    <div class="room-card"><div class="room-icon">🎙️</div><div class="room-name">影音錄製暨<br>流行樂團教室 C406</div></div>
+    <div class="room-card"><div class="room-icon">🎤</div><div class="room-name">歌唱音樂教室<br>C405</div></div>
+    <div class="room-card"><div class="room-icon">🎭</div><div class="room-name">演藝時尚微劇場<br>主控室・化妝間</div></div>
+  </div>
+  <div style="margin-top:2.5rem; background:var(--bg3); border:1px solid var(--gold); padding:1.5rem 2rem; text-align:center;">
+    <div class="section-label" style="margin-bottom:0.5rem;">實習就業</div>
+    <div style="font-size:2rem; font-weight:900; color:var(--gold);">100+</div>
+    <div style="color:var(--text-dim); font-size:0.9rem;">實習合作廠商，在校即可累積業界實戰經驗</div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- 韓國遊學 -->
+<div class="section-bg">
+<div class="section-inner" id="korea">
+  <div class="section-label">KOREA STUDY TOUR</div>
+  <div class="section-title">韓國遊學 特別補助</div>
+  <p class="section-sub">直接去首爾學最新韓系彩妝、進韓國練習生訓練教室</p>
+  <div class="gold-line"></div>
+  <div class="korea-grid">
+    <div class="korea-card">
+      <h4>💄 時尚類行程</h4>
+      <ul>
+        <li>首爾當地大學學習最新韓國彩妝技巧</li>
+        <li>參訪時尚美妝企業、醫美企業</li>
+        <li>東大門等時尚景點參觀</li>
+      </ul>
+    </div>
+    <div class="korea-card">
+      <h4>🎤 表藝類行程</h4>
+      <ul>
+        <li>韓國練習生訓練課程</li>
+        <li>前往首爾三大舞蹈教室</li>
+        <li>少女時代、2NE1、Twice、Blackpink 合作教室</li>
+        <li>東大門等時尚景點參觀</li>
+        <li>After party 與韓國當地舞者交流</li>
+      </ul>
+    </div>
+  </div>
+</div>
+</div>
+
+<hr class="divider">
+
+<!-- 精彩影片 -->
+<section id="video">
+  <div class="section-label">VIDEOS</div>
+  <div class="section-title">精彩影片</div>
+  <p class="section-sub">看看我們的學生在做什麼</p>
+  <div class="gold-line"></div>
+  <div class="video-grid">
+    <div>
+      <div style="color:var(--gold); font-size:0.8rem; letter-spacing:3px; margin-bottom:0.8rem;">VNU GIRLS 最強女團</div>
+      <div class="video-wrap">
+        <iframe src="https://www.youtube.com/embed/z6ulsn2Wg-0" frameborder="0" allowfullscreen></iframe>
+      </div>
+    </div>
+    <div>
+      <div style="color:var(--gold); font-size:0.8rem; letter-spacing:3px; margin-bottom:0.8rem;">咖啡廣場廣告拍攝</div>
+      <div class="video-wrap">
+        <iframe src="https://www.youtube.com/embed/gOR1IKXKrQ8" frameborder="0" allowfullscreen></iframe>
+      </div>
     </div>
   </div>
 </section>
 
-<!-- APPLY -->
-<section id="apply">
-  <div class="sec-tag fade-up">報名資訊</div>
-  <h2 class="sec-title fade-up">加入<span>龍蝦帝國</span></h2>
-  <div class="apply-grid">
-    <div class="apply-steps fade-up">
-      <div class="step">
-        <div class="step-num">01</div>
-        <div><div class="step-title">確認招生管道</div><div class="step-desc">技職繁星、申請入學、甄選入學、登記分發，多元管道任你選</div></div>
-      </div>
-      <div class="step">
-        <div class="step-num">02</div>
-        <div><div class="step-title">準備備審資料</div><div class="step-desc">學習歷程、作品集、自我介紹，展現你的熱情與潛力</div></div>
-      </div>
-      <div class="step">
-        <div class="step-num">03</div>
-        <div><div class="step-title">預約參觀</div><div class="step-desc">親自來看看我們的教室、設備、校園環境，感受氛圍</div></div>
-      </div>
-      <div class="step">
-        <div class="step-num">04</div>
-        <div><div class="step-title">正式報名</div><div class="step-desc">完成報名手續，開始你的時尚之旅</div></div>
-      </div>
+<hr class="divider">
+
+<!-- CTA -->
+<div class="cta-section">
+  <div class="section-label" style="margin-bottom:1rem;">VANUNG UNIVERSITY</div>
+  <div class="cta-title">給你一個時尚新人生</div>
+  <p class="cta-sub">時尚造型設計暨表演藝術系，等你來</p>
+  <div class="cta-info">
+    <div class="cta-info-item">
+      <div class="cta-info-label">學校地址</div>
+      <div class="cta-info-val">桃園市中壢區萬能路1號</div>
     </div>
-    <div class="apply-box fade-up">
-      <h3>115學年度招生</h3>
-      <p>桃園航空城核心，連結世界的起點。現在就開始規劃你的未來。</p>
-      <div class="info-row"><span class="info-label">學校</span><span class="info-val">萬能科技大學</span></div>
-      <div class="info-row"><span class="info-label">系所</span><span class="info-val">時尚造型設計系</span></div>
-      <div class="info-row"><span class="info-label">地點</span><span class="info-val">桃園市中壢區萬能路1號</span></div>
-      <div class="info-row"><span class="info-label">招生電話</span><span class="info-val">03-4515811 #21500</span></div>
-      <div style="margin-top:2rem">
-        <a href="https://www.exams.vnu.edu.tw/" target="_blank" class="btn-primary">前往招生專區 →</a>
-        <a href="https://administration.vnu.edu.tw/ac/3151" target="_blank" class="btn-secondary">預約參觀校園</a>
-      </div>
+    <div class="cta-info-item">
+      <div class="cta-info-label">學校電話</div>
+      <div class="cta-info-val">03-4581196</div>
+    </div>
+    <div class="cta-info-item">
+      <div class="cta-info-label">學校網站</div>
+      <div class="cta-info-val">www.vnu.edu.tw</div>
     </div>
   </div>
-</section>
-
-<footer>
-  <div class="footer-left">萬能科技大學 時尚造型設計系 · 115學年度招生</div>
-  <div class="footer-right">桃園市中壢區萬能路1號 · 03-4515811</div>
-</footer>
+</div>
 
 <script>
-// Progress bar
-window.addEventListener('scroll', () => {
-  const p = document.getElementById('progress');
-  const pct = window.scrollY / (document.body.scrollHeight - window.innerHeight) * 100;
-  p.style.width = pct + '%';
-});
-// Fade up
-const obs = new IntersectionObserver((entries) => {
-  entries.forEach(e => { if(e.isIntersecting) e.target.classList.add('visible'); });
-}, {threshold: 0.1});
-document.querySelectorAll('.fade-up').forEach(el => obs.observe(el));
+function showTab(id) {
+  document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+  document.getElementById('tab-' + id).classList.add('active');
+  event.target.classList.add('active');
+}
 </script>
 </body>
 </html>

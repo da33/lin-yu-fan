@@ -12,87 +12,99 @@
         }
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft JhengHei", sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: #0a0a0a;
+            color: #fff;
             padding: 20px;
             min-height: 100vh;
         }
         .container {
-            max-width: 800px;
+            max-width: 600px;
             margin: 0 auto;
-            background: white;
-            border-radius: 16px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-            overflow: hidden;
         }
         .header {
-            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
-            color: white;
-            padding: 30px;
             text-align: center;
+            margin-bottom: 40px;
+            padding-top: 20px;
         }
         .header h1 {
-            font-size: 28px;
-            margin-bottom: 10px;
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            letter-spacing: -0.5px;
         }
         .header .date {
-            font-size: 18px;
-            opacity: 0.9;
-        }
-        .content {
-            padding: 30px;
+            font-size: 16px;
+            color: #888;
+            font-weight: 400;
         }
         .section {
-            margin-bottom: 30px;
+            background: #111;
+            border: 1px solid #222;
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 16px;
         }
         .section-title {
-            font-size: 20px;
-            font-weight: bold;
-            color: #2a5298;
-            margin-bottom: 15px;
-            padding-bottom: 10px;
-            border-bottom: 3px solid #667eea;
+            font-size: 14px;
+            color: #666;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 16px;
+            font-weight: 600;
         }
-        .info-grid {
-            display: grid;
-            gap: 15px;
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            padding: 12px 0;
+            border-bottom: 1px solid #1a1a1a;
         }
-        .info-item {
-            background: #f8f9fa;
-            padding: 15px;
-            border-radius: 8px;
-            border-left: 4px solid #667eea;
+        .info-row:last-child {
+            border-bottom: none;
         }
         .info-label {
-            font-weight: bold;
-            color: #495057;
-            margin-bottom: 5px;
+            font-size: 14px;
+            color: #888;
         }
         .info-value {
-            color: #212529;
             font-size: 16px;
+            font-weight: 500;
+            text-align: right;
+        }
+        .highlight {
+            background: linear-gradient(135deg, #1a1a1a 0%, #2a2a2a 100%);
+            border: 1px solid #333;
         }
         .crew-list {
             list-style: none;
         }
         .crew-list li {
-            background: #f8f9fa;
-            padding: 12px 15px;
-            margin-bottom: 8px;
-            border-radius: 8px;
-            border-left: 4px solid #764ba2;
+            padding: 10px 0;
+            font-size: 15px;
+            border-bottom: 1px solid #1a1a1a;
         }
-        .highlight {
-            background: #fff3cd;
-            border-left-color: #ffc107;
+        .crew-list li:last-child {
+            border-bottom: none;
+        }
+        .crew-list strong {
+            color: #aaa;
+            font-weight: 500;
+            display: inline-block;
+            min-width: 100px;
+        }
+        .notes {
+            font-size: 14px;
+            line-height: 1.8;
+            color: #aaa;
         }
         @media (max-width: 600px) {
             body {
-                padding: 10px;
+                padding: 16px;
             }
             .header h1 {
-                font-size: 24px;
+                font-size: 28px;
             }
-            .content {
+            .section {
                 padding: 20px;
             }
         }
@@ -101,53 +113,43 @@
 <body>
     <div class="container">
         <div class="header">
-            <h1>📹 EMBA 形象影片拍攝通告</h1>
-            <div class="date">2026 年 3 月 6 日（四）</div>
+            <h1>📹 EMBA 拍攝通告</h1>
+            <div class="date">2026 年 3 月 6 日 星期四</div>
         </div>
         
-        <div class="content">
-            <div class="section">
-                <div class="section-title">📍 拍攝資訊</div>
-                <div class="info-grid">
-                    <div class="info-item highlight">
-                        <div class="info-label">拍攝時間</div>
-                        <div class="info-value">2026/03/06（四）上午 10:00</div>
-                    </div>
-                    <div class="info-item">
-                        <div class="info-label">拍攝地點</div>
-                        <div class="info-value">商設系 7 樓</div>
-                    </div>
-                    <div class="info-item">
-                        <div class="info-label">受訪者</div>
-                        <div class="info-value">莊暢 校長</div>
-                    </div>
-                    <div class="info-item">
-                        <div class="info-label">影片主題</div>
-                        <div class="info-value">EMBA 形象影片（旅程敘事）</div>
-                    </div>
-                </div>
+        <div class="section highlight">
+            <div class="info-row">
+                <div class="info-label">時間</div>
+                <div class="info-value">10:00 AM</div>
             </div>
-
-            <div class="section">
-                <div class="section-title">👥 劇組人員</div>
-                <ul class="crew-list">
-                    <li><strong>導演：</strong>林祐凡 Rino</li>
-                    <li><strong>攝影：</strong>Suki / 林璐</li>
-                    <li><strong>攝影助理：</strong>待確認</li>
-                    <li><strong>導演助理兼化妝師：</strong>宸瑄</li>
-                    <li><strong>髮型師：</strong>林璐</li>
-                </ul>
+            <div class="info-row">
+                <div class="info-label">地點</div>
+                <div class="info-value">商設系 7 樓</div>
             </div>
+            <div class="info-row">
+                <div class="info-label">受訪者</div>
+                <div class="info-value">莊暢 校長</div>
+            </div>
+        </div>
 
-            <div class="section">
-                <div class="section-title">📝 備註</div>
-                <div class="info-item">
-                    <div class="info-value">
-                        • 原班人馬出動<br>
-                        • 請提前 15 分鐘到場準備<br>
-                        • 確認妝髮及燈光設備
-                    </div>
-                </div>
+        <div class="section">
+            <div class="section-title">劇組人員</div>
+            <ul class="crew-list">
+                <li><strong>導演</strong>林祐凡 Rino</li>
+                <li><strong>攝影</strong>Suki / 林璐</li>
+                <li><strong>攝影助理</strong>待確認</li>
+                <li><strong>導演助理</strong>宸瑄</li>
+                <li><strong>化妝師</strong>宸瑄</li>
+                <li><strong>髮型師</strong>林璐</li>
+            </ul>
+        </div>
+
+        <div class="section">
+            <div class="section-title">備註</div>
+            <div class="notes">
+                • 原班人馬出動<br>
+                • 請提前 15 分鐘到場準備<br>
+                • 確認妝髮及燈光設備
             </div>
         </div>
     </div>

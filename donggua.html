@@ -1,0 +1,157 @@
+        
+        /* Gallery Section */
+        .gallery {
+            padding: 100px 60px;
+            background: #0a0a0a;
+        }
+        
+        .section-title {
+            font-size: 48px;
+            font-weight: 700;
+            text-align: center;
+            margin-bottom: 80px;
+            letter-spacing: -1px;
+        }
+        
+        .gallery-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+        
+        .gallery-item {
+            aspect-ratio: 3/4;
+            background: #1a1a1a;
+            border-radius: 8px;
+            overflow: hidden;
+            position: relative;
+            cursor: pointer;
+            transition: transform 0.3s;
+        }
+        
+        .gallery-item:hover {
+            transform: scale(1.02);
+        }
+        
+        .gallery-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        /* Contact Section */
+        .contact {
+            padding: 100px 60px;
+            background: #000;
+            text-align: center;
+        }
+        
+        .contact-info {
+            max-width: 600px;
+            margin: 0 auto;
+            margin-top: 60px;
+        }
+        
+        .contact-item {
+            margin-bottom: 30px;
+            font-size: 18px;
+            color: #888;
+        }
+        
+        .contact-item strong {
+            color: #fff;
+            display: block;
+            margin-bottom: 10px;
+            font-size: 14px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+        
+        /* Mobile */
+        @media (max-width: 768px) {
+            nav {
+                padding: 20px 30px;
+            }
+            
+            .nav-links {
+                gap: 20px;
+            }
+            
+            .hero h1 {
+                font-size: 48px;
+            }
+            
+            .hero p {
+                font-size: 14px;
+            }
+            
+            .gallery, .contact {
+                padding: 60px 30px;
+            }
+            
+            .section-title {
+                font-size: 32px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <div class="logo">冬瓜</div>
+        <ul class="nav-links">
+            <li><a href="#home">Home</a></li>
+            <li><a href="#gallery">Works</a></li>
+            <li><a href="#contact">Contact</a></li>
+        </ul>
+    </nav>
+
+    <section class="hero" id="home">
+        <div class="hero-content">
+            <h1>冬瓜</h1>
+            <p>Hair Design Studio</p>
+        </div>
+    </section>
+
+    <section class="gallery" id="gallery">
+        <h2 class="section-title">作品集</h2>
+        <div class="gallery-grid">
+            <div class="gallery-item">
+                <img src="https://images.unsplash.com/photo-1560066984-138dadb4c035?w=600" alt="Hair Design 1">
+            </div>
+            <div class="gallery-item">
+                <img src="https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?w=600" alt="Hair Design 2">
+            </div>
+            <div class="gallery-item">
+                <img src="https://images.unsplash.com/photo-1562322140-8baeececf3df?w=600" alt="Hair Design 3">
+            </div>
+            <div class="gallery-item">
+                <img src="https://images.unsplash.com/photo-1519699047748-de8e457a634e?w=600" alt="Hair Design 4">
+            </div>
+            <div class="gallery-item">
+                <img src="https://images.unsplash.com/photo-1521590832167-7bcbfaa6381f?w=600" alt="Hair Design 5">
+            </div>
+            <div class="gallery-item">
+                <img src="https://images.unsplash.com/photo-1605497788044-5a32c7078486?w=600" alt="Hair Design 6">
+            </div>
+        </div>
+    </section>
+
+    <section class="contact" id="contact">
+        <h2 class="section-title">聯絡方式</h2>
+        <div class="contact-info">
+            <div class="contact-item">
+                <strong>Instagram</strong>
+                @donggua_hair
+            </div>
+            <div class="contact-item">
+                <strong>電話</strong>
+                0912-345-678
+            </div>
+            <div class="contact-item">
+                <strong>地址</strong>
+                台北市信義區○○路○○號
+            </div>
+        </div>
+    </section>
+</body>
+</html>

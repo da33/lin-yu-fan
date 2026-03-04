@@ -118,6 +118,66 @@
             }
         }
         
+        .about {
+            padding: 150px 80px;
+            background: #000;
+        }
+        
+        .about-content {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        .about-intro {
+            font-size: 18px;
+            font-weight: 300;
+            line-height: 2;
+            color: #999;
+            margin-bottom: 60px;
+        }
+        
+        .about-skills {
+            margin-top: 60px;
+        }
+        
+        .about-skills h3 {
+            font-size: 14px;
+            font-weight: 400;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            margin-bottom: 30px;
+            color: #fff;
+        }
+        
+        .about-skills ul {
+            list-style: none;
+        }
+        
+        .about-skills li {
+            font-size: 16px;
+            font-weight: 300;
+            color: #666;
+            margin-bottom: 15px;
+            padding-left: 20px;
+            position: relative;
+        }
+        
+        .about-skills li::before {
+            content: '•';
+            position: absolute;
+            left: 0;
+            color: #fff;
+        }
+        
+        .about-quote {
+            font-size: 20px;
+            font-weight: 300;
+            font-style: italic;
+            color: #fff;
+            margin-top: 60px;
+            text-align: center;
+        }
+        
         .gallery {
             padding: 150px 80px;
             background: #0d0d0d;
@@ -197,6 +257,9 @@
             .gallery-grid { grid-template-columns: repeat(2, 1fr); }
             .section-title { font-size: 36px; }
             .contact { padding: 80px 40px; }
+            .about { padding: 80px 40px; }
+            .about-intro { font-size: 15px; }
+            .about-quote { font-size: 16px; }
         }
     </style>
 </head>
@@ -205,6 +268,7 @@
         <div class="logo">冬瓜</div>
         <ul class="nav-links">
             <li><a href="#home">HOME</a></li>
+            <li><a href="#about">ABOUT</a></li>
             <li><a href="#gallery">WORKS</a></li>
             <li><a href="#contact">CONTACT</a></li>
         </ul>
@@ -215,6 +279,36 @@
         <div class="hero-content">
             <h1>冬瓜</h1>
             <p>Hair Design Studio</p>
+        </div>
+    </section>
+
+    <section class="about" id="about">
+        <h2 class="section-title">關於冬瓜</h2>
+        <div class="about-content">
+            <div class="about-intro">
+                2005年出生，新世代髮型設計師。<br>
+                從助理一路走到設計師，我相信一句話——沒有努力，就沒有價值。<br><br>
+                
+                在成長過程中，我曾看過迷失與誘惑，但我很清楚自己要的是未來，而不是一時的熱鬧。<br>
+                選擇遠離錯誤的圈子，把時間投資在技術、專業與自我提升。<br><br>
+                
+                目前除了是沙龍設計師，同時也是國中技藝學程美容美髮講師，並持續進修大學課程。<br>
+                我希望讓更多孩子看見——技職不是退而求其次，而是一條能翻轉人生的道路。
+            </div>
+            
+            <div class="about-skills">
+                <h3>專長項目</h3>
+                <ul>
+                    <li>染髮調色設計</li>
+                    <li>燙髮結構判斷</li>
+                    <li>頭皮養護規劃</li>
+                    <li>年輕族群流行髮型打造</li>
+                </ul>
+            </div>
+            
+            <div class="about-quote">
+                「髮型不只是造型，而是自信的開始。」
+            </div>
         </div>
     </section>
 

@@ -8,8 +8,8 @@
         * { margin: 0; padding: 0; box-sizing: border-box; }
         
         body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft JhengHei", sans-serif;
-            background: #000;
+            font-family: 'Helvetica Neue', -apple-system, sans-serif;
+            background: #0d0d0d;
             color: #fff;
             overflow-x: hidden;
         }
@@ -18,93 +18,185 @@
             position: fixed;
             top: 0;
             width: 100%;
-            padding: 30px 60px;
+            padding: 40px 80px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            z-index: 100;
-            background: rgba(0,0,0,0.8);
-            backdrop-filter: blur(10px);
+            z-index: 1000;
+            mix-blend-mode: difference;
         }
         
-        .logo { font-size: 24px; font-weight: 700; }
-        .nav-links { display: flex; gap: 40px; list-style: none; }
+        .logo {
+            font-size: 28px;
+            font-weight: 300;
+            letter-spacing: 8px;
+            color: #fff;
+        }
+        
+        .nav-links {
+            display: flex;
+            gap: 60px;
+            list-style: none;
+        }
+        
         .nav-links a {
             color: #fff;
             text-decoration: none;
-            font-size: 14px;
-            letter-spacing: 1px;
-            text-transform: uppercase;
-            transition: color 0.3s;
+            font-size: 13px;
+            font-weight: 300;
+            letter-spacing: 3px;
+            position: relative;
         }
-        .nav-links a:hover { color: #888; }
+        
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 1px;
+            background: #fff;
+            transition: width 0.3s;
+        }
+        
+        .nav-links a:hover::after {
+            width: 100%;
+        }
         
         .hero {
             height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
-            background: linear-gradient(135deg, #1a1a1a 0%, #000 100%);
             position: relative;
+            background: #0d0d0d;
         }
         
-        .hero::before {
-            content: '';
+        .hero-bg {
             position: absolute;
-            width: 500px;
-            height: 500px;
-            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
-            top: -250px;
-            right: -250px;
-            animation: float 8s ease-in-out infinite;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at 20% 50%, rgba(255,255,255,0.03) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(255,255,255,0.02) 0%, transparent 50%);
         }
         
-        @keyframes float {
-            0%, 100% { transform: translate(0, 0); }
-            50% { transform: translate(-50px, 50px); }
+        .hero-content {
+            text-align: center;
+            z-index: 1;
         }
         
-        .hero-content { text-align: center; z-index: 1; }
-        .hero h1 { font-size: 80px; font-weight: 700; letter-spacing: -2px; margin-bottom: 20px; }
-        .hero p { font-size: 20px; color: #888; letter-spacing: 4px; text-transform: uppercase; }
+        .hero h1 {
+            font-size: 120px;
+            font-weight: 200;
+            letter-spacing: 20px;
+            margin-bottom: 30px;
+            opacity: 0;
+            animation: fadeInUp 1.2s ease forwards;
+        }
         
-        .gallery { padding: 100px 60px; background: #0a0a0a; }
-        .section-title { font-size: 48px; font-weight: 700; text-align: center; margin-bottom: 80px; }
+        .hero p {
+            font-size: 14px;
+            font-weight: 300;
+            color: #999;
+            letter-spacing: 8px;
+            text-transform: uppercase;
+            opacity: 0;
+            animation: fadeInUp 1.2s ease 0.3s forwards;
+        }
+        
+        @keyframes fadeInUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+        }
+        
+        .gallery {
+            padding: 150px 80px;
+            background: #0d0d0d;
+        }
+        
+        .section-title {
+            font-size: 60px;
+            font-weight: 200;
+            text-align: center;
+            margin-bottom: 100px;
+            letter-spacing: 10px;
+        }
+        
         .gallery-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 20px;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 2px;
+            background: #0d0d0d;
         }
         
         .gallery-item {
             aspect-ratio: 3/4;
-            background: #1a1a1a;
-            border-radius: 8px;
             overflow: hidden;
-            transition: transform 0.3s;
+            position: relative;
         }
-        .gallery-item:hover { transform: scale(1.02); }
-        .gallery-item img { width: 100%; height: 100%; object-fit: cover; }
         
-        .contact { padding: 100px 60px; background: #000; text-align: center; }
-        .contact-info { max-width: 600px; margin: 60px auto 0; }
-        .contact-item { margin-bottom: 30px; font-size: 18px; color: #888; }
+        .gallery-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            filter: grayscale(100%);
+            transition: all 0.6s ease;
+        }
+        
+        .gallery-item:hover img {
+            filter: grayscale(0%);
+            transform: scale(1.05);
+        }
+        
+        .contact {
+            padding: 150px 80px;
+            background: #000;
+            text-align: center;
+        }
+        
+        .contact-info {
+            max-width: 500px;
+            margin: 80px auto 0;
+        }
+        
+        .contact-item {
+            margin-bottom: 50px;
+            font-size: 16px;
+            font-weight: 300;
+            color: #666;
+            letter-spacing: 2px;
+        }
+        
         .contact-item strong {
             color: #fff;
             display: block;
-            margin-bottom: 10px;
-            font-size: 14px;
-            letter-spacing: 2px;
+            margin-bottom: 15px;
+            font-size: 11px;
+            font-weight: 400;
+            letter-spacing: 4px;
             text-transform: uppercase;
         }
         
         @media (max-width: 768px) {
-            nav { padding: 20px 30px; }
-            .nav-links { gap: 20px; }
-            .hero h1 { font-size: 48px; }
-            .hero p { font-size: 14px; }
-            .gallery, .contact { padding: 60px 30px; }
-            .section-title { font-size: 32px; }
+            nav { padding: 30px 40px; }
+            .logo { font-size: 20px; letter-spacing: 4px; }
+            .nav-links { gap: 30px; }
+            .nav-links a { font-size: 11px; }
+            .hero h1 { font-size: 60px; letter-spacing: 10px; }
+            .hero p { font-size: 11px; }
+            .gallery { padding: 80px 20px; }
+            .gallery-grid { grid-template-columns: repeat(2, 1fr); }
+            .section-title { font-size: 36px; }
+            .contact { padding: 80px 40px; }
         }
     </style>
 </head>
@@ -112,13 +204,14 @@
     <nav>
         <div class="logo">冬瓜</div>
         <ul class="nav-links">
-            <li><a href="#home">Home</a></li>
-            <li><a href="#gallery">Works</a></li>
-            <li><a href="#contact">Contact</a></li>
+            <li><a href="#home">HOME</a></li>
+            <li><a href="#gallery">WORKS</a></li>
+            <li><a href="#contact">CONTACT</a></li>
         </ul>
     </nav>
 
     <section class="hero" id="home">
+        <div class="hero-bg"></div>
         <div class="hero-content">
             <h1>冬瓜</h1>
             <p>Hair Design Studio</p>
@@ -128,12 +221,12 @@
     <section class="gallery" id="gallery">
         <h2 class="section-title">作品集</h2>
         <div class="gallery-grid">
-            <div class="gallery-item"><img src="https://images.unsplash.com/photo-1560066984-138dadb4c035?w=600" alt="Hair Design 1"></div>
-            <div class="gallery-item"><img src="https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?w=600" alt="Hair Design 2"></div>
-            <div class="gallery-item"><img src="https://images.unsplash.com/photo-1562322140-8baeececf3df?w=600" alt="Hair Design 3"></div>
-            <div class="gallery-item"><img src="https://images.unsplash.com/photo-1519699047748-de8e457a634e?w=600" alt="Hair Design 4"></div>
-            <div class="gallery-item"><img src="https://images.unsplash.com/photo-1521590832167-7bcbfaa6381f?w=600" alt="Hair Design 5"></div>
-            <div class="gallery-item"><img src="https://images.unsplash.com/photo-1605497788044-5a32c7078486?w=600" alt="Hair Design 6"></div>
+            <div class="gallery-item"><img src="https://images.unsplash.com/photo-1560066984-138dadb4c035?w=800" alt="Hair Design 1"></div>
+            <div class="gallery-item"><img src="https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?w=800" alt="Hair Design 2"></div>
+            <div class="gallery-item"><img src="https://images.unsplash.com/photo-1562322140-8baeececf3df?w=800" alt="Hair Design 3"></div>
+            <div class="gallery-item"><img src="https://images.unsplash.com/photo-1519699047748-de8e457a634e?w=800" alt="Hair Design 4"></div>
+            <div class="gallery-item"><img src="https://images.unsplash.com/photo-1521590832167-7bcbfaa6381f?w=800" alt="Hair Design 5"></div>
+            <div class="gallery-item"><img src="https://images.unsplash.com/photo-1605497788044-5a32c7078486?w=800" alt="Hair Design 6"></div>
         </div>
     </section>
 
@@ -141,8 +234,8 @@
         <h2 class="section-title">聯絡方式</h2>
         <div class="contact-info">
             <div class="contact-item"><strong>Instagram</strong>@donggua_hair</div>
-            <div class="contact-item"><strong>電話</strong>0912-345-678</div>
-            <div class="contact-item"><strong>地址</strong>台北市信義區○○路○○號</div>
+            <div class="contact-item"><strong>Phone</strong>0912-345-678</div>
+            <div class="contact-item"><strong>Location</strong>台北市信義區</div>
         </div>
     </section>
 </body>

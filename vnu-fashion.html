@@ -5,121 +5,160 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>VNU 時尚表演藝術系</title>
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&display=swap');
+        
         * { margin: 0; padding: 0; box-sizing: border-box; }
         
         body {
-            font-family: 'Helvetica Neue', -apple-system, sans-serif;
-            background: #000;
-            color: #fff;
+            font-family: 'Helvetica Neue', sans-serif;
+            background: #fff;
+            color: #000;
             overflow-x: hidden;
         }
         
+        /* 導航 */
         nav {
             position: fixed;
             top: 0;
             width: 100%;
-            padding: 30px 60px;
+            padding: 40px 80px;
             display: flex;
             justify-content: space-between;
             align-items: center;
             z-index: 1000;
-            background: rgba(0,0,0,0.9);
-            backdrop-filter: blur(10px);
+            background: rgba(255,255,255,0.95);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(0,0,0,0.05);
         }
         
         .logo {
-            font-size: 24px;
+            font-family: 'Playfair Display', serif;
+            font-size: 20px;
             font-weight: 700;
-            letter-spacing: 2px;
+            letter-spacing: 1px;
         }
         
-        .social-links {
+        .social-icons {
             display: flex;
             gap: 30px;
         }
         
-        .social-links a {
-            color: #fff;
+        .social-icons a {
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid #000;
+            color: #000;
             text-decoration: none;
-            font-size: 14px;
-            letter-spacing: 2px;
-            transition: color 0.3s;
+            font-size: 12px;
+            transition: all 0.3s;
         }
         
-        .social-links a:hover {
-            color: #ff0050;
+        .social-icons a:hover {
+            background: #000;
+            color: #fff;
         }
         
+        /* Hero 區塊 */
         .hero {
             height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
-            background: linear-gradient(135deg, #000 0%, #1a1a1a 100%);
+            background: linear-gradient(135deg, #f5f5f5 0%, #fff 100%);
             position: relative;
-        }
-        
-        .hero::before {
-            content: '';
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            background: url('data:image/svg+xml,<svg width="100" height="100" xmlns="http://www.w3.org/2000/svg"><rect width="1" height="1" fill="white" opacity="0.05"/></svg>');
-            background-size: 50px 50px;
         }
         
         .hero-content {
             text-align: center;
-            z-index: 1;
+            max-width: 900px;
         }
         
         .hero h1 {
-            font-size: 80px;
+            font-family: 'Playfair Display', serif;
+            font-size: 120px;
             font-weight: 900;
-            letter-spacing: -2px;
-            margin-bottom: 20px;
-            background: linear-gradient(135deg, #fff 0%, #ff0050 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            animation: fadeIn 1s ease;
+            line-height: 1;
+            margin-bottom: 30px;
+            letter-spacing: -3px;
         }
         
-        .hero p {
-            font-size: 18px;
-            letter-spacing: 4px;
-            color: #999;
+        .hero .subtitle {
+            font-size: 14px;
+            letter-spacing: 8px;
             text-transform: uppercase;
+            color: #666;
         }
         
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
+        /* 特色區塊 */
+        .features {
+            padding: 150px 80px;
+            background: #000;
+            color: #fff;
         }
         
-        .about {
-            padding: 100px 60px;
-            background: #0a0a0a;
-            text-align: center;
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 60px;
+            margin-top: 80px;
+        }
+        
+        .feature-item h3 {
+            font-family: 'Playfair Display', serif;
+            font-size: 32px;
+            margin-bottom: 20px;
+        }
+        
+        .feature-item p {
+            font-size: 15px;
+            line-height: 1.8;
+            color: #999;
         }
         
         .section-title {
-            font-size: 48px;
+            font-family: 'Playfair Display', serif;
+            font-size: 60px;
             font-weight: 700;
-            margin-bottom: 60px;
-            letter-spacing: -1px;
+            text-align: center;
         }
         
-        .about-text {
-            max-width: 800px;
-            margin: 0 auto;
-            font-size: 18px;
-            line-height: 2;
-            color: #999;
+        /* Gallery */
+        .gallery {
+            padding: 150px 0;
+            background: #fff;
         }
         
+        .gallery-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 0;
+        }
+        
+        .gallery-item {
+            aspect-ratio: 1;
+            background: #f5f5f5;
+            overflow: hidden;
+        }
+        
+        .gallery-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.6s;
+        }
+        
+        .gallery-item:hover img {
+            transform: scale(1.05);
+        }
+        
+        /* CTA */
         .cta {
-            padding: 100px 60px;
+            padding: 150px 80px;
             background: #000;
+            color: #fff;
             text-align: center;
         }
         
@@ -131,12 +170,12 @@
         }
         
         .btn {
-            padding: 20px 50px;
-            font-size: 16px;
-            font-weight: 600;
-            letter-spacing: 2px;
+            padding: 20px 60px;
+            font-size: 12px;
+            letter-spacing: 3px;
+            text-transform: uppercase;
             text-decoration: none;
-            border: 2px solid #fff;
+            border: 1px solid #fff;
             color: #fff;
             transition: all 0.3s;
         }
@@ -146,54 +185,62 @@
             color: #000;
         }
         
-        .btn-primary {
-            background: #ff0050;
-            border-color: #ff0050;
-        }
-        
-        .btn-primary:hover {
-            background: #fff;
-            color: #ff0050;
-            border-color: #fff;
-        }
-        
         @media (max-width: 768px) {
             nav { padding: 20px 30px; }
-            .hero h1 { font-size: 48px; }
-            .section-title { font-size: 32px; }
+            .hero h1 { font-size: 60px; }
+            .features-grid { grid-template-columns: 1fr; }
+            .gallery-grid { grid-template-columns: 1fr; }
             .cta-buttons { flex-direction: column; }
         }
     </style>
 </head>
 <body>
     <nav>
-        <div class="logo">VNU 時尚表演藝術</div>
-        <div class="social-links">
-            <a href="https://www.instagram.com/vnu001_official" target="_blank">INSTAGRAM</a>
-            <a href="https://youtube.com/@henryproduction" target="_blank">YOUTUBE</a>
+        <div class="logo">VNU Fashion & Arts</div>
+        <div class="social-icons">
+            <a href="https://www.instagram.com/vnu001_official" target="_blank">IG</a>
+            <a href="https://youtube.com/@henryproduction" target="_blank">YT</a>
         </div>
     </nav>
 
     <section class="hero">
         <div class="hero-content">
-            <h1>時尚表演藝術系</h1>
-            <p>Fashion & Performing Arts</p>
+            <h1>時尚<br>表演<br>藝術</h1>
+            <p class="subtitle">Fashion & Performing Arts</p>
         </div>
     </section>
 
-    <section class="about">
-        <h2 class="section-title">關於我們</h2>
-        <div class="about-text">
-            萬能科技大學時尚表演藝術系，培育新世代時尚與表演藝術人才。<br>
-            結合理論與實務，打造專業舞台表演、時尚造型、影像製作能力。<br><br>
-            我們相信，創意與技術並重，才能在時尚產業中脫穎而出。
+    <section class="features">
+        <h2 class="section-title">我們的專業</h2>
+        <div class="features-grid">
+            <div class="feature-item">
+                <h3>時尚造型</h3>
+                <p>專業彩妝、髮型設計、服裝搭配，打造完整時尚造型能力</p>
+            </div>
+            <div class="feature-item">
+                <h3>舞台表演</h3>
+                <p>舞蹈、戲劇、音樂表演訓練，培養舞台魅力與專業演出技巧</p>
+            </div>
+            <div class="feature-item">
+                <h3>影像製作</h3>
+                <p>攝影、剪輯、後製技術，掌握視覺傳達與影像敘事能力</p>
+            </div>
+        </div>
+    </section>
+
+    <section class="gallery">
+        <div class="gallery-grid">
+            <div class="gallery-item"><img src="https://images.unsplash.com/photo-1509631179647-0177331693ae?w=800" alt="Fashion 1"></div>
+            <div class="gallery-item"><img src="https://images.unsplash.com/photo-1558769132-cb1aea1f1f57?w=800" alt="Fashion 2"></div>
+            <div class="gallery-item"><img src="https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=800" alt="Fashion 3"></div>
+            <div class="gallery-item"><img src="https://images.unsplash.com/photo-1490481651871-ab68de25d43d?w=800" alt="Fashion 4"></div>
         </div>
     </section>
 
     <section class="cta">
         <h2 class="section-title">探索更多</h2>
         <div class="cta-buttons">
-            <a href="https://www.instagram.com/vnu001_official" target="_blank" class="btn btn-primary">Instagram</a>
+            <a href="https://www.instagram.com/vnu001_official" target="_blank" class="btn">Instagram</a>
             <a href="https://youtube.com/@henryproduction" target="_blank" class="btn">YouTube</a>
         </div>
     </section>

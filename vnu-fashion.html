@@ -4,292 +4,159 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>VNU 時尚造型設計暨表演藝術系</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;600&family=Work+Sans:wght@300;400;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;700&display=swap" rel="stylesheet">
     <style>
-        :root {
-            --primary: #0a0a0a;
-            --accent: #d4af37;
-            --bg: #f8f6f3;
-            --text: #2a2a2a;
-            --light: #e8e6e3;
-        }
-        
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
         
         body {
-            font-family: 'Work Sans', sans-serif;
-            background: var(--bg);
-            color: var(--text);
-            line-height: 1.6;
+            font-family: 'Space Grotesk', sans-serif;
+            background: #000;
+            color: #fff;
             overflow-x: hidden;
         }
         
-        /* Navigation */
-        nav {
+        /* 固定側邊資訊 */
+        .sidebar {
             position: fixed;
+            left: 0;
             top: 0;
-            width: 100%;
-            padding: 30px 60px;
+            width: 300px;
+            height: 100vh;
+            padding: 60px 40px;
+            background: rgba(0,0,0,0.9);
+            z-index: 100;
             display: flex;
+            flex-direction: column;
             justify-content: space-between;
-            align-items: center;
-            z-index: 1000;
-            background: rgba(248, 246, 243, 0.95);
-            backdrop-filter: blur(10px);
-            border-bottom: 1px solid rgba(42, 42, 42, 0.1);
         }
         
-        .logo {
-            font-family: 'Cormorant Garamond', serif;
-            font-size: 24px;
-            font-weight: 600;
-            letter-spacing: 1px;
+        .sidebar h1 {
+            font-size: 32px;
+            font-weight: 700;
+            line-height: 1.2;
+            margin-bottom: 20px;
         }
         
-        .nav-social {
+        .sidebar p {
+            font-size: 12px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            opacity: 0.6;
+        }
+        
+        .sidebar-links {
             display: flex;
-            gap: 20px;
+            flex-direction: column;
+            gap: 15px;
         }
         
-        .nav-social a {
-            font-size: 13px;
-            color: var(--text);
+        .sidebar-links a {
+            color: #fff;
             text-decoration: none;
+            font-size: 14px;
             letter-spacing: 1px;
-            transition: color 0.3s;
+            transition: opacity 0.3s;
         }
         
-        .nav-social a:hover {
-            color: var(--accent);
+        .sidebar-links a:hover {
+            opacity: 0.6;
         }
         
-        /* Hero Section */
-        .hero {
-            min-height: 100vh;
+        /* 全屏滾動作品 */
+        .gallery-fullscreen {
+            margin-left: 300px;
+            height: 100vh;
+            overflow-y: scroll;
+            scroll-snap-type: y mandatory;
+        }
+        
+        .slide {
+            height: 100vh;
+            scroll-snap-align: start;
+            position: relative;
             display: flex;
             align-items: center;
             justify-content: center;
-            position: relative;
-            padding: 0 60px;
         }
         
-        .hero::before {
-            content: '';
-            position: absolute;
-            width: 400px;
-            height: 400px;
-            background: var(--accent);
-            opacity: 0.15;
-            clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
-            top: 10%;
-            right: 10%;
-            animation: float 8s ease-in-out infinite;
-        }
-        
-        @keyframes float {
-            0%, 100% { transform: translateY(0) rotate(0deg); }
-            50% { transform: translateY(-30px) rotate(10deg); }
-        }
-        
-        .hero-content {
-            max-width: 900px;
-            z-index: 1;
-        }
-        
-        .hero h1 {
-            font-family: 'Cormorant Garamond', serif;
-            font-size: 96px;
-            font-weight: 300;
-            line-height: 1.1;
-            margin-bottom: 30px;
-            letter-spacing: -2px;
-        }
-        
-        .hero .subtitle {
-            font-size: 16px;
-            letter-spacing: 4px;
-            text-transform: uppercase;
-            color: var(--accent);
-            font-weight: 300;
-        }
-        
-        /* Features Section */
-        .features {
-            padding: 120px 60px;
-            background: var(--primary);
-            color: var(--bg);
-        }
-        
-        .section-title {
-            font-family: 'Cormorant Garamond', serif;
-            font-size: 56px;
-            font-weight: 300;
-            text-align: center;
-            margin-bottom: 80px;
-        }
-        
-        .features-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 60px;
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-        
-        .feature-item {
-            text-align: center;
-            opacity: 0;
-            animation: fadeInUp 0.8s ease forwards;
-        }
-        
-        .feature-item:nth-child(1) { animation-delay: 0.2s; }
-        .feature-item:nth-child(2) { animation-delay: 0.4s; }
-        .feature-item:nth-child(3) { animation-delay: 0.6s; }
-        
-        @keyframes fadeInUp {
-            to { opacity: 1; transform: translateY(0); }
-            from { opacity: 0; transform: translateY(30px); }
-        }
-        
-        .feature-item h3 {
-            font-family: 'Cormorant Garamond', serif;
-            font-size: 32px;
-            font-weight: 400;
-            margin-bottom: 20px;
-            color: var(--accent);
-        }
-        
-        .feature-item p {
-            font-size: 15px;
-            line-height: 1.8;
-            color: rgba(248, 246, 243, 0.8);
-        }
-        
-        /* Gallery */
-        .gallery {
-            padding: 120px 60px;
-        }
-        
-        .gallery-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 30px;
-            max-width: 1200px;
-            margin: 80px auto 0;
-        }
-        
-        .gallery-item {
-            aspect-ratio: 4/5;
-            overflow: hidden;
-            position: relative;
-        }
-        
-        .gallery-item img {
+        .slide img {
             width: 100%;
             height: 100%;
             object-fit: cover;
-            transition: transform 0.6s ease;
+            position: absolute;
+            inset: 0;
         }
         
-        .gallery-item:hover img {
-            transform: scale(1.05);
-        }
-        
-        /* CTA */
-        .cta {
-            padding: 120px 60px;
+        .slide-content {
+            position: relative;
+            z-index: 1;
             text-align: center;
-            background: var(--light);
+            padding: 40px;
+            background: rgba(0,0,0,0.5);
+            backdrop-filter: blur(10px);
         }
         
-        .cta-buttons {
-            display: flex;
-            gap: 30px;
-            justify-content: center;
-            margin-top: 50px;
+        .slide-content h2 {
+            font-size: 48px;
+            font-weight: 700;
+            margin-bottom: 15px;
         }
         
-        .btn {
-            padding: 18px 50px;
-            font-size: 13px;
-            letter-spacing: 2px;
-            text-transform: uppercase;
-            text-decoration: none;
-            background: var(--primary);
-            color: var(--bg);
-            transition: all 0.3s;
-            border: 1px solid var(--primary);
-        }
-        
-        .btn:hover {
-            background: transparent;
-            color: var(--primary);
+        .slide-content p {
+            font-size: 16px;
+            opacity: 0.8;
         }
         
         @media (max-width: 768px) {
-            .hero h1 { font-size: 48px; }
-            .features-grid, .gallery-grid { grid-template-columns: 1fr; }
+            .sidebar { width: 100%; height: auto; position: relative; }
+            .gallery-fullscreen { margin-left: 0; }
         }
     </style>
 </head>
 <body>
-    <nav>
-        <div class="logo">VNU Fashion & Arts</div>
-        <div class="nav-social">
-            <a href="https://www.instagram.com/vnu001_official" target="_blank">Instagram</a>
-            <a href="https://youtube.com/@henryproduction" target="_blank">YouTube</a>
+    <div class="sidebar">
+        <div>
+            <h1>VNU<br>時尚造型<br>表演藝術</h1>
+            <p>Fashion & Arts</p>
         </div>
-    </nav>
-
-    <section class="hero">
-        <div class="hero-content">
-            <h1>時尚造型設計<br>暨表演藝術系</h1>
-            <p class="subtitle">Fashion & Performing Arts</p>
+        <div class="sidebar-links">
+            <a href="https://www.instagram.com/vnu001_official" target="_blank">Instagram →</a>
+            <a href="https://youtube.com/@henryproduction" target="_blank">YouTube →</a>
         </div>
-    </section>
+    </div>
 
-    <section class="features">
-        <h2 class="section-title">專業領域</h2>
-        <div class="features-grid">
-            <div class="feature-item">
-                <h3>時尚造型</h3>
-                <p>彩妝、髮型、服裝搭配，培養完整時尚造型能力</p>
-            </div>
-            <div class="feature-item">
-                <h3>舞台表演</h3>
-                <p>舞蹈、戲劇、音樂表演，培養舞台魅力與演出技巧</p>
-            </div>
-            <div class="feature-item">
-                <h3>影像製作</h3>
-                <p>攝影、剪輯、後製，掌握視覺傳達與影像敘事</p>
+    <div class="gallery-fullscreen">
+        <div class="slide">
+            <img src="https://images.unsplash.com/photo-1509631179647-0177331693ae?w=1920" alt="時尚造型">
+            <div class="slide-content">
+                <h2>時尚造型</h2>
+                <p>彩妝 · 髮型 · 服裝搭配</p>
             </div>
         </div>
-    </section>
-
-    <section class="gallery">
-        <h2 class="section-title">學生作品</h2>
-        <div class="gallery-grid">
-            <div class="gallery-item"><img src="https://images.unsplash.com/photo-1509631179647-0177331693ae?w=600" alt="1"></div>
-            <div class="gallery-item"><img src="https://images.unsplash.com/photo-1558769132-cb1aea1f1f57?w=600" alt="2"></div>
-            <div class="gallery-item"><img src="https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=600" alt="3"></div>
-            <div class="gallery-item"><img src="https://images.unsplash.com/photo-1490481651871-ab68de25d43d?w=600" alt="4"></div>
-            <div class="gallery-item"><img src="https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=600" alt="5"></div>
-            <div class="gallery-item"><img src="https://images.unsplash.com/photo-1469334031218-e382a71b716b?w=600" alt="6"></div>
+        
+        <div class="slide">
+            <img src="https://images.unsplash.com/photo-1558769132-cb1aea1f1f57?w=1920" alt="舞台表演">
+            <div class="slide-content">
+                <h2>舞台表演</h2>
+                <p>舞蹈 · 戲劇 · 音樂</p>
+            </div>
         </div>
-    </section>
-
-    <section class="cta">
-        <h2 class="section-title">探索更多</h2>
-        <div class="cta-buttons">
-            <a href="https://www.instagram.com/vnu001_official" target="_blank" class="btn">Instagram</a>
-            <a href="https://youtube.com/@henryproduction" target="_blank" class="btn">YouTube</a>
+        
+        <div class="slide">
+            <img src="https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=1920" alt="影像製作">
+            <div class="slide-content">
+                <h2>影像製作</h2>
+                <p>攝影 · 剪輯 · 後製</p>
+            </div>
         </div>
-    </section>
+        
+        <div class="slide">
+            <img src="https://images.unsplash.com/photo-1490481651871-ab68de25d43d?w=1920" alt="學生作品">
+            <div class="slide-content">
+                <h2>學生作品</h2>
+                <p>創意無限 · 專業培訓</p>
+            </div>
+        </div>
+    </div>
 </body>
 </html>

@@ -5,15 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>VNU 時尚造型設計暨表演藝術系</title>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Noto+Sans+TC:wght@300;400;700&display=swap');
-        
         * { margin: 0; padding: 0; box-sizing: border-box; }
         
         body {
-            font-family: 'Noto Sans TC', sans-serif;
-            background: #000;
-            color: #fff;
-            overflow-x: hidden;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+            background: #fafafa;
+            color: #1a1a1a;
+            line-height: 1.6;
         }
         
         /* 導航 */
@@ -21,54 +19,50 @@
             position: fixed;
             top: 0;
             width: 100%;
-            padding: 30px 60px;
+            padding: 25px 50px;
             display: flex;
             justify-content: space-between;
             align-items: center;
             z-index: 1000;
-            background: rgba(0,0,0,0.8);
-            backdrop-filter: blur(20px);
+            background: rgba(250,250,250,0.95);
+            backdrop-filter: blur(10px);
         }
         
         .logo {
-            font-family: 'Bebas Neue', sans-serif;
-            font-size: 32px;
-            letter-spacing: 3px;
+            font-size: 16px;
+            font-weight: 600;
+            letter-spacing: 2px;
         }
         
-        .social-links {
+        .social {
             display: flex;
-            gap: 20px;
+            gap: 15px;
         }
         
-        .social-links a {
-            width: 50px;
-            height: 50px;
+        .social a {
+            width: 32px;
+            height: 32px;
             display: flex;
             align-items: center;
             justify-content: center;
-            background: #fff;
-            color: #000;
-            text-decoration: none;
-            font-weight: 700;
-            font-size: 14px;
-            transition: all 0.3s;
-            clip-path: polygon(0 0, 100% 0, 100% 70%, 70% 100%, 0 100%);
-        }
-        
-        .social-links a:hover {
-            background: #ff0050;
+            background: #1a1a1a;
             color: #fff;
-            transform: scale(1.1);
+            text-decoration: none;
+            font-size: 11px;
+            font-weight: 600;
+            transition: transform 0.3s;
         }
         
-        /* Hero 超大視覺 */
+        .social a:hover {
+            transform: translateY(-3px);
+        }
+        
+        /* Hero - 幾何圖形背景 */
         .hero {
-            height: 100vh;
+            min-height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
-            background: linear-gradient(135deg, #000 0%, #1a1a1a 50%, #000 100%);
             position: relative;
             overflow: hidden;
         }
@@ -76,96 +70,112 @@
         .hero::before {
             content: '';
             position: absolute;
-            width: 200%;
-            height: 200%;
-            background: repeating-linear-gradient(
-                45deg,
-                transparent,
-                transparent 10px,
-                rgba(255,255,255,0.02) 10px,
-                rgba(255,255,255,0.02) 20px
-            );
-            animation: slide 20s linear infinite;
+            width: 600px;
+            height: 600px;
+            background: #1a1a1a;
+            transform: rotate(45deg);
+            top: -300px;
+            right: -300px;
         }
         
-        @keyframes slide {
-            0% { transform: translate(0, 0); }
-            100% { transform: translate(50px, 50px); }
+        .hero::after {
+            content: '';
+            position: absolute;
+            width: 400px;
+            height: 400px;
+            border: 2px solid #1a1a1a;
+            transform: rotate(30deg);
+            bottom: -200px;
+            left: -200px;
         }
         
         .hero-content {
             text-align: center;
             z-index: 1;
+            max-width: 800px;
+            padding: 0 40px;
         }
         
         .hero h1 {
-            font-family: 'Bebas Neue', sans-serif;
-            font-size: 150px;
-            line-height: 0.9;
-            letter-spacing: 10px;
-            background: linear-gradient(135deg, #fff 0%, #ff0050 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            animation: glow 2s ease-in-out infinite;
+            font-size: 64px;
+            font-weight: 300;
+            letter-spacing: -1px;
+            margin-bottom: 20px;
         }
         
-        @keyframes glow {
-            0%, 100% { filter: drop-shadow(0 0 20px rgba(255,0,80,0.5)); }
-            50% { filter: drop-shadow(0 0 40px rgba(255,0,80,0.8)); }
-        }
-        
-        .hero .tagline {
-            font-size: 24px;
-            margin-top: 30px;
-            letter-spacing: 8px;
+        .hero p {
+            font-size: 14px;
+            letter-spacing: 3px;
             text-transform: uppercase;
-            color: #999;
+            color: #666;
         }
         
-        /* 特色區塊 - 分割設計 */
-        .split-section {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            min-height: 100vh;
+        /* 特色區塊 - 幾何卡片 */
+        .features {
+            padding: 100px 50px;
+            max-width: 1200px;
+            margin: 0 auto;
         }
         
-        .split-left {
-            background: #ff0050;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 80px;
-        }
-        
-        .split-right {
-            background: #000;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 80px;
-        }
-        
-        .split-content h2 {
-            font-family: 'Bebas Neue', sans-serif;
-            font-size: 80px;
-            margin-bottom: 40px;
-            line-height: 1;
-        }
-        
-        .split-content p {
-            font-size: 18px;
-            line-height: 1.8;
-            color: rgba(255,255,255,0.8);
-        }
-        
-        .split-left .split-content h2 { color: #000; }
-        .split-left .split-content p { color: rgba(0,0,0,0.7); }
-        
-        /* Gallery 全屏網格 */
-        .gallery {
+        .features-grid {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            gap: 0;
+            gap: 30px;
+            margin-top: 60px;
+        }
+        
+        .feature-card {
+            background: #fff;
+            padding: 50px 30px;
+            position: relative;
+            transition: transform 0.3s;
+        }
+        
+        .feature-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 60px;
+            height: 60px;
+            background: #1a1a1a;
+            clip-path: polygon(0 0, 100% 0, 0 100%);
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-10px);
+        }
+        
+        .feature-card h3 {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 15px;
+        }
+        
+        .feature-card p {
+            font-size: 14px;
+            color: #666;
+            line-height: 1.8;
+        }
+        
+        .section-title {
+            font-size: 36px;
+            font-weight: 300;
+            text-align: center;
+        }
+        
+        /* Gallery - 簡約網格 */
+        .gallery {
+            padding: 100px 50px;
+            background: #fff;
+        }
+        
+        .gallery-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            max-width: 1200px;
+            margin: 60px auto 0;
         }
         
         .gallery-item {
@@ -174,78 +184,77 @@
             position: relative;
         }
         
+        .gallery-item::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: #1a1a1a;
+            opacity: 0;
+            transition: opacity 0.3s;
+            z-index: 1;
+        }
+        
+        .gallery-item:hover::before {
+            opacity: 0.1;
+        }
+        
         .gallery-item img {
             width: 100%;
             height: 100%;
             object-fit: cover;
-            filter: grayscale(100%);
-            transition: all 0.5s;
         }
         
-        .gallery-item:hover img {
-            filter: grayscale(0%);
-            transform: scale(1.2);
+        /* CTA */
+        .cta {
+            padding: 100px 50px;
+            text-align: center;
+            position: relative;
         }
         
-        .gallery-item::after {
+        .cta::before {
             content: '';
             position: absolute;
-            inset: 0;
-            background: rgba(255,0,80,0.3);
-            opacity: 0;
-            transition: opacity 0.5s;
+            width: 300px;
+            height: 300px;
+            border: 1px solid #e0e0e0;
+            transform: rotate(45deg);
+            top: 50%;
+            left: 50%;
+            margin: -150px 0 0 -150px;
+            z-index: 0;
         }
         
-        .gallery-item:hover::after {
-            opacity: 1;
-        }
-        
-        /* CTA 區塊 */
-        .cta {
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            background: #000;
-            text-align: center;
-            padding: 80px 40px;
-        }
-        
-        .cta h2 {
-            font-family: 'Bebas Neue', sans-serif;
-            font-size: 100px;
-            margin-bottom: 60px;
+        .cta-content {
+            position: relative;
+            z-index: 1;
         }
         
         .cta-buttons {
             display: flex;
-            gap: 30px;
+            gap: 20px;
+            justify-content: center;
+            margin-top: 40px;
         }
         
         .btn {
-            padding: 25px 60px;
-            font-size: 18px;
-            font-weight: 700;
-            letter-spacing: 3px;
+            padding: 15px 40px;
+            font-size: 12px;
+            letter-spacing: 2px;
             text-transform: uppercase;
             text-decoration: none;
-            background: #fff;
-            color: #000;
+            background: #1a1a1a;
+            color: #fff;
             transition: all 0.3s;
-            clip-path: polygon(0 0, 100% 0, 100% 70%, 70% 100%, 0 100%);
         }
         
         .btn:hover {
-            background: #ff0050;
-            color: #fff;
-            transform: translateY(-5px);
+            background: #000;
+            transform: translateY(-3px);
         }
         
         @media (max-width: 768px) {
-            .hero h1 { font-size: 60px; }
-            .split-section { grid-template-columns: 1fr; }
-            .gallery { grid-template-columns: repeat(2, 1fr); }
+            .hero h1 { font-size: 40px; }
+            .features-grid, .gallery-grid { grid-template-columns: 1fr; }
             .cta-buttons { flex-direction: column; }
         }
     </style>
@@ -253,7 +262,7 @@
 <body>
     <nav>
         <div class="logo">VNU FASHION</div>
-        <div class="social-links">
+        <div class="social">
             <a href="https://www.instagram.com/vnu001_official" target="_blank">IG</a>
             <a href="https://youtube.com/@henryproduction" target="_blank">YT</a>
         </div>
@@ -261,40 +270,48 @@
 
     <section class="hero">
         <div class="hero-content">
-            <h1>FASHION<br>ARTS</h1>
-            <p class="tagline">時尚造型 × 表演藝術</p>
+            <h1>時尚造型設計<br>暨表演藝術系</h1>
+            <p>Fashion & Performing Arts</p>
         </div>
     </section>
 
-    <div class="split-section">
-        <div class="split-left">
-            <div class="split-content">
-                <h2>創意<br>無限</h2>
-                <p>從時尚造型到舞台表演，我們培養新世代創意人才。專業師資、完善設備、產學合作，打造你的時尚夢想。</p>
+    <section class="features">
+        <h2 class="section-title">專業領域</h2>
+        <div class="features-grid">
+            <div class="feature-card">
+                <h3>時尚造型</h3>
+                <p>彩妝、髮型、服裝搭配，培養完整時尚造型能力</p>
+            </div>
+            <div class="feature-card">
+                <h3>舞台表演</h3>
+                <p>舞蹈、戲劇、音樂表演，培養舞台魅力與演出技巧</p>
+            </div>
+            <div class="feature-card">
+                <h3>影像製作</h3>
+                <p>攝影、剪輯、後製，掌握視覺傳達與影像敘事</p>
             </div>
         </div>
-        <div class="split-right">
-            <div class="split-content">
-                <h2>專業<br>培訓</h2>
-                <p>彩妝、髮型、服裝、舞蹈、戲劇、影像製作。六大專業領域，全方位培養你的技能與美感。</p>
-            </div>
-        </div>
-    </div>
+    </section>
 
     <section class="gallery">
-        <div class="gallery-item"><img src="https://images.unsplash.com/photo-1509631179647-0177331693ae?w=800" alt="1"></div>
-        <div class="gallery-item"><img src="https://images.unsplash.com/photo-1558769132-cb1aea1f1f57?w=800" alt="2"></div>
-        <div class="gallery-item"><img src="https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=800" alt="3"></div>
-        <div class="gallery-item"><img src="https://images.unsplash.com/photo-1490481651871-ab68de25d43d?w=800" alt="4"></div>
-        <div class="gallery-item"><img src="https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=800" alt="5"></div>
-        <div class="gallery-item"><img src="https://images.unsplash.com/photo-1469334031218-e382a71b716b?w=800" alt="6"></div>
+        <h2 class="section-title">學生作品</h2>
+        <div class="gallery-grid">
+            <div class="gallery-item"><img src="https://images.unsplash.com/photo-1509631179647-0177331693ae?w=600" alt="1"></div>
+            <div class="gallery-item"><img src="https://images.unsplash.com/photo-1558769132-cb1aea1f1f57?w=600" alt="2"></div>
+            <div class="gallery-item"><img src="https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=600" alt="3"></div>
+            <div class="gallery-item"><img src="https://images.unsplash.com/photo-1490481651871-ab68de25d43d?w=600" alt="4"></div>
+            <div class="gallery-item"><img src="https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=600" alt="5"></div>
+            <div class="gallery-item"><img src="https://images.unsplash.com/photo-1469334031218-e382a71b716b?w=600" alt="6"></div>
+        </div>
     </section>
 
     <section class="cta">
-        <h2>JOIN US</h2>
-        <div class="cta-buttons">
-            <a href="https://www.instagram.com/vnu001_official" target="_blank" class="btn">Instagram</a>
-            <a href="https://youtube.com/@henryproduction" target="_blank" class="btn">YouTube</a>
+        <div class="cta-content">
+            <h2 class="section-title">探索更多</h2>
+            <div class="cta-buttons">
+                <a href="https://www.instagram.com/vnu001_official" target="_blank" class="btn">Instagram</a>
+                <a href="https://youtube.com/@henryproduction" target="_blank" class="btn">YouTube</a>
+            </div>
         </div>
     </section>
 </body>

@@ -3,56 +3,69 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>VNU 時尚表演藝術系</title>
+    <title>VNU 時尚造型設計暨表演藝術系</title>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;700;900&display=swap');
         
         * { margin: 0; padding: 0; box-sizing: border-box; }
         
         body {
-            font-family: 'Helvetica Neue', sans-serif;
+            font-family: 'Noto Sans TC', -apple-system, sans-serif;
             background: #fff;
             color: #000;
-            overflow-x: hidden;
+            line-height: 1.6;
         }
         
-        /* 導航 */
         nav {
             position: fixed;
             top: 0;
             width: 100%;
-            padding: 40px 80px;
+            padding: 30px 60px;
             display: flex;
             justify-content: space-between;
             align-items: center;
             z-index: 1000;
-            background: rgba(255,255,255,0.95);
+            background: rgba(255,255,255,0.98);
             backdrop-filter: blur(20px);
-            border-bottom: 1px solid rgba(0,0,0,0.05);
+            border-bottom: 1px solid rgba(0,0,0,0.1);
         }
         
         .logo {
-            font-family: 'Playfair Display', serif;
-            font-size: 20px;
+            font-family: 'Noto Serif TC', serif;
+            font-size: 18px;
             font-weight: 700;
-            letter-spacing: 1px;
         }
+        
+        .nav-menu {
+            display: flex;
+            gap: 40px;
+            list-style: none;
+        }
+        
+        .nav-menu a {
+            color: #000;
+            text-decoration: none;
+            font-size: 14px;
+            transition: opacity 0.3s;
+        }
+        
+        .nav-menu a:hover { opacity: 0.6; }
         
         .social-icons {
             display: flex;
-            gap: 30px;
+            gap: 20px;
         }
         
         .social-icons a {
-            width: 40px;
-            height: 40px;
+            width: 36px;
+            height: 36px;
             display: flex;
             align-items: center;
             justify-content: center;
             border: 1px solid #000;
             color: #000;
             text-decoration: none;
-            font-size: 12px;
+            font-size: 11px;
             transition: all 0.3s;
         }
         
@@ -61,85 +74,93 @@
             color: #fff;
         }
         
-        /* Hero 區塊 */
         .hero {
             height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
-            background: linear-gradient(135deg, #f5f5f5 0%, #fff 100%);
-            position: relative;
+            background: linear-gradient(135deg, #f8f8f8 0%, #fff 100%);
         }
         
         .hero-content {
             text-align: center;
-            max-width: 900px;
+            max-width: 1000px;
+            padding: 0 40px;
         }
         
         .hero h1 {
-            font-family: 'Playfair Display', serif;
-            font-size: 120px;
+            font-family: 'Noto Serif TC', serif;
+            font-size: 72px;
             font-weight: 900;
-            line-height: 1;
+            line-height: 1.2;
             margin-bottom: 30px;
-            letter-spacing: -3px;
         }
         
         .hero .subtitle {
-            font-size: 14px;
-            letter-spacing: 8px;
-            text-transform: uppercase;
+            font-size: 16px;
             color: #666;
+            letter-spacing: 2px;
         }
         
-        /* 特色區塊 */
-        .features {
-            padding: 150px 80px;
-            background: #000;
+        section { padding: 100px 60px; }
+        .section-title {
+            font-family: 'Noto Serif TC', serif;
+            font-size: 48px;
+            font-weight: 700;
+            text-align: center;
+            margin-bottom: 60px;
+        }
+        
+        .about { background: #fff; }
+        .about-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 40px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .about-item h3 {
+            font-size: 24px;
+            margin-bottom: 15px;
+        }
+        
+        .about-item p {
+            color: #666;
+            line-height: 1.8;
+        }
+        
+        .features { background: #000; color: #fff; }
+        .features-list {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        .features-list li {
+            font-size: 18px;
+            margin-bottom: 20px;
+            padding-left: 30px;
+            position: relative;
+        }
+        
+        .features-list li::before {
+            content: '•';
+            position: absolute;
+            left: 0;
             color: #fff;
         }
         
-        .features-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 60px;
-            margin-top: 80px;
-        }
-        
-        .feature-item h3 {
-            font-family: 'Playfair Display', serif;
-            font-size: 32px;
-            margin-bottom: 20px;
-        }
-        
-        .feature-item p {
-            font-size: 15px;
-            line-height: 1.8;
-            color: #999;
-        }
-        
-        .section-title {
-            font-family: 'Playfair Display', serif;
-            font-size: 60px;
-            font-weight: 700;
-            text-align: center;
-        }
-        
-        /* Gallery */
-        .gallery {
-            padding: 150px 0;
-            background: #fff;
-        }
-        
+        .gallery { background: #f8f8f8; }
         .gallery-grid {
             display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 0;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
         }
         
         .gallery-item {
             aspect-ratio: 1;
-            background: #f5f5f5;
             overflow: hidden;
         }
         
@@ -147,56 +168,44 @@
             width: 100%;
             height: 100%;
             object-fit: cover;
-            transition: transform 0.6s;
+            transition: transform 0.5s;
         }
         
-        .gallery-item:hover img {
-            transform: scale(1.05);
+        .gallery-item:hover img { transform: scale(1.1); }
+        
+        .contact { background: #000; color: #fff; text-align: center; }
+        .contact-info { max-width: 600px; margin: 40px auto 0; }
+        .contact-item {
+            margin-bottom: 30px;
+            font-size: 16px;
         }
         
-        /* CTA */
-        .cta {
-            padding: 150px 80px;
-            background: #000;
-            color: #fff;
-            text-align: center;
-        }
-        
-        .cta-buttons {
-            display: flex;
-            gap: 30px;
-            justify-content: center;
-            margin-top: 60px;
-        }
-        
-        .btn {
-            padding: 20px 60px;
+        .contact-item strong {
+            display: block;
+            margin-bottom: 10px;
             font-size: 12px;
-            letter-spacing: 3px;
+            letter-spacing: 2px;
             text-transform: uppercase;
-            text-decoration: none;
-            border: 1px solid #fff;
-            color: #fff;
-            transition: all 0.3s;
-        }
-        
-        .btn:hover {
-            background: #fff;
-            color: #000;
+            color: #999;
         }
         
         @media (max-width: 768px) {
             nav { padding: 20px 30px; }
-            .hero h1 { font-size: 60px; }
-            .features-grid { grid-template-columns: 1fr; }
-            .gallery-grid { grid-template-columns: 1fr; }
-            .cta-buttons { flex-direction: column; }
+            .nav-menu { display: none; }
+            .hero h1 { font-size: 40px; }
+            .about-grid, .gallery-grid { grid-template-columns: 1fr; }
         }
     </style>
 </head>
 <body>
     <nav>
-        <div class="logo">VNU Fashion & Arts</div>
+        <div class="logo">VNU 時尚表演藝術</div>
+        <ul class="nav-menu">
+            <li><a href="#about">關於</a></li>
+            <li><a href="#features">特色</a></li>
+            <li><a href="#gallery">作品</a></li>
+            <li><a href="#contact">聯絡</a></li>
+        </ul>
         <div class="social-icons">
             <a href="https://www.instagram.com/vnu001_official" target="_blank">IG</a>
             <a href="https://youtube.com/@henryproduction" target="_blank">YT</a>
@@ -205,43 +214,72 @@
 
     <section class="hero">
         <div class="hero-content">
-            <h1>時尚<br>表演<br>藝術</h1>
-            <p class="subtitle">Fashion & Performing Arts</p>
+            <h1>時尚造型設計<br>暨表演藝術系</h1>
+            <p class="subtitle">萬能科技大學 | VNU Fashion & Performing Arts</p>
         </div>
     </section>
 
-    <section class="features">
-        <h2 class="section-title">我們的專業</h2>
-        <div class="features-grid">
-            <div class="feature-item">
+    <section class="about" id="about">
+        <h2 class="section-title">系所特色</h2>
+        <div class="about-grid">
+            <div class="about-item">
                 <h3>時尚造型</h3>
-                <p>專業彩妝、髮型設計、服裝搭配，打造完整時尚造型能力</p>
+                <p>專業彩妝、髮型設計、服裝搭配，培養完整時尚造型能力。結合理論與實務，打造業界即戰力。</p>
             </div>
-            <div class="feature-item">
+            <div class="about-item">
                 <h3>舞台表演</h3>
-                <p>舞蹈、戲劇、音樂表演訓練，培養舞台魅力與專業演出技巧</p>
+                <p>舞蹈、戲劇、音樂表演訓練，培養舞台魅力與專業演出技巧。定期舉辦成果展演。</p>
             </div>
-            <div class="feature-item">
+            <div class="about-item">
                 <h3>影像製作</h3>
-                <p>攝影、剪輯、後製技術，掌握視覺傳達與影像敘事能力</p>
+                <p>攝影、剪輯、後製技術，掌握視覺傳達與影像敘事能力。培育新媒體創作人才。</p>
             </div>
         </div>
     </section>
 
-    <section class="gallery">
+    <section class="features" id="features">
+        <h2 class="section-title">課程亮點</h2>
+        <ul class="features-list">
+            <li>專業師資陣容，業界實務經驗豐富</li>
+            <li>完善實習設備，專業攝影棚、化妝間、舞蹈教室</li>
+            <li>產學合作機會，與時尚產業緊密連結</li>
+            <li>國際交流活動，拓展國際視野</li>
+            <li>多元證照輔導，提升就業競爭力</li>
+            <li>成果展演平台，累積實戰經驗</li>
+        </ul>
+    </section>
+
+    <section class="gallery" id="gallery">
+        <h2 class="section-title">學生作品</h2>
         <div class="gallery-grid">
-            <div class="gallery-item"><img src="https://images.unsplash.com/photo-1509631179647-0177331693ae?w=800" alt="Fashion 1"></div>
-            <div class="gallery-item"><img src="https://images.unsplash.com/photo-1558769132-cb1aea1f1f57?w=800" alt="Fashion 2"></div>
-            <div class="gallery-item"><img src="https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=800" alt="Fashion 3"></div>
-            <div class="gallery-item"><img src="https://images.unsplash.com/photo-1490481651871-ab68de25d43d?w=800" alt="Fashion 4"></div>
+            <div class="gallery-item"><img src="https://images.unsplash.com/photo-1509631179647-0177331693ae?w=600" alt="作品1"></div>
+            <div class="gallery-item"><img src="https://images.unsplash.com/photo-1558769132-cb1aea1f1f57?w=600" alt="作品2"></div>
+            <div class="gallery-item"><img src="https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=600" alt="作品3"></div>
+            <div class="gallery-item"><img src="https://images.unsplash.com/photo-1490481651871-ab68de25d43d?w=600" alt="作品4"></div>
+            <div class="gallery-item"><img src="https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=600" alt="作品5"></div>
+            <div class="gallery-item"><img src="https://images.unsplash.com/photo-1469334031218-e382a71b716b?w=600" alt="作品6"></div>
         </div>
     </section>
 
-    <section class="cta">
-        <h2 class="section-title">探索更多</h2>
-        <div class="cta-buttons">
-            <a href="https://www.instagram.com/vnu001_official" target="_blank" class="btn">Instagram</a>
-            <a href="https://youtube.com/@henryproduction" target="_blank" class="btn">YouTube</a>
+    <section class="contact" id="contact">
+        <h2 class="section-title">聯絡我們</h2>
+        <div class="contact-info">
+            <div class="contact-item">
+                <strong>Instagram</strong>
+                @vnu001_official
+            </div>
+            <div class="contact-item">
+                <strong>YouTube</strong>
+                Henry Production
+            </div>
+            <div class="contact-item">
+                <strong>學校官網</strong>
+                www.vnu.edu.tw
+            </div>
+            <div class="contact-item">
+                <strong>電話</strong>
+                03-4581196
+            </div>
         </div>
     </section>
 </body>

@@ -1,0 +1,817 @@
+<!DOCTYPE html>
+<html lang="zh-Hant-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>萬能早鳥報名</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<meta name="description" content="萬能科技大學招生處早鳥報名：一次一題、無障礙、約兩分鐘完成。">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;700&family=Noto+Sans+TC:wght@400;500;700;900&display=swap">
+<style>
+/* Layout: a single-question stage. Sticky status bar (mascot, level, progress) on top,
+   one centred card in the middle, sticky action bar at the bottom. Nothing else competes. */
+:root{
+  --bg:#F2F6FC;        /* dawn sky, cool and pale */
+  --surface:#FFFFFF;
+  --fg:#141A2A;
+  --muted:#55607A;
+  --line:#D6DCE8;
+  --accent:#C2410C;    /* sunrise orange, AA on white */
+  --accent-ink:#FFFFFF;
+  --accent-soft:#FFF1E8;
+  --ok:#1A7F4B;
+  --ok-soft:#E6F6EC;
+  --bad:#B42318;
+  --bad-soft:#FEF0EE;
+  --bird:#F59E0B;
+  --bird-dark:#C2700A;
+  --sky:#DCE8F8;
+  --shadow:0 12px 32px rgba(20,26,42,.08);
+  --font-body:"Noto Sans TC",system-ui,-apple-system,"PingFang TC","Microsoft JhengHei",sans-serif;
+  --font-display:"Fredoka","Noto Sans TC",system-ui,sans-serif;
+  --radius:22px;
+  --radius-sm:14px;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0E1424; --surface:#182036; --fg:#EEF2F8; --muted:#A7B1C7; --line:#2B3550;
+    --accent:#FB923C; --accent-ink:#141A2A; --accent-soft:#2A2214;
+    --ok:#5CD38D; --ok-soft:#14301F; --bad:#FF8A80; --bad-soft:#3A1F1C;
+    --bird:#FBBF24; --bird-dark:#D97706; --sky:#1C2742;
+    --shadow:0 12px 32px rgba(0,0,0,.4);
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0E1424; --surface:#182036; --fg:#EEF2F8; --muted:#A7B1C7; --line:#2B3550;
+  --accent:#FB923C; --accent-ink:#141A2A; --accent-soft:#2A2214;
+  --ok:#5CD38D; --ok-soft:#14301F; --bad:#FF8A80; --bad-soft:#3A1F1C;
+  --bird:#FBBF24; --bird-dark:#D97706; --sky:#1C2742;
+  --shadow:0 12px 32px rgba(0,0,0,.4);
+  color-scheme:dark;
+}
+
+html{font-size:18px;height:100%;-webkit-text-size-adjust:100%}
+html[data-fs="lg"]{font-size:21px}
+*,*::before,*::after{box-sizing:border-box}
+body{
+  margin:0;min-height:100%;display:flex;flex-direction:column;
+  background:var(--bg);color:var(--fg);
+  font-family:var(--font-body);line-height:1.6;
+  overflow-x:hidden;
+}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--bg)}
+.gutter{padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+:focus-visible{outline:3px solid var(--accent);outline-offset:3px;border-radius:6px}
+button{font:inherit;color:inherit}
+.sr-only{position:absolute!important;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+
+/* ---- top status bar ---- */
+.topbar{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg)}
+.topbar-in{max-width:36rem;margin:0 auto;padding-block:.6rem .4rem;display:flex;flex-direction:column;gap:.5rem}
+.status{display:flex;align-items:center;gap:.6rem;min-height:2.6rem}
+.mascot{width:2.6rem;height:2.6rem;flex:none}
+.mascot svg{width:100%;height:100%;display:block}
+.mascot .eye-happy{opacity:0}
+.mascot.happy .eye{opacity:0}
+.mascot.happy .eye-happy{opacity:1}
+.mascot.oops{animation:wobble .5s ease}
+.mascot.happy{animation:hop .5s ease}
+.level{display:inline-flex;align-items:center;gap:.35rem;font-weight:700;font-size:.85rem;padding:.2rem .65rem;border-radius:999px;background:var(--accent-soft);color:var(--accent);white-space:nowrap}
+.counter{margin-left:auto;font-family:var(--font-display);font-weight:700;font-size:1.05rem;font-variant-numeric:tabular-nums;color:var(--muted);white-space:nowrap}
+.counter b{color:var(--fg);font-size:1.3rem}
+.points{font-family:var(--font-display);font-weight:700;font-size:1rem;color:var(--accent);font-variant-numeric:tabular-nums;white-space:nowrap}
+.prog{display:flex;gap:4px;height:.5rem}
+.prog span{flex:1;border-radius:999px;background:var(--line);transition:background .3s}
+.prog span.on{background:var(--accent)}
+.prog span.now{background:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
+.fs-btn{margin-left:.25rem;border:2px solid var(--line);background:var(--surface);border-radius:999px;padding:.15rem .6rem;font-weight:700;font-size:.85rem;cursor:pointer;line-height:1.4}
+.fs-btn[aria-pressed="true"]{border-color:var(--accent);background:var(--accent-soft);color:var(--accent)}
+
+/* ---- stage ---- */
+.stage{flex:1;width:100%;max-width:36rem;margin:0 auto;padding-block:.75rem 1.25rem;display:flex;flex-direction:column}
+.card{
+  background:var(--surface);border-radius:var(--radius);box-shadow:var(--shadow);
+  padding:1.5rem 1.25rem 1.6rem;display:flex;flex-direction:column;gap:.9rem;min-width:0;
+}
+.card.enter{animation:slideIn .26s cubic-bezier(.2,.8,.2,1) both}
+.card.enter-back{animation:slideBack .26s cubic-bezier(.2,.8,.2,1) both}
+.eyebrow{margin:0;font-family:var(--font-display);font-weight:700;letter-spacing:.06em;font-size:.85rem;color:var(--accent);text-transform:uppercase}
+.eyebrow .zh{font-family:var(--font-body);letter-spacing:.08em}
+.q-title{margin:0;font-size:1.75rem;line-height:1.3;font-weight:900;text-wrap:balance;letter-spacing:.01em}
+.q-hint{margin:0;color:var(--muted);font-size:1rem}
+fieldset{border:0;padding:0;margin:0;min-width:0;display:flex;flex-direction:column;gap:.9rem}
+legend{padding:0;float:left;width:100%}
+legend + *{clear:both}
+
+.field{
+  width:100%;min-height:3.4rem;font:inherit;font-size:1.3rem;padding:.6rem .9rem;
+  border:2px solid var(--line);border-radius:var(--radius-sm);background:var(--surface);color:var(--fg);
+  -webkit-appearance:none;appearance:none;
+}
+.field::placeholder{color:var(--muted);opacity:.7}
+.field:focus{border-color:var(--accent);outline:3px solid var(--accent-soft);outline-offset:0}
+.field[aria-invalid="true"]{border-color:var(--bad)}
+.field.upper{text-transform:uppercase;letter-spacing:.08em;font-family:var(--font-display)}
+.err{margin:0;color:var(--bad);font-weight:700;background:var(--bad-soft);padding:.55rem .8rem;border-radius:var(--radius-sm);font-size:.95rem}
+.ok-note{margin:0;color:var(--ok);font-weight:700;font-size:.95rem}
+
+/* choice options */
+.opts{display:flex;flex-direction:column;gap:.6rem}
+.opt{position:relative;display:block;cursor:pointer}
+.opt input{position:absolute;opacity:0;width:1px;height:1px;margin:0}
+.opt-body{
+  display:flex;align-items:center;gap:.75rem;min-height:3.4rem;padding:.7rem .9rem;
+  border:2px solid var(--line);border-radius:var(--radius-sm);background:var(--surface);font-size:1.15rem;font-weight:500;
+  transition:border-color .15s,background .15s,transform .15s;
+}
+.opt-key{flex:none;width:1.9rem;height:1.9rem;border-radius:8px;border:2px solid var(--line);display:none;place-items:center;font-family:var(--font-display);font-weight:700;font-size:.9rem;color:var(--muted)}
+@media (hover:hover) and (min-width:700px){.opt-key{display:grid}}
+.opt-mark{margin-left:auto;flex:none;width:1.5rem;height:1.5rem;border-radius:50%;border:2px solid var(--line);display:grid;place-items:center}
+.opt-mark::after{content:"";width:.7rem;height:.7rem;border-radius:50%;background:var(--accent);transform:scale(0);transition:transform .15s}
+.opt input:checked + .opt-body{border-color:var(--accent);background:var(--accent-soft)}
+.opt input:checked + .opt-body .opt-mark{border-color:var(--accent)}
+.opt input:checked + .opt-body .opt-mark::after{transform:scale(1)}
+.opt input:focus-visible + .opt-body{outline:3px solid var(--accent);outline-offset:3px}
+@media (hover:hover){.opt:hover .opt-body{border-color:var(--accent)}}
+
+/* multi chips */
+.chips{display:flex;flex-wrap:wrap;gap:.5rem}
+.chip{position:relative;cursor:pointer}
+.chip input{position:absolute;opacity:0;width:1px;height:1px;margin:0}
+.chip-body{display:inline-flex;align-items:center;gap:.4rem;min-height:2.9rem;padding:.45rem .9rem;border:2px solid var(--line);border-radius:999px;background:var(--surface);font-weight:500;font-size:1.02rem;transition:border-color .15s,background .15s}
+.chip input:checked + .chip-body{border-color:var(--accent);background:var(--accent-soft);color:var(--accent);font-weight:700}
+.chip input:focus-visible + .chip-body{outline:3px solid var(--accent);outline-offset:3px}
+.chip input:disabled + .chip-body{opacity:.45;cursor:not-allowed}
+.group-label{margin:.4rem 0 0;font-size:.85rem;font-weight:700;color:var(--muted);letter-spacing:.06em}
+.group-label:first-child{margin-top:0}
+.count{margin:0;font-family:var(--font-display);font-weight:700;color:var(--muted);font-variant-numeric:tabular-nums}
+.count b{color:var(--accent)}
+
+/* consent */
+.consent .opt-body{align-items:flex-start;font-size:1.02rem;line-height:1.55}
+.consent .opt-mark{margin-left:0;margin-top:.2rem;border-radius:7px}
+.consent .opt-mark::after{border-radius:2px}
+.link{background:none;border:0;padding:0;color:var(--accent);font-weight:700;text-decoration:underline;text-underline-offset:3px;cursor:pointer}
+.skip{align-self:flex-start;background:none;border:0;padding:.4rem 0;color:var(--muted);font-weight:700;text-decoration:underline;text-underline-offset:3px;cursor:pointer}
+
+/* review */
+.review{margin:0;display:flex;flex-direction:column;border-top:1px solid var(--line)}
+.review > div{display:grid;grid-template-columns:5.5rem 1fr;gap:.25rem .6rem;align-items:start;padding:.7rem 0;border-bottom:1px solid var(--line);min-width:0}
+.review dt{color:var(--muted);font-size:.9rem;font-weight:700;padding-top:.15rem}
+.review dd{margin:0;display:flex;gap:.6rem;align-items:flex-start;justify-content:space-between;min-width:0;font-weight:500;overflow-wrap:anywhere}
+.review dd .edit{flex:none;border:2px solid var(--line);background:var(--surface);border-radius:999px;padding:.15rem .7rem;font-size:.85rem;font-weight:700;cursor:pointer;min-height:2.2rem}
+.review dd .edit:hover{border-color:var(--accent);color:var(--accent)}
+
+/* welcome / done */
+.hero{align-items:center;text-align:center;gap:.75rem;padding-top:2rem}
+.hero .mascot-big{width:6.5rem;height:6.5rem}
+.hero .mascot-big svg{width:100%;height:100%}
+.hero h1{font-size:2.6rem;margin:0;font-weight:900;line-height:1.15;letter-spacing:.02em}
+.hero .lead{margin:0;color:var(--muted);max-width:28ch;text-wrap:balance}
+.hero ul{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:.35rem;color:var(--muted);font-size:.95rem}
+.badge{display:inline-flex;align-items:center;gap:.4rem;background:var(--sky);color:var(--fg);padding:.3rem .8rem;border-radius:999px;font-weight:700;font-size:.9rem;max-width:100%;overflow-wrap:anywhere}
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:.5rem;
+  min-height:3.4rem;padding:.7rem 1.4rem;border-radius:999px;border:2px solid transparent;
+  font-weight:900;font-size:1.15rem;cursor:pointer;text-decoration:none;transition:transform .12s,background .15s;
+}
+.btn:active{transform:scale(.98)}
+.btn-primary{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.btn-primary:disabled{opacity:.55;cursor:wait}
+.btn-ghost{background:var(--surface);color:var(--fg);border-color:var(--line)}
+.btn-ghost:hover{border-color:var(--accent)}
+.btn-wide{width:100%}
+.hero .btn-wide{max-width:22rem}
+.done .ref{display:flex;flex-direction:column;align-items:center;gap:.2rem;background:var(--accent-soft);border-radius:var(--radius-sm);padding:.8rem 1rem;width:100%;max-width:22rem}
+.done .ref span{font-size:.85rem;color:var(--muted);font-weight:700}
+.done .ref strong{font-family:var(--font-display);font-size:1.6rem;letter-spacing:.08em;color:var(--accent);user-select:all}
+.done .ref .copy{margin-top:.2rem;border:0;background:none;color:var(--accent);font-weight:700;text-decoration:underline;text-underline-offset:3px;cursor:pointer;min-height:2.2rem}
+.score{margin:0;font-family:var(--font-display);font-weight:700;font-size:1.15rem;color:var(--fg)}
+.score b{color:var(--accent);font-size:1.5rem}
+.note{margin:0;color:var(--muted);font-size:.95rem;max-width:32ch;text-wrap:balance}
+.notice{margin:0;width:100%;padding:.7rem .9rem;border-radius:var(--radius-sm);font-size:.95rem;font-weight:500;text-align:left}
+.notice.warn{background:var(--accent-soft);color:var(--fg);border:2px solid var(--accent)}
+.notice.good{background:var(--ok-soft);color:var(--fg)}
+.links{display:flex;flex-wrap:wrap;gap:.6rem;justify-content:center;width:100%}
+.badge-svg{width:5.5rem;height:5.5rem}
+
+/* ---- bottom action bar ---- */
+.actions{position:sticky;bottom:0;z-index:5;background:var(--bg);border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom,0px)}
+.actions[hidden]{display:none}
+.actions-in{max-width:36rem;margin:0 auto;padding-block:.7rem;display:flex;gap:.6rem;align-items:center}
+.actions .btn-primary{flex:1}
+.actions .btn-ghost{flex:none;min-width:5.5rem}
+
+/* toast + live */
+.toast{
+  position:fixed;left:50%;top:calc(env(safe-area-inset-top,0px) + 4.6rem);transform:translateX(-50%);
+  background:var(--fg);color:var(--bg);font-family:var(--font-display);font-weight:700;font-size:1.05rem;
+  padding:.45rem 1rem;border-radius:999px;pointer-events:none;opacity:0;z-index:20;white-space:nowrap;
+}
+.toast.show{animation:toast 1.1s ease forwards}
+.confetti{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:30}
+
+/* dialog */
+dialog{
+  border:0;border-radius:var(--radius);background:var(--surface);color:var(--fg);padding:0;
+  width:min(92vw,34rem);max-height:85vh;box-shadow:var(--shadow);
+}
+dialog::backdrop{background:rgba(10,14,26,.55)}
+.dlg{padding:1.25rem 1.25rem 1.4rem;display:flex;flex-direction:column;gap:.7rem;overflow:auto;max-height:85vh}
+.dlg h2{margin:0;font-size:1.3rem}
+.dlg h3{margin:.4rem 0 0;font-size:1rem;color:var(--accent)}
+.dlg p,.dlg li{margin:0;font-size:.95rem}
+.dlg ol{margin:0;padding-left:1.3rem;display:flex;flex-direction:column;gap:.35rem}
+.dlg .btn{align-self:flex-end}
+
+@keyframes slideIn{from{opacity:0;transform:translateX(28px)}to{opacity:1;transform:none}}
+@keyframes slideBack{from{opacity:0;transform:translateX(-28px)}to{opacity:1;transform:none}}
+@keyframes hop{0%,100%{transform:none}40%{transform:translateY(-6px) rotate(-6deg)}}
+@keyframes wobble{0%,100%{transform:none}25%{transform:translateX(-4px) rotate(-5deg)}75%{transform:translateX(4px) rotate(5deg)}}
+@keyframes toast{0%{opacity:0;transform:translate(-50%,8px)}15%{opacity:1;transform:translate(-50%,0)}80%{opacity:1}100%{opacity:0;transform:translate(-50%,-10px)}}
+@media (prefers-reduced-motion: reduce){
+  *,*::before,*::after{animation:none!important;transition:none!important}
+  .toast.show{opacity:1}
+}
+@media (min-width:700px){
+  .card{padding:2rem 2rem 2.2rem}
+  .q-title{font-size:2rem}
+}
+</style>
+</head>
+<body>
+
+<header class="topbar" id="topbar">
+  <div class="topbar-in gutter">
+    <div class="status">
+      <div class="mascot" id="mascot" aria-hidden="true">
+        <svg viewBox="0 0 64 64">
+          <path d="M31 13c-1-6 2-9 6-8-3 2-3 5-2 8z" fill="var(--bird-dark)"/>
+          <circle cx="32" cy="36" r="22" fill="var(--bird)"/>
+          <path d="M13 40c-5 6-3 14 4 16 5-1 9-5 10-10z" fill="var(--bird-dark)"/>
+          <path d="M51 32l11 4-11 4z" fill="#E8590C"/>
+          <circle class="eye" cx="41" cy="30" r="3.2" fill="#141A2A"/>
+          <path class="eye-happy" d="M37 31q4-5 8 0" stroke="#141A2A" stroke-width="3" fill="none" stroke-linecap="round"/>
+          <circle cx="44" cy="38" r="3.5" fill="#FDBA74" opacity=".8"/>
+        </svg>
+      </div>
+      <span class="level" id="level">剛破殼</span>
+      <span class="points" id="points" aria-label="目前分數">0 分</span>
+      <span class="counter" id="counter"></span>
+      <button class="fs-btn" id="fs" type="button" aria-pressed="false" aria-label="切換大字模式">大字</button>
+    </div>
+    <div class="prog" id="prog" role="progressbar" aria-label="填寫進度" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"></div>
+  </div>
+</header>
+
+<main class="stage gutter" id="stage" aria-live="off"></main>
+
+<nav class="actions" id="actions" hidden aria-label="上一關與下一關">
+  <div class="actions-in gutter">
+    <button class="btn btn-ghost" id="back" type="button">上一關</button>
+    <button class="btn btn-primary" id="next" type="submit" form="stepform">下一關</button>
+  </div>
+</nav>
+
+<div class="toast" id="toast" aria-hidden="true"></div>
+<div class="sr-only" id="live" aria-live="polite" aria-atomic="true"></div>
+
+<dialog id="privacy" aria-labelledby="privacy-title">
+  <div class="dlg">
+    <h2 id="privacy-title">個人資料蒐集告知事項</h2>
+    <p>依個人資料保護法第 8 條，萬能科技大學招生處向你說明：</p>
+    <h3>蒐集目的</h3><p>辦理招生宣導、早鳥報名登記、入學相關活動通知與諮詢。</p>
+    <h3>蒐集的資料</h3><p>姓名、手機、電子郵件、身分證字號、就讀學校與年級、有興趣的系所。</p>
+    <h3>利用期間、對象與方式</h3><p>自填寫日起至當學年度招生作業結束；僅供本校招生處與相關系所使用，以電子或書面方式處理，不會提供給第三人。</p>
+    <h3>你的權利</h3><p>你可以向招生處查詢、更正或請求刪除資料。</p>
+    <h3>不提供的影響</h3><p>若未提供完整資料，將無法完成早鳥登記。</p>
+    <button class="btn btn-primary" type="button" id="privacy-close">我知道了</button>
+  </div>
+</dialog>
+
+<script>
+(function(){
+'use strict';
+document.documentElement.lang = 'zh-Hant-TW';
+
+/* =========================================================
+   設定區：之後對齊學校早鳥系統時，只需要改這裡
+   ========================================================= */
+const CONFIG = {
+  endpoint: '',                 // Google Apps Script 網頁應用程式網址（空白 = 示範模式，只存在手機裡）
+  schoolName: '萬能科技大學',
+  unit: '招生處',
+  year: '116',                  // 學年度
+  afterText: '招生處會在 3 個工作天內，用簡訊或 Email 通知你早鳥資格與後續活動。',
+  afterLinks: [                 // 完成畫面的連結按鈕，可留空陣列
+    { label: '萬能科大招生資訊', href: 'https://www.vnu.edu.tw/' }
+  ],
+  // 系所名單：請依當年度招生簡章修正
+  departments: {
+    '設計學院': ['時尚造型設計暨表演藝術系', '商品設計系', '數位多媒體設計系'],
+    '航空暨觀光學院': ['航空暨運輸服務管理系', '觀光與休閒事業管理系', '餐飲管理系', '旅館管理系'],
+    '管理學院': ['企業管理系', '行銷與流通管理系', '資訊管理系'],
+    '工程學院': ['資訊工程系', '電機工程系', '機械工程系', '光電工程系', '營建科技系', '環境工程系', '化妝品應用與管理系']
+  },
+  // 學校快速選取名單（找不到可直接輸入）
+  schools: [
+    '武陵高中','桃園高中','中壢高中','內壢高中','陽明高中','壽山高中','南崁高中','平鎮高中','大園國際高中','永豐高中','楊梅高中','大溪高中','龍潭高中','觀音高中','新屋高中','中壢高商','中壢家商','桃園農工','治平高中','育達高中','啟英高中','振聲高中','復旦高中','新興高中','大興高中','方曙商工','光啟高中','成功工商','六和高中','永平工商','至善高中','清華高中','泉僑高中','大華高中',
+    '新竹高中','新竹女中','竹北高中','新竹高商','新竹高工','竹東高中','關西高中','湖口高中','義民高中','磐石高中','曙光女中','內思高工','忠信高中',
+    '苗栗高中','苗栗農工','苗栗高商','竹南高中','苑裡高中','卓蘭高中','君毅高中','建臺高中','興華高中','育民工家','中興商工','大成高中',
+    '板橋高中','新店高中','海山高中','中和高中','永平高中','新莊高中','林口高中','三重高中','三民高中','泰山高中','樹林高中','明德高中','錦和高中','清水高中','秀峰高中','丹鳳高中','金山高中','瑞芳高工','鶯歌工商','新北高工','三重商工','淡水商工','新北高中','竹圍高中','北大高中','安康高中','淡江高中','南山高中','竹林高中','恆毅高中','崇光高中','徐匯高中','聖心女中','及人高中','中華高中','東海高中','能仁家商','豫章工商','南強工商','莊敬高職','穀保家商','復興商工','智光商工','清傳高商','格致高中','裕德高中','醒吾高中','光仁高中','辭修高中',
+    '建國中學','北一女中','師大附中','成功高中','中山女高','松山高中','大同高中','中正高中','景美女中','內湖高中','麗山高中','大直高中','和平高中','南港高中','萬芳高中','明倫高中','百齡高中','永春高中','西松高中','成淵高中','復興高中','華江高中','士林高商','松山家商','松山工農','大安高工','南港高工','內湖高工','木柵高工','開南商工','泰北高中','景文高中','東山高中','薇閣高中','再興中學','靜修女中','達人女中','金甌女中','滬江高中','強恕高中','喬治工商','育達高職','開平餐飲','大誠高中','南華高中','惇敘工商','華岡藝校',
+    '基隆高中','基隆女中','暖暖高中','安樂高中','基隆商工','基隆海事','二信高中','光隆家商','培德工家'
+  ],
+  sources: ['高中職宣導講座', '升學博覽會／擺攤', '學校老師推薦', '朋友或學長姐介紹', 'IG／FB／社群', '網路搜尋', '其他'],
+  grades: ['高三', '高二', '高一', '已畢業／重考', '其他'],
+  pointsRequired: 10,
+  pointsOptional: 5,
+  pointsFinish: 20
+};
+
+/* 題目：一題一關。enabled:false 可關閉；順序即關卡順序 */
+const QUESTIONS = [
+  { key: 'name', type: 'text', label: '姓名', title: '先認識一下，你的名字是？', hint: '請填身分證上的姓名。', placeholder: '例如：林小鳥', autocomplete: 'name', maxlength: 30,
+    validate: v => /^[㐀-䶿一-鿿A-Za-z·‧\s]{2,30}$/.test(v) ? '' : '請輸入 2 到 30 個字的中文或英文姓名。' },
+  { key: 'phone', type: 'tel', label: '手機', title: '你的手機號碼？', hint: '早鳥資格和活動通知會用簡訊寄給你。', placeholder: '09xx xxx xxx', inputmode: 'numeric', autocomplete: 'tel', maxlength: 14,
+    normalize: v => v.replace(/\D/g, ''), validate: v => /^09\d{8}$/.test(v) ? '' : '手機要是 09 開頭的 10 碼數字，例如 0912345678。' },
+  { key: 'email', type: 'email', label: 'Email', title: '你的電子郵件？', hint: '收錄取通知、活動資訊會用到。', placeholder: 'name@example.com', inputmode: 'email', autocomplete: 'email', maxlength: 80,
+    normalize: v => v.trim().toLowerCase(), validate: v => /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v) ? '' : '看起來少了 @ 或網域，請再確認一次。' },
+  { key: 'idno', type: 'text', label: '身分證字號', title: '身分證字號', hint: '用來核對早鳥資格，只有招生處看得到。', placeholder: 'A123456789', autocomplete: 'off', maxlength: 10, upper: true,
+    normalize: v => v.toUpperCase().replace(/\s/g, ''), validate: v => validTwId(v) ? '' : '字號格式不對，請再對一次（1 個英文字母＋9 個數字）。' },
+  { key: 'school', type: 'school', label: '就讀學校', title: '你現在讀哪所學校？', hint: '輸入幾個字會出現建議，找不到就直接打完整校名。', placeholder: '例如：中壢高中', autocomplete: 'off', maxlength: 40,
+    normalize: v => v.trim(), validate: v => v.length >= 2 ? '' : '請輸入學校名稱。' },
+  { key: 'grade', type: 'choice', label: '年級', title: '你是幾年級？', options: CONFIG.grades },
+  { key: 'klass', type: 'text', label: '科別／班級', title: '你的科別或班級？', hint: '選填，方便老師之後聯絡。', placeholder: '例如：表演藝術科 3 年 2 班', optional: true, autocomplete: 'off', maxlength: 40 },
+  { key: 'depts', type: 'multi', label: '有興趣的系', title: '對哪些系有興趣？', hint: '最多選 3 個，先選最想看的。', max: 3, groups: CONFIG.departments },
+  { key: 'source', type: 'choice', label: '得知管道', title: '你是怎麼知道這次早鳥的？', options: CONFIG.sources, skipIfParam: 'src' },
+  { key: 'consent', type: 'consent', label: '個資同意', title: '最後一步', hint: '看完同意後，就可以檢查資料並送出。' }
+];
+
+/* ---------- 工具 ---------- */
+const $ = (s, r) => (r || document).querySelector(s);
+const hist = { push(st){ try { history.pushState(st, ''); } catch (e) {} }, replace(st){ try { history.replaceState(st, ''); } catch (e) {} } };
+const LS = {
+  get(k){ try { return JSON.parse(localStorage.getItem(k)); } catch (e) { return null; } },
+  set(k, v){ try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} },
+  del(k){ try { localStorage.removeItem(k); } catch (e) {} }
+};
+const K_DRAFT = 'vnu-eb-draft', K_QUEUE = 'vnu-eb-queue', K_FS = 'vnu-eb-fs';
+const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]));
+const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+const params = new URLSearchParams(location.search);
+const meta = { src: (params.get('src') || '').slice(0, 80), by: (params.get('by') || '').slice(0, 80), evt: (params.get('evt') || '').slice(0, 80) };
+
+const ID_MAP = { A:10,B:11,C:12,D:13,E:14,F:15,G:16,H:17,I:34,J:18,K:19,L:20,M:21,N:22,O:35,P:23,Q:24,R:25,S:26,T:27,U:28,V:29,W:32,X:30,Y:31,Z:33 };
+function validTwId(s){
+  s = (s || '').toUpperCase();
+  if (/^[A-Z]{2}\d{8}$/.test(s)) return true;                 // 舊式居留證號，不做檢查碼
+  if (!/^[A-Z][1289]\d{8}$/.test(s)) return false;           // 身分證 / 新式統一證號
+  const n = ID_MAP[s[0]];
+  let sum = Math.floor(n / 10) + (n % 10) * 9;
+  const w = [8, 7, 6, 5, 4, 3, 2, 1];
+  for (let i = 0; i < 8; i++) sum += (+s[i + 1]) * w[i];
+  sum += +s[9];
+  return sum % 10 === 0;
+}
+function makeRef(){
+  const d = new Date(), p = n => String(n).padStart(2, '0');
+  const alpha = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+  let r = ''; for (let i = 0; i < 4; i++) r += alpha[Math.floor(Math.random() * alpha.length)];
+  return 'EB' + d.getFullYear() + p(d.getMonth() + 1) + p(d.getDate()) + '-' + r;
+}
+
+/* ---------- 關卡 ---------- */
+const QS = QUESTIONS.filter(q => q.enabled !== false && !(q.skipIfParam && meta[q.skipIfParam]));
+const STEPS = [{ type: 'welcome' }].concat(QS.map(q => ({ type: 'q', q })), [{ type: 'review' }, { type: 'done' }]);
+const TOTAL = QS.length;
+const LEVELS = ['剛破殼', '學飛中', '展翅了', '早鳥達人'];
+const CHEERS = ['好耶', '太棒了', '就是這樣', '很順喔', '快完成了', '厲害'];
+
+let state = { i: 0, answers: {}, points: 0, ref: null, returnToReview: false, result: null, dir: 1 };
+let lastPointer = false;
+
+const stage = $('#stage'), actions = $('#actions'), backBtn = $('#back'), nextBtn = $('#next');
+const live = $('#live'), toast = $('#toast'), mascot = $('#mascot');
+
+function announce(t){ live.textContent = ''; setTimeout(() => { live.textContent = t; }, 40); }
+function cheer(pts, i){
+  if (pts) { state.points += pts; $('#points').textContent = state.points + ' 分'; }
+  toast.textContent = (pts ? '+' + pts + ' ' : '') + CHEERS[i % CHEERS.length];
+  toast.classList.remove('show'); void toast.offsetWidth; toast.classList.add('show');
+  mascot.classList.remove('happy'); void mascot.offsetWidth; mascot.classList.add('happy');
+  setTimeout(() => mascot.classList.remove('happy'), 700);
+}
+function oops(){ mascot.classList.remove('oops'); void mascot.offsetWidth; mascot.classList.add('oops'); setTimeout(() => mascot.classList.remove('oops'), 600); }
+function saveDraft(){ LS.set(K_DRAFT, { answers: state.answers, i: state.i, points: state.points, t: Date.now() }); }
+function qIndex(step){ return STEPS[step].type === 'q' ? QS.indexOf(STEPS[step].q) : -1; }
+
+/* ---------- 畫面 ---------- */
+function renderTop(){
+  const step = STEPS[state.i];
+  const done = step.type === 'done' ? TOTAL : step.type === 'review' ? TOTAL : Math.max(0, qIndex(state.i));
+  const prog = $('#prog');
+  prog.innerHTML = QS.map((q, k) => `<span class="${k < done ? 'on' : (k === done && step.type === 'q') ? 'now' : ''}"></span>`).join('');
+  const pct = Math.round(done / TOTAL * 100);
+  prog.setAttribute('aria-valuenow', pct);
+  prog.setAttribute('aria-valuetext', `已完成 ${done} 關，共 ${TOTAL} 關`);
+  const lv = step.type === 'done' ? 3 : Math.min(2, Math.floor(done / TOTAL * 3));
+  $('#level').textContent = LEVELS[lv];
+  $('#points').textContent = state.points + ' 分';
+  $('#counter').innerHTML = step.type === 'q' ? `<b>${done + 1}</b> / ${TOTAL}` : step.type === 'review' ? '檢查' : step.type === 'done' ? '完成' : `${TOTAL} 關`;
+}
+
+function render(opts){
+  opts = opts || {};
+  const step = STEPS[state.i];
+  renderTop();
+  let html = '';
+  if (step.type === 'welcome') html = viewWelcome();
+  else if (step.type === 'q') html = viewQuestion(step.q);
+  else if (step.type === 'review') html = viewReview();
+  else html = viewDone();
+  stage.innerHTML = html;
+  const card = stage.firstElementChild;
+  if (card && !reduced) card.classList.add(state.dir < 0 ? 'enter-back' : 'enter');
+
+  actions.hidden = (step.type === 'welcome' || step.type === 'done');
+  backBtn.hidden = false;
+  if (step.type === 'q') {
+    const k = qIndex(state.i);
+    nextBtn.textContent = state.returnToReview ? '回到檢查' : (k === TOTAL - 1 ? '檢查資料' : '下一關');
+    backBtn.textContent = k === 0 ? '回首頁' : '上一關';
+  } else if (step.type === 'review') {
+    nextBtn.textContent = '送出報名';
+    backBtn.textContent = '上一關';
+  }
+  nextBtn.disabled = false; nextBtn.removeAttribute('aria-busy');
+
+  bind(step);
+  if (!opts.silent) {
+    if (step.type === 'q') announce(`第 ${qIndex(state.i) + 1} 關，共 ${TOTAL} 關。${step.q.title}`);
+    else if (step.type === 'review') announce('檢查資料。請確認每一項都正確，再按送出報名。');
+    else if (step.type === 'done') announce('報名完成。');
+  }
+  focusStep(step, opts);
+  window.scrollTo({ top: 0, behavior: 'auto' });
+}
+
+function focusStep(step, opts){
+  if (step.type === 'welcome' && !opts.focus) return;
+  let el = null;
+  if (step.type === 'q') {
+    const q = step.q;
+    if (q.type === 'choice') el = stage.querySelector('input:checked') || stage.querySelector('input[type=radio]');
+    else if (q.type === 'multi') el = stage.querySelector('.q-title');
+    else if (q.type === 'consent') el = stage.querySelector('.q-title');
+    else el = stage.querySelector('.field');
+  } else el = stage.querySelector('h1');
+  if (!el) return;
+  if (el.tagName === 'H1' || el.tagName === 'LEGEND' || el.classList.contains('q-title')) el.setAttribute('tabindex', '-1');
+  el.focus({ preventScroll: true });
+}
+
+function eyebrow(q){
+  const k = QS.indexOf(q) + 1;
+  return `<p class="eyebrow">Level ${k} <span class="zh">／ 共 ${TOTAL} 關${q.optional ? ' · 選填' : ''}</span></p>`;
+}
+
+function viewWelcome(){
+  const draft = LS.get(K_DRAFT);
+  const n = draft && draft.answers ? Object.keys(draft.answers).length : 0;
+  const fresh = draft && draft.t && (Date.now() - draft.t) < 7 * 864e5 && n > 0;
+  return `
+  <section class="card hero" aria-labelledby="w-title">
+    <div class="mascot-big" aria-hidden="true">${mascot.innerHTML}</div>
+    <p class="eyebrow">Early Bird <span class="zh">／ ${esc(CONFIG.schoolName)}${esc(CONFIG.unit)} · ${esc(CONFIG.year)} 學年度</span></p>
+    <h1 id="w-title">早鳥報名</h1>
+    <p class="lead">一次一題，大約兩分鐘。答錯可以回上一關改，不用急。</p>
+    ${meta.src ? `<span class="badge">活動：${esc(meta.src)}${meta.by ? '（' + esc(meta.by) + '）' : ''}</span>` : ''}
+    <ul aria-label="說明">
+      <li>共 ${TOTAL} 個小關卡，每一關只問一件事</li>
+      <li>沒有時間限制，可以隨時回頭修改</li>
+      <li>右上角「大字」可以放大字體</li>
+    </ul>
+    ${fresh ? `<button class="btn btn-primary btn-wide" type="button" id="resume">繼續上次（已填 ${n} 題）</button>
+               <button class="btn btn-ghost btn-wide" type="button" id="start">重新開始</button>`
+            : `<button class="btn btn-primary btn-wide" type="button" id="start">開始</button>`}
+    <button class="link" type="button" data-privacy>填寫前先看個資告知</button>
+  </section>`;
+}
+
+function viewQuestion(q){
+  const v = state.answers[q.key];
+  let body = '';
+  const descr = `hint-${q.key} err-${q.key}`;
+  if (q.type === 'choice') {
+    body = `<fieldset>
+      <legend class="q-title">${esc(q.title)}</legend>
+      ${q.hint ? `<p class="q-hint" id="hint-${q.key}">${esc(q.hint)}</p>` : ''}
+      <div class="opts">
+        ${q.options.map((o, k) => `<label class="opt"><input type="radio" name="${q.key}" value="${esc(o)}" ${v === o ? 'checked' : ''}><span class="opt-body"><span class="opt-key" aria-hidden="true">${k + 1}</span>${esc(o)}<span class="opt-mark" aria-hidden="true"></span></span></label>`).join('')}
+      </div>
+      <p class="err" id="err-${q.key}" role="alert" hidden></p>
+    </fieldset>`;
+  } else if (q.type === 'multi') {
+    const sel = Array.isArray(v) ? v : [];
+    const groups = Object.keys(q.groups);
+    body = `<fieldset>
+      <legend class="q-title">${esc(q.title)}</legend>
+      <p class="q-hint" id="hint-${q.key}">${esc(q.hint || '')}</p>
+      <p class="count" aria-live="polite">已選 <b id="cnt-${q.key}">${sel.length}</b> / ${q.max}</p>
+      ${groups.map(g => `<p class="group-label">${esc(g)}</p><div class="chips">${q.groups[g].map(o => `<label class="chip"><input type="checkbox" name="${q.key}" value="${esc(o)}" ${sel.includes(o) ? 'checked' : ''}><span class="chip-body">${esc(o)}</span></label>`).join('')}</div>`).join('')}
+      <p class="err" id="err-${q.key}" role="alert" hidden></p>
+    </fieldset>`;
+  } else if (q.type === 'consent') {
+    body = `<h1 class="q-title">${esc(q.title)}</h1>
+      <p class="q-hint" id="hint-${q.key}">${esc(q.hint || '')}</p>
+      <p class="q-hint"><button class="link" type="button" data-privacy>打開個資告知事項</button></p>
+      <label class="opt consent"><input type="checkbox" id="f-${q.key}" name="${q.key}" ${v ? 'checked' : ''} aria-describedby="${descr}"><span class="opt-body"><span class="opt-mark" aria-hidden="true"></span><span>我已閱讀個資告知事項，同意${esc(CONFIG.schoolName)}${esc(CONFIG.unit)}使用以上資料辦理早鳥報名與活動通知。</span></span></label>
+      <input class="sr-only" type="text" name="company" tabindex="-1" autocomplete="off" aria-hidden="true">
+      <p class="err" id="err-${q.key}" role="alert" hidden></p>`;
+  } else {
+    const type = q.type === 'school' ? 'text' : q.type;
+    body = `<h1 class="q-title"><label for="f-${q.key}">${esc(q.title)}</label></h1>
+      ${q.hint ? `<p class="q-hint" id="hint-${q.key}">${esc(q.hint)}</p>` : ''}
+      <input class="field${q.upper ? ' upper' : ''}" id="f-${q.key}" name="${q.key}" type="${type}" value="${esc(v || '')}"
+        placeholder="${esc(q.placeholder || '')}" ${q.inputmode ? `inputmode="${q.inputmode}"` : ''} autocomplete="${q.autocomplete || 'off'}"
+        ${q.maxlength ? `maxlength="${q.maxlength}"` : ''} ${q.type === 'school' ? 'list="school-list"' : ''} aria-describedby="${descr}" enterkeyhint="next" autocapitalize="${q.upper ? 'characters' : 'off'}">
+      ${q.type === 'school' ? `<datalist id="school-list">${CONFIG.schools.map(s => `<option value="${esc(s)}"></option>`).join('')}</datalist>` : ''}
+      <p class="err" id="err-${q.key}" role="alert" hidden></p>
+      ${q.optional ? `<button class="skip" type="button" id="skip">這題先跳過</button>` : ''}`;
+  }
+  return `<form class="card" id="stepform" novalidate>${eyebrow(q)}${body}</form>`;
+}
+
+function displayValue(q){
+  const v = state.answers[q.key];
+  if (q.type === 'multi') return (v || []).join('、');
+  if (q.type === 'consent') return v ? '已同意' : '未同意';
+  return v || '';
+}
+
+function viewReview(){
+  const rows = QS.filter(q => q.type !== 'consent').map(q => `
+    <div><dt>${esc(q.label)}</dt><dd><span>${esc(displayValue(q)) || '<em>（未填）</em>'}</span><button type="button" class="edit" data-edit="${q.key}" aria-label="修改${esc(q.label)}">修改</button></dd></div>`).join('');
+  const extra = meta.src ? `<div><dt>活動</dt><dd><span>${esc(meta.src)}${meta.by ? '（' + esc(meta.by) + '）' : ''}</span></dd></div>` : '';
+  return `<form class="card" id="stepform" novalidate>
+    <p class="eyebrow">Final Check <span class="zh">／ 檢查一下</span></p>
+    <h1 class="q-title">資料都對嗎？</h1>
+    <p class="q-hint">按「修改」可以回到那一關，改完會自動回來這裡。</p>
+    <dl class="review">${rows}${extra}</dl>
+    <p class="err" id="err-submit" role="alert" hidden></p>
+  </form>`;
+}
+
+function viewDone(){
+  const r = state.result || {};
+  const name = state.answers.name || '';
+  let notice = '';
+  if (r.mode === 'demo') notice = `<p class="notice warn">示範模式：還沒接上後台，這筆資料只留在這支手機裡。</p>`;
+  else if (r.mode === 'queued') notice = `<p class="notice warn">網路不穩，資料已先暫存在手機。連上網後再打開這個頁面，會自動補送。</p>`;
+  else notice = `<p class="notice good">資料已送到${esc(CONFIG.unit)}。</p>`;
+  return `
+  <section class="card hero done" aria-labelledby="d-title">
+    <svg class="badge-svg" viewBox="0 0 96 96" aria-hidden="true">
+      <circle cx="48" cy="48" r="44" fill="var(--accent-soft)"/>
+      <circle cx="48" cy="48" r="34" fill="var(--accent)"/>
+      <path d="M31 49l11 11 23-25" fill="none" stroke="var(--accent-ink)" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+    <p class="eyebrow">Complete <span class="zh">／ 報名完成</span></p>
+    <h1 id="d-title">太棒了${name ? '，' + esc(name) : ''}！</h1>
+    <p class="lead">你已完成 ${esc(CONFIG.schoolName)} ${esc(CONFIG.year)} 學年度早鳥登記。</p>
+    <div class="ref"><span>受理編號（截圖留存）</span><strong id="ref">${esc(state.ref)}</strong><button class="copy" type="button" id="copy-ref">複製編號</button></div>
+    <p class="score">本次獲得 <b>${state.points}</b> 分 · 稱號「早鳥達人」</p>
+    ${notice}
+    <p class="note">${esc(CONFIG.afterText)}</p>
+    <div class="links">
+      ${CONFIG.afterLinks.map(l => `<a class="btn btn-ghost" href="${esc(l.href)}" target="_blank" rel="noopener">${esc(l.label)}</a>`).join('')}
+      ${r.mode === 'queued' ? `<button class="btn btn-ghost" type="button" id="retry">再試一次送出</button>` : ''}
+    </div>
+    <button class="btn btn-primary btn-wide" type="button" id="again">再幫一位同學報名</button>
+  </section>`;
+}
+
+/* ---------- 事件 ---------- */
+function bind(step){
+  stage.querySelectorAll('[data-privacy]').forEach(b => b.addEventListener('click', openPrivacy));
+  if (step.type === 'welcome') {
+    const start = $('#start'), resume = $('#resume');
+    if (start) start.addEventListener('click', () => { LS.del(K_DRAFT); state.answers = {}; state.points = 0; go(1, { focus: true }); });
+    if (resume) resume.addEventListener('click', () => {
+      const d = LS.get(K_DRAFT) || {};
+      state.answers = d.answers || {}; state.points = d.points || 0;
+      const firstEmpty = QS.findIndex(q => !q.optional && (state.answers[q.key] == null || state.answers[q.key] === '' || state.answers[q.key] === false));
+      go(firstEmpty < 0 ? STEPS.length - 2 : firstEmpty + 1, { focus: true });
+    });
+    return;
+  }
+  const form = $('#stepform');
+  if (step.type === 'q') {
+    const q = step.q;
+    form.addEventListener('submit', e => { e.preventDefault(); submitQuestion(q); });
+    if (q.type === 'choice') {
+      form.querySelectorAll('input[type=radio]').forEach(r => r.addEventListener('change', () => {
+        hideErr(q.key);
+        if (lastPointer) setTimeout(() => { if (STEPS[state.i] === step && r.checked) submitQuestion(q); }, 380);
+      }));
+    } else if (q.type === 'multi') {
+      const boxes = form.querySelectorAll('input[type=checkbox]');
+      const sync = () => {
+        const n = form.querySelectorAll('input[type=checkbox]:checked').length;
+        $('#cnt-' + q.key).textContent = n;
+        boxes.forEach(b => { b.disabled = !b.checked && n >= q.max; });
+        hideErr(q.key);
+      };
+      boxes.forEach(b => b.addEventListener('change', sync)); sync();
+    } else if (q.type === 'consent') {
+      form.querySelector('#f-' + q.key).addEventListener('change', () => hideErr(q.key));
+    } else {
+      const inp = form.querySelector('.field');
+      inp.addEventListener('input', () => hideErr(q.key));
+      const skip = $('#skip');
+      if (skip) skip.addEventListener('click', () => { state.answers[q.key] = ''; saveDraft(); advance(); });
+    }
+  } else if (step.type === 'review') {
+    form.addEventListener('submit', e => { e.preventDefault(); doSubmit(); });
+    form.querySelectorAll('[data-edit]').forEach(b => b.addEventListener('click', () => {
+      const k = QS.findIndex(q => q.key === b.dataset.edit);
+      state.returnToReview = true; go(k + 1, { focus: true });
+    }));
+  } else if (step.type === 'done') {
+    $('#again').addEventListener('click', () => {
+      state = { i: 0, answers: {}, points: 0, ref: null, returnToReview: false, result: null, dir: 1 };
+      LS.del(K_DRAFT); hist.replace({ i: 0 }); render({ focus: true });
+    });
+    $('#copy-ref').addEventListener('click', e => {
+      const t = state.ref, btn = e.currentTarget;
+      const ok = () => { btn.textContent = '已複製'; setTimeout(() => btn.textContent = '複製編號', 1500); };
+      const fallback = () => { const sel = window.getSelection(), rg = document.createRange(); rg.selectNodeContents($('#ref')); sel.removeAllRanges(); sel.addRange(rg); btn.textContent = '請長按複製'; };
+      if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(t).then(ok, fallback); else fallback();
+    });
+    const retry = $('#retry');
+    if (retry) retry.addEventListener('click', async () => { retry.disabled = true; retry.textContent = '送出中…'; await flushQueue(); const q = LS.get(K_QUEUE) || []; state.result = { mode: q.some(x => x.ref === state.ref) ? 'queued' : 'sent' }; render({ silent: true }); });
+  }
+}
+
+function showErr(key, msg){
+  const el = $('#err-' + key); if (!el) return;
+  el.textContent = msg; el.hidden = false;
+  const f = $('#f-' + key); if (f) { f.setAttribute('aria-invalid', 'true'); f.focus(); }
+  oops();
+}
+function hideErr(key){
+  const el = $('#err-' + key); if (el) { el.hidden = true; el.textContent = ''; }
+  const f = $('#f-' + key); if (f) f.removeAttribute('aria-invalid');
+}
+
+function submitQuestion(q){
+  const form = $('#stepform');
+  let val;
+  if (q.type === 'choice') {
+    const c = form.querySelector('input[type=radio]:checked');
+    if (!c) return showErr(q.key, '請選一個答案。');
+    val = c.value;
+  } else if (q.type === 'multi') {
+    val = Array.from(form.querySelectorAll('input[type=checkbox]:checked')).map(b => b.value);
+    if (!val.length) return showErr(q.key, '至少選一個有興趣的系。');
+  } else if (q.type === 'consent') {
+    const hp = form.querySelector('input[name=company]');
+    if (hp && hp.value) { state.answers.__bot = true; }
+    if (!form.querySelector('#f-' + q.key).checked) return showErr(q.key, '要勾選同意才能送出喔。');
+    val = true;
+  } else {
+    const inp = form.querySelector('.field');
+    val = q.normalize ? q.normalize(inp.value) : inp.value.trim();
+    if (!val && q.optional) { state.answers[q.key] = ''; saveDraft(); return advance(); }
+    if (!val) return showErr(q.key, '這題還沒填喔。');
+    if (q.validate) { const m = q.validate(val); if (m) return showErr(q.key, m); }
+  }
+  const first = state.answers[q.key] == null || state.answers[q.key] === '';
+  state.answers[q.key] = val;
+  saveDraft();
+  cheer(first ? (q.optional ? CONFIG.pointsOptional : CONFIG.pointsRequired) : 0, QS.indexOf(q));
+  advance();
+}
+
+function advance(){
+  if (state.returnToReview) { state.returnToReview = false; return go(STEPS.length - 2, { focus: true }); }
+  go(state.i + 1, { focus: true });
+}
+
+function go(i, opts){
+  opts = opts || {};
+  state.dir = i >= state.i ? 1 : -1;
+  state.i = Math.max(0, Math.min(STEPS.length - 1, i));
+  if (!opts.fromHistory) hist.push({ i: state.i });
+  saveDraft();
+  render(opts);
+}
+
+backBtn.addEventListener('click', () => {
+  if (STEPS[state.i].type === 'review') return go(STEPS.length - 3, { focus: true });
+  if (state.returnToReview) { state.returnToReview = false; return go(STEPS.length - 2, { focus: true }); }
+  go(state.i - 1, { focus: true });
+});
+window.addEventListener('popstate', e => {
+  const i = e.state && typeof e.state.i === 'number' ? e.state.i : 0;
+  if (STEPS[state.i].type === 'done') { hist.push({ i: state.i }); return; }
+  state.dir = i < state.i ? -1 : 1; state.i = Math.min(i, STEPS.length - 2); render({ fromHistory: true, focus: true });
+});
+document.addEventListener('pointerdown', () => { lastPointer = true; }, true);
+document.addEventListener('keydown', e => {
+  lastPointer = false;
+  const step = STEPS[state.i];
+  if (step.type !== 'q' || step.q.type !== 'choice') return;
+  if (/^[1-9]$/.test(e.key) && !(e.target && /^(INPUT|TEXTAREA)$/.test(e.target.tagName) && e.target.type !== 'radio')) {
+    const r = stage.querySelectorAll('input[type=radio]')[+e.key - 1];
+    if (r) { r.checked = true; r.focus(); hideErr(step.q.key); e.preventDefault(); }
+  }
+});
+
+/* 大字模式 */
+const fsBtn = $('#fs');
+function applyFs(on){ document.documentElement.toggleAttribute('data-fs', on); if (on) document.documentElement.setAttribute('data-fs', 'lg'); fsBtn.setAttribute('aria-pressed', on ? 'true' : 'false'); }
+applyFs(LS.get(K_FS) === true);
+fsBtn.addEventListener('click', () => { const on = fsBtn.getAttribute('aria-pressed') !== 'true'; applyFs(on); LS.set(K_FS, on); });
+
+/* 個資對話框 */
+const dlg = $('#privacy');
+function openPrivacy(){ if (dlg.showModal) dlg.showModal(); else dlg.setAttribute('open', ''); $('#privacy-close').focus(); }
+$('#privacy-close').addEventListener('click', () => dlg.close ? dlg.close() : dlg.removeAttribute('open'));
+
+/* ---------- 送出 ---------- */
+function payload(){
+  const p = { ref: state.ref, submittedAt: new Date().toISOString(), src: meta.src, by: meta.by, evt: meta.evt, points: state.points, page: location.href.split('?')[0] };
+  QS.forEach(q => { p[q.key] = q.type === 'multi' ? (state.answers[q.key] || []).join('、') : (q.type === 'consent' ? (state.answers[q.key] ? '同意' : '') : (state.answers[q.key] || '')); });
+  return p;
+}
+async function send(p){
+  if (!CONFIG.endpoint) return { mode: 'demo' };
+  const ctrl = new AbortController(); const t = setTimeout(() => ctrl.abort(), 12000);
+  try {
+    await fetch(CONFIG.endpoint, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify(p), signal: ctrl.signal });
+    return { mode: 'sent' };
+  } catch (e) { return { mode: 'queued', error: String(e) }; }
+  finally { clearTimeout(t); }
+}
+async function doSubmit(){
+  if (state.answers.__bot) { state.ref = makeRef(); state.result = { mode: 'sent' }; return finish(); }
+  const missing = QS.find(q => !q.optional && (state.answers[q.key] == null || state.answers[q.key] === '' || state.answers[q.key] === false));
+  if (missing) { state.returnToReview = true; return go(QS.indexOf(missing) + 1, { focus: true }); }
+  nextBtn.disabled = true; nextBtn.setAttribute('aria-busy', 'true'); nextBtn.textContent = '送出中…';
+  state.ref = state.ref || makeRef();
+  const p = payload();
+  const r = await send(p);
+  if (r.mode === 'queued') { const q = LS.get(K_QUEUE) || []; q.push(p); LS.set(K_QUEUE, q); }
+  if (!CONFIG.endpoint) { const d = LS.get('vnu-eb-demo') || []; d.push(p); LS.set('vnu-eb-demo', d.slice(-50)); }
+  state.result = r;
+  finish();
+}
+function finish(){
+  state.points += CONFIG.pointsFinish;
+  LS.del(K_DRAFT);
+  state.i = STEPS.length - 1; state.dir = 1;
+  hist.push({ i: state.i });
+  render({ focus: true });
+  confetti();
+}
+async function flushQueue(){
+  const q = LS.get(K_QUEUE) || [];
+  if (!q.length || !CONFIG.endpoint) return;
+  const left = [];
+  for (const p of q) { const r = await send(p); if (r.mode !== 'sent') left.push(p); }
+  LS.set(K_QUEUE, left);
+}
+
+/* ---------- 彩帶 ---------- */
+function confetti(){
+  if (reduced) return;
+  const c = document.createElement('canvas'); c.className = 'confetti'; c.setAttribute('aria-hidden', 'true'); document.body.appendChild(c);
+  const ctx = c.getContext('2d'); const dpr = Math.min(2, window.devicePixelRatio || 1);
+  c.width = innerWidth * dpr; c.height = innerHeight * dpr;
+  const cs = getComputedStyle(document.documentElement);
+  const cols = [cs.getPropertyValue('--accent').trim(), cs.getPropertyValue('--bird').trim(), cs.getPropertyValue('--ok').trim(), '#60A5FA', '#F472B6'];
+  const P = Array.from({ length: 150 }, (_, i) => ({ x: Math.random() * c.width, y: -Math.random() * c.height * .4, w: (6 + Math.random() * 6) * dpr, h: (8 + Math.random() * 8) * dpr, vx: (Math.random() - .5) * 2.4 * dpr, vy: (2 + Math.random() * 3) * dpr, r: Math.random() * Math.PI, vr: (Math.random() - .5) * .2, col: cols[i % cols.length] }));
+  const t0 = performance.now();
+  (function frame(t){
+    const el = t - t0; ctx.clearRect(0, 0, c.width, c.height);
+    for (const p of P) { p.x += p.vx; p.y += p.vy; p.vy += .03 * dpr; p.r += p.vr; ctx.save(); ctx.translate(p.x, p.y); ctx.rotate(p.r); ctx.globalAlpha = Math.max(0, 1 - el / 2800); ctx.fillStyle = p.col; ctx.fillRect(-p.w / 2, -p.h / 2, p.w, p.h); ctx.restore(); }
+    if (el < 3000) requestAnimationFrame(frame); else c.remove();
+  })(t0);
+}
+
+/* ---------- 啟動 ---------- */
+function start(snap){
+  if (snap && snap.answers) { state = Object.assign(state, snap); state.i = Math.min(state.i, STEPS.length - 2); }
+  hist.replace({ i: state.i });
+  render({ silent: true });
+  flushQueue();
+}
+if (window.claude && window.claude.hot && window.claude.hot.snapshot) window.claude.hot.snapshot(() => ({ i: state.i, answers: state.answers, points: state.points, returnToReview: state.returnToReview }));
+if (window.claude && window.claude.hot && window.claude.hot.ready) window.claude.hot.ready(start); else start((window.claude && window.claude.hot && window.claude.hot.data) || null);
+})();
+</script>
+</body>
+</html>

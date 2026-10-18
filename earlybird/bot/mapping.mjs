@@ -26,6 +26,11 @@ export const DEPARTMENTS = [
 ];
 
 export const INFO_FROM = ['1萬能科大推薦人', '2高中職推薦人', '3親友推薦', '4萬能官網', '5-FB', '6-IG', '7-LINE@'];
+// 學生端（index.html 的 CONFIG.sources）顯示的文字 → 學校選項
+const INFO_FROM_ALIASES = {
+  萬能科大老師推薦: INFO_FROM[0], 高中職老師推薦: INFO_FROM[1], 親友推薦: INFO_FROM[2], 萬能官網: INFO_FROM[3],
+  Facebook: INFO_FROM[4], Instagram: INFO_FROM[5], 'LINE 官方帳號': INFO_FROM[6],
+};
 
 const SPEC_SKILLS = { 乙級證照: '1', '技能(藝)比賽獲獎': '2', 全國性比賽獲獎: '3' };
 
@@ -143,7 +148,7 @@ export function mapRow(r) {
   form.TX_BefReFeree = String(r['班導師'] || '').trim().slice(0, LIMITS.TX_BefReFeree);
 
   // 掃招生老師或活動 QR Code 進來的 → 萬能科大推薦人；否則用學生自己選的管道
-  form.LB_InfoFrom = (r['招生老師'] || r['活動來源']) ? INFO_FROM[0] : (pickOption(r['得知管道'], INFO_FROM) || INFO_FROM[0]);
+  form.LB_InfoFrom = (r['招生老師'] || r['活動來源']) ? INFO_FROM[0] : (INFO_FROM_ALIASES[String(r['得知管道'] || '').trim()] || pickOption(r['得知管道'], INFO_FROM) || INFO_FROM[0]);
 
   if (r['個資同意'] !== '同意') problems.push('沒有個資同意');
   form.CKB_Iagree = r['個資同意'] === '同意';

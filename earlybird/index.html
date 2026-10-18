@@ -3,22 +3,23 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>萬能早鳥報名</title>
+<title>早鳥大冒險</title>
 <meta name="claude:viewport-fit-sides" content="cover">
-<meta name="description" content="萬能科技大學招生處早鳥報名：一次一題、無障礙、約三分鐘完成。">
+<meta name="description" content="萬能科技大學招生處早鳥報名：9 個關卡、大約 1 分鐘，完成就拿到冒險者卡。">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;700&family=Noto+Sans+TC:wght@400;500;700;900&display=swap">
 <style>
-/* Layout: a single-question stage. Sticky status bar (mascot, level, progress) on top,
-   one centred card in the middle, sticky action bar at the bottom. Nothing else competes. */
+/* Layout: 一個關卡一張卡。上方是冒險地圖（小鳥沿路走、每站拿道具），中間是小鳥對話＋作答區，
+   下方固定「上一站／下一站」。完成後產生可截圖的冒險者卡。 */
 :root{
-  --bg:#F2F6FC;        /* dawn sky, cool and pale */
+  --bg:#F2F6FC;
   --surface:#FFFFFF;
   --fg:#141A2A;
   --muted:#55607A;
   --line:#D6DCE8;
-  --accent:#C2410C;    /* sunrise orange, AA on white */
+  --accent:#C2410C;
   --accent-ink:#FFFFFF;
   --accent-soft:#FFF1E8;
+  --accent-deep:#9A3412;
   --ok:#1A7F4B;
   --ok-soft:#E6F6EC;
   --bad:#B42318;
@@ -26,6 +27,7 @@
   --bird:#F59E0B;
   --bird-dark:#C2700A;
   --sky:#DCE8F8;
+  --gold:#B7791F;
   --shadow:0 12px 32px rgba(20,26,42,.08);
   --font-body:"Noto Sans TC",system-ui,-apple-system,"PingFang TC","Microsoft JhengHei",sans-serif;
   --font-display:"Fredoka","Noto Sans TC",system-ui,sans-serif;
@@ -35,18 +37,18 @@
 @media (prefers-color-scheme: dark){
   :root:not([data-theme="light"]){
     --bg:#0E1424; --surface:#182036; --fg:#EEF2F8; --muted:#A7B1C7; --line:#2B3550;
-    --accent:#FB923C; --accent-ink:#141A2A; --accent-soft:#2A2214;
+    --accent:#FB923C; --accent-ink:#141A2A; --accent-soft:#2A2214; --accent-deep:#C2410C;
     --ok:#5CD38D; --ok-soft:#14301F; --bad:#FF8A80; --bad-soft:#3A1F1C;
-    --bird:#FBBF24; --bird-dark:#D97706; --sky:#1C2742;
+    --bird:#FBBF24; --bird-dark:#D97706; --sky:#1C2742; --gold:#F6C453;
     --shadow:0 12px 32px rgba(0,0,0,.4);
     color-scheme:dark;
   }
 }
 :root[data-theme="dark"]{
   --bg:#0E1424; --surface:#182036; --fg:#EEF2F8; --muted:#A7B1C7; --line:#2B3550;
-  --accent:#FB923C; --accent-ink:#141A2A; --accent-soft:#2A2214;
+  --accent:#FB923C; --accent-ink:#141A2A; --accent-soft:#2A2214; --accent-deep:#C2410C;
   --ok:#5CD38D; --ok-soft:#14301F; --bad:#FF8A80; --bad-soft:#3A1F1C;
-  --bird:#FBBF24; --bird-dark:#D97706; --sky:#1C2742;
+  --bird:#FBBF24; --bird-dark:#D97706; --sky:#1C2742; --gold:#F6C453;
   --shadow:0 12px 32px rgba(0,0,0,.4);
   color-scheme:dark;
 }
@@ -54,6 +56,7 @@
 html{font-size:18px;height:100%;-webkit-text-size-adjust:100%}
 html[data-fs="lg"]{font-size:21px}
 *,*::before,*::after{box-sizing:border-box}
+[hidden]{display:none!important}
 body{
   margin:0;min-height:100%;display:flex;flex-direction:column;
   background:var(--bg);color:var(--fg);
@@ -65,44 +68,53 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
 :focus-visible{outline:3px solid var(--accent);outline-offset:3px;border-radius:6px}
 button{font:inherit;color:inherit}
 .sr-only{position:absolute!important;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+.bird-svg{display:block;width:100%;height:100%}
 
-/* ---- top status bar ---- */
+/* ---- 上方：狀態列＋冒險地圖 ---- */
 .topbar{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg)}
-.topbar-in{max-width:36rem;margin:0 auto;padding-block:.6rem .4rem;display:flex;flex-direction:column;gap:.5rem}
-.status{display:flex;align-items:center;gap:.6rem;min-height:2.6rem}
-.mascot{width:2.6rem;height:2.6rem;flex:none}
-.mascot svg{width:100%;height:100%;display:block}
-.mascot .eye-happy{opacity:0}
-.mascot.happy .eye{opacity:0}
-.mascot.happy .eye-happy{opacity:1}
-.mascot.oops{animation:wobble .5s ease}
-.mascot.happy{animation:hop .5s ease}
-.level{display:inline-flex;align-items:center;gap:.35rem;font-weight:700;font-size:.85rem;padding:.2rem .65rem;border-radius:999px;background:var(--accent-soft);color:var(--accent);white-space:nowrap}
-.counter{margin-left:auto;font-family:var(--font-display);font-weight:700;font-size:1.05rem;font-variant-numeric:tabular-nums;color:var(--muted);white-space:nowrap}
-.counter b{color:var(--fg);font-size:1.3rem}
-.points{font-family:var(--font-display);font-weight:700;font-size:1rem;color:var(--accent);font-variant-numeric:tabular-nums;white-space:nowrap}
-.prog{display:flex;gap:4px;height:.5rem}
-.prog span{flex:1;border-radius:999px;background:var(--line);transition:background .3s}
-.prog span.on{background:var(--accent)}
-.prog span.now{background:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
-.fs-btn{margin-left:.25rem;border:2px solid var(--line);background:var(--surface);border-radius:999px;padding:.15rem .6rem;font-weight:700;font-size:.85rem;cursor:pointer;line-height:1.4}
+.topbar-in{max-width:36rem;margin:0 auto;padding-block:.55rem .35rem;display:flex;flex-direction:column;gap:.35rem}
+.status{display:flex;align-items:center;gap:.55rem;min-height:2.4rem}
+.lv{display:inline-flex;align-items:center;gap:.35rem;font-weight:700;font-size:.85rem;padding:.2rem .65rem;border-radius:999px;background:var(--accent-soft);color:var(--accent);white-space:nowrap}
+.lv b{font-family:var(--font-display)}
+.exp{font-family:var(--font-display);font-weight:700;font-size:1rem;color:var(--accent);font-variant-numeric:tabular-nums;white-space:nowrap}
+.counter{margin-left:auto;font-family:var(--font-display);font-weight:700;font-size:1rem;font-variant-numeric:tabular-nums;color:var(--muted);white-space:nowrap}
+.counter b{color:var(--fg);font-size:1.25rem}
+.fs-btn{border:2px solid var(--line);background:var(--surface);border-radius:999px;padding:.15rem .6rem;font-weight:700;font-size:.85rem;cursor:pointer;line-height:1.4}
 .fs-btn[aria-pressed="true"]{border-color:var(--accent);background:var(--accent-soft);color:var(--accent)}
 
-/* ---- stage ---- */
-.stage{flex:1;width:100%;max-width:36rem;margin:0 auto;padding-block:.75rem 1.25rem;display:flex;flex-direction:column}
+.map{position:relative;height:2.6rem;margin-inline:1rem}
+.map .road{position:absolute;left:0;right:0;top:1.75rem;height:4px;border-radius:4px;background:repeating-linear-gradient(90deg,var(--line) 0 8px,transparent 8px 14px)}
+.map .road-done{position:absolute;left:0;top:1.75rem;height:4px;border-radius:4px;background:var(--accent);transition:width .45s cubic-bezier(.2,.8,.2,1)}
+.map ol{list-style:none;margin:0;padding:0;position:absolute;inset:0}
+.map li{position:absolute;top:1.42rem;width:.9rem;height:.9rem;margin-left:-.45rem;border-radius:50%;background:var(--surface);border:3px solid var(--line);transition:background .3s,border-color .3s,transform .3s}
+.map li.done{background:var(--accent);border-color:var(--accent)}
+.map li.now{border-color:var(--accent);transform:scale(1.25)}
+.map li.goal{width:1.25rem;height:1.25rem;margin-left:-.62rem;top:1.25rem;border-radius:5px;border-color:var(--gold);background:var(--surface)}
+.map li.goal.done{background:var(--gold);border-color:var(--gold)}
+.walker{position:absolute;top:-.1rem;width:1.9rem;height:1.9rem;margin-left:-.95rem;transition:left .45s cubic-bezier(.2,.8,.2,1)}
+.walker.hop{animation:hop .45s ease}
+
+/* ---- 關卡卡片 ---- */
+.stage{flex:1;width:100%;max-width:36rem;margin:0 auto;padding-block:.6rem 1.25rem;display:flex;flex-direction:column}
 .card{
   background:var(--surface);border-radius:var(--radius);box-shadow:var(--shadow);
-  padding:1.5rem 1.25rem 1.6rem;display:flex;flex-direction:column;gap:.9rem;min-width:0;
+  padding:1.25rem 1.15rem 1.4rem;display:flex;flex-direction:column;gap:.9rem;min-width:0;
 }
 .card.enter{animation:slideIn .26s cubic-bezier(.2,.8,.2,1) both}
 .card.enter-back{animation:slideBack .26s cubic-bezier(.2,.8,.2,1) both}
-.eyebrow{margin:0;font-family:var(--font-display);font-weight:700;letter-spacing:.06em;font-size:.85rem;color:var(--accent);text-transform:uppercase}
+.eyebrow{margin:0;font-family:var(--font-display);font-weight:700;letter-spacing:.06em;font-size:.85rem;color:var(--accent)}
 .eyebrow .zh{font-family:var(--font-body);letter-spacing:.08em}
-.q-title{margin:0;font-size:1.75rem;line-height:1.3;font-weight:900;text-wrap:balance;letter-spacing:.01em}
+
+.npc{display:flex;gap:.7rem;align-items:flex-start}
+.npc-bird{flex:none;width:3.4rem;height:3.4rem}
+.npc-bird.happy{animation:hop .5s ease}
+.npc-bird.oops{animation:wobble .5s ease}
+.bubble{
+  position:relative;flex:1;min-width:0;background:var(--sky);border-radius:18px;border-top-left-radius:6px;
+  padding:.7rem .9rem;font-size:1.3rem;font-weight:900;line-height:1.4;text-wrap:balance;
+}
+.bubble .say{display:block;min-height:1.4em}
 .q-hint{margin:0;color:var(--muted);font-size:1rem}
-fieldset{border:0;padding:0;margin:0;min-width:0;display:flex;flex-direction:column;gap:.9rem}
-legend{padding:0;float:left;width:100%}
-legend + *{clear:both}
 
 .field{
   width:100%;min-height:3.4rem;font:inherit;font-size:1.3rem;padding:.6rem .9rem;
@@ -112,131 +124,168 @@ legend + *{clear:both}
 .field::placeholder{color:var(--muted);opacity:.7}
 .field:focus{border-color:var(--accent);outline:3px solid var(--accent-soft);outline-offset:0}
 .field[aria-invalid="true"]{border-color:var(--bad)}
-.field.upper{text-transform:uppercase;letter-spacing:.08em;font-family:var(--font-display)}
 .err{margin:0;color:var(--bad);font-weight:700;background:var(--bad-soft);padding:.55rem .8rem;border-radius:var(--radius-sm);font-size:.95rem}
-.ok-note{margin:0;color:var(--ok);font-weight:700;font-size:.95rem}
+.good{margin:0;color:var(--ok);font-weight:700;background:var(--ok-soft);padding:.55rem .8rem;border-radius:var(--radius-sm);font-size:.95rem}
 
-/* choice options */
-.opts{display:flex;flex-direction:column;gap:.6rem}
-.opt{position:relative;display:block;cursor:pointer}
-.opt input{position:absolute;opacity:0;width:1px;height:1px;margin:0}
-.opt-body{
-  display:flex;align-items:center;gap:.75rem;min-height:3.4rem;padding:.7rem .9rem;
-  border:2px solid var(--line);border-radius:var(--radius-sm);background:var(--surface);font-size:1.15rem;font-weight:500;
-  transition:border-color .15s,background .15s,transform .15s;
+/* 通行證：10 格 */
+.cells{display:grid;grid-template-columns:repeat(10,minmax(0,1fr));gap:4px}
+.cells span{
+  aspect-ratio:3/4;display:grid;place-items:center;border:2px solid var(--line);border-radius:8px;
+  font-family:var(--font-display);font-weight:700;font-size:clamp(1.05rem,5vw,1.6rem);background:var(--surface);
+  transition:border-color .2s,background .2s,transform .2s;
 }
-.opt-key{flex:none;width:1.9rem;height:1.9rem;border-radius:8px;border:2px solid var(--line);display:none;place-items:center;font-family:var(--font-display);font-weight:700;font-size:.9rem;color:var(--muted)}
-@media (hover:hover) and (min-width:700px){.opt-key{display:grid}}
-.opt-mark{margin-left:auto;flex:none;width:1.5rem;height:1.5rem;border-radius:50%;border:2px solid var(--line);display:grid;place-items:center}
-.opt-mark::after{content:"";width:.7rem;height:.7rem;border-radius:50%;background:var(--accent);transform:scale(0);transition:transform .15s}
-.opt input:checked + .opt-body{border-color:var(--accent);background:var(--accent-soft)}
-.opt input:checked + .opt-body .opt-mark{border-color:var(--accent)}
-.opt input:checked + .opt-body .opt-mark::after{transform:scale(1)}
-.opt input:focus-visible + .opt-body{outline:3px solid var(--accent);outline-offset:3px}
-@media (hover:hover){.opt:hover .opt-body{border-color:var(--accent)}}
+.cells span.filled{border-color:var(--accent)}
+.cells.ok span{border-color:var(--ok);background:var(--ok-soft);color:var(--ok)}
+.cells.bad span{border-color:var(--bad)}
+.cells.bad{animation:wobble .45s ease}
+.id-input{font-family:var(--font-display);letter-spacing:.18em;text-transform:uppercase}
 
-/* multi chips */
+/* 小圓鈕（科別、學校建議、群類） */
 .chips{display:flex;flex-wrap:wrap;gap:.5rem}
-.chip{position:relative;cursor:pointer}
-.chip input{position:absolute;opacity:0;width:1px;height:1px;margin:0}
-.chip-body{display:inline-flex;align-items:center;gap:.4rem;min-height:2.9rem;padding:.45rem .9rem;border:2px solid var(--line);border-radius:999px;background:var(--surface);font-weight:500;font-size:1.02rem;transition:border-color .15s,background .15s}
-.chip input:checked + .chip-body{border-color:var(--accent);background:var(--accent-soft);color:var(--accent);font-weight:700}
-.chip input:focus-visible + .chip-body{outline:3px solid var(--accent);outline-offset:3px}
-.chip input:disabled + .chip-body{opacity:.45;cursor:not-allowed}
-.group-label{margin:.4rem 0 0;font-size:.85rem;font-weight:700;color:var(--muted);letter-spacing:.06em}
-.group-label:first-child{margin-top:0}
-.count{margin:0;font-family:var(--font-display);font-weight:700;color:var(--muted);font-variant-numeric:tabular-nums}
-.count b{color:var(--accent)}
+.chip{
+  display:inline-flex;align-items:center;min-height:2.9rem;padding:.45rem .95rem;cursor:pointer;
+  border:2px solid var(--line);border-bottom-width:4px;border-radius:999px;background:var(--surface);
+  font-weight:700;font-size:1.02rem;transition:border-color .15s,background .15s,transform .1s;
+}
+.chip:active{transform:translateY(2px);border-bottom-width:2px}
+.chip[aria-pressed="true"]{border-color:var(--accent);background:var(--accent-soft);color:var(--accent)}
+@media (hover:hover){.chip:hover{border-color:var(--accent)}}
+.chip small{font-weight:500;color:var(--muted);margin-left:.35rem;font-size:.82rem}
+.picked{display:flex;align-items:center;gap:.5rem;padding:.55rem .8rem;border-radius:var(--radius-sm);background:var(--ok-soft);color:var(--ok);font-weight:700}
+.or{margin:0;font-size:.85rem;font-weight:700;color:var(--muted);letter-spacing:.06em}
 
-/* consent */
-.consent .opt-body{align-items:flex-start;font-size:1.02rem;line-height:1.55}
-.consent .opt-mark{margin-left:0;margin-top:.2rem;border-radius:7px}
-.consent .opt-mark::after{border-radius:2px}
+/* 技能樹揭曉 */
+.reveal{
+  display:flex;flex-direction:column;align-items:center;gap:.3rem;text-align:center;
+  padding:1.1rem 1rem;border-radius:var(--radius-sm);border:3px solid var(--gold);background:var(--accent-soft);
+}
+.reveal.pop{animation:pop .5s cubic-bezier(.2,1.4,.4,1)}
+.reveal span{font-size:.85rem;font-weight:700;color:var(--muted);letter-spacing:.08em}
+.reveal strong{font-size:1.45rem;font-weight:900;line-height:1.3}
+.btn-row{display:flex;gap:.6rem;flex-wrap:wrap}
+.btn-row .btn{flex:1}
+
+/* 目標城堡（系） */
+.castles{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:.55rem}
+.castle{
+  position:relative;display:flex;flex-direction:column;gap:.2rem;text-align:left;cursor:pointer;min-height:4.4rem;
+  padding:.6rem .7rem;border:2px solid var(--line);border-bottom-width:4px;border-radius:var(--radius-sm);background:var(--surface);
+  font-weight:700;font-size:.98rem;line-height:1.35;transition:border-color .15s,background .15s,transform .1s;
+}
+.castle:active{transform:translateY(2px);border-bottom-width:2px}
+.castle small{font-weight:500;font-size:.75rem;color:var(--muted);letter-spacing:.04em}
+.castle[aria-pressed="true"]{border-color:var(--accent);background:var(--accent-soft)}
+.castle[aria-pressed="true"]::after{content:"目標";position:absolute;top:.4rem;right:.5rem;font-size:.7rem;font-weight:900;color:var(--accent-ink);background:var(--accent);padding:.05rem .45rem;border-radius:999px}
+@media (hover:hover){.castle:hover{border-color:var(--accent)}}
+
+/* 冒險契約：蓋章 */
+.contract{border:2px dashed var(--line);border-radius:var(--radius-sm);padding:.9rem 1rem;display:flex;flex-direction:column;gap:.8rem;align-items:center;text-align:center}
+.contract p{margin:0;font-size:1rem;line-height:1.6}
+.stamp-btn{
+  width:7.5rem;height:7.5rem;border-radius:50%;cursor:pointer;display:grid;place-content:center;gap:.15rem;
+  border:4px solid var(--accent);background:var(--surface);color:var(--accent);
+  font-weight:900;font-size:1.1rem;line-height:1.2;
+}
+.stamp-btn small{font-weight:700;font-size:.78rem;color:var(--muted)}
+.stamp-btn[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink);transform:rotate(-12deg)}
+.stamp-btn[aria-pressed="true"] small{color:var(--accent-ink)}
+.stamp-btn.thump{animation:thump .4s cubic-bezier(.2,1.6,.4,1)}
 .link{background:none;border:0;padding:0;color:var(--accent);font-weight:700;text-decoration:underline;text-underline-offset:3px;cursor:pointer}
-.skip{align-self:flex-start;background:none;border:0;padding:.4rem 0;color:var(--muted);font-weight:700;text-decoration:underline;text-underline-offset:3px;cursor:pointer}
 
-/* review */
+/* 檢查 */
 .review{margin:0;display:flex;flex-direction:column;border-top:1px solid var(--line)}
-.review > div{display:grid;grid-template-columns:5.5rem 1fr;gap:.25rem .6rem;align-items:start;padding:.7rem 0;border-bottom:1px solid var(--line);min-width:0}
+.review > div{display:grid;grid-template-columns:5.5rem 1fr;gap:.25rem .6rem;align-items:start;padding:.65rem 0;border-bottom:1px solid var(--line);min-width:0}
 .review dt{color:var(--muted);font-size:.9rem;font-weight:700;padding-top:.15rem}
 .review dd{margin:0;display:flex;gap:.6rem;align-items:flex-start;justify-content:space-between;min-width:0;font-weight:500;overflow-wrap:anywhere}
 .review dd .edit{flex:none;border:2px solid var(--line);background:var(--surface);border-radius:999px;padding:.15rem .7rem;font-size:.85rem;font-weight:700;cursor:pointer;min-height:2.2rem}
 .review dd .edit:hover{border-color:var(--accent);color:var(--accent)}
+.q-title{margin:0;font-size:1.6rem;line-height:1.3;font-weight:900;text-wrap:balance}
 
-/* welcome / done */
-.hero{align-items:center;text-align:center;gap:.75rem;padding-top:2rem}
-.hero .mascot-big{width:6.5rem;height:6.5rem}
-.hero .mascot-big svg{width:100%;height:100%}
-.hero h1{font-size:2.6rem;margin:0;font-weight:900;line-height:1.15;letter-spacing:.02em}
+/* 首頁、完成 */
+.hero{align-items:center;text-align:center;gap:.75rem;padding-top:1.6rem}
+.hero .bird-big{width:6.5rem;height:6.5rem;animation:float 3s ease-in-out infinite}
+.hero h1{font-size:2.5rem;margin:0;font-weight:900;line-height:1.15;letter-spacing:.02em;text-wrap:balance}
 .hero .lead{margin:0;color:var(--muted);max-width:28ch;text-wrap:balance}
-.hero ul{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:.35rem;color:var(--muted);font-size:.95rem}
+.route{display:flex;flex-wrap:wrap;justify-content:center;gap:.35rem;margin:0;padding:0;list-style:none}
+.route li{font-size:.82rem;font-weight:700;padding:.2rem .6rem;border-radius:999px;background:var(--sky)}
 .badge{display:inline-flex;align-items:center;gap:.4rem;background:var(--sky);color:var(--fg);padding:.3rem .8rem;border-radius:999px;font-weight:700;font-size:.9rem;max-width:100%;overflow-wrap:anywhere}
 .btn{
   display:inline-flex;align-items:center;justify-content:center;gap:.5rem;
-  min-height:3.4rem;padding:.7rem 1.4rem;border-radius:999px;border:2px solid transparent;
-  font-weight:900;font-size:1.15rem;cursor:pointer;text-decoration:none;transition:transform .12s,background .15s;
+  min-height:3.4rem;padding:.7rem 1.4rem;border-radius:999px;border:2px solid transparent;border-bottom-width:5px;
+  font-weight:900;font-size:1.15rem;cursor:pointer;text-decoration:none;transition:transform .1s,background .15s;
 }
-.btn:active{transform:scale(.98)}
-.btn-primary{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.btn:active{transform:translateY(3px);border-bottom-width:2px}
+.btn-primary{background:var(--accent);color:var(--accent-ink);border-color:var(--accent-deep)}
 .btn-primary:disabled{opacity:.55;cursor:wait}
 .btn-ghost{background:var(--surface);color:var(--fg);border-color:var(--line)}
 .btn-ghost:hover{border-color:var(--accent)}
 .btn-wide{width:100%}
 .hero .btn-wide{max-width:22rem}
-.done .ref{display:flex;flex-direction:column;align-items:center;gap:.2rem;background:var(--accent-soft);border-radius:var(--radius-sm);padding:.8rem 1rem;width:100%;max-width:22rem}
-.done .ref span{font-size:.85rem;color:var(--muted);font-weight:700}
-.done .ref strong{font-family:var(--font-display);font-size:1.6rem;letter-spacing:.08em;color:var(--accent);user-select:all}
-.done .ref .copy{margin-top:.2rem;border:0;background:none;color:var(--accent);font-weight:700;text-decoration:underline;text-underline-offset:3px;cursor:pointer;min-height:2.2rem}
-.score{margin:0;font-family:var(--font-display);font-weight:700;font-size:1.15rem;color:var(--fg)}
-.score b{color:var(--accent);font-size:1.5rem}
+
+.hero-card{
+  width:100%;max-width:22rem;border-radius:20px;padding:4px;
+  background:linear-gradient(135deg,var(--gold),var(--accent),var(--bird));
+}
+.hero-card-in{background:var(--surface);border-radius:16px;padding:1rem 1rem 1.1rem;display:flex;flex-direction:column;gap:.55rem;text-align:left}
+.hc-top{display:flex;align-items:center;gap:.7rem}
+.hc-top .bird-mini{width:3rem;height:3rem;flex:none}
+.hc-name{margin:0;font-size:1.5rem;font-weight:900;line-height:1.2;overflow-wrap:anywhere}
+.hc-lv{margin:0;font-family:var(--font-display);font-weight:700;color:var(--accent);font-size:.95rem}
+.hc-rows{margin:0;display:grid;grid-template-columns:auto 1fr;gap:.25rem .7rem;font-size:.95rem}
+.hc-rows dt{color:var(--muted);font-weight:700}
+.hc-rows dd{margin:0;font-weight:700;overflow-wrap:anywhere}
+.items{display:flex;flex-wrap:wrap;gap:.3rem}
+.items span{font-size:.75rem;font-weight:700;padding:.1rem .5rem;border-radius:999px;background:var(--accent-soft);color:var(--accent)}
+.ref{display:flex;flex-direction:column;align-items:center;gap:.2rem;background:var(--accent-soft);border-radius:var(--radius-sm);padding:.8rem 1rem;width:100%;max-width:22rem}
+.ref span{font-size:.85rem;color:var(--muted);font-weight:700}
+.ref strong{font-family:var(--font-display);font-size:1.5rem;letter-spacing:.08em;color:var(--accent);user-select:all}
+.ref .copy{margin-top:.2rem;border:0;background:none;color:var(--accent);font-weight:700;text-decoration:underline;text-underline-offset:3px;cursor:pointer;min-height:2.2rem}
 .note{margin:0;color:var(--muted);font-size:.95rem;max-width:32ch;text-wrap:balance}
 .notice{margin:0;width:100%;padding:.7rem .9rem;border-radius:var(--radius-sm);font-size:.95rem;font-weight:500;text-align:left}
 .notice.warn{background:var(--accent-soft);color:var(--fg);border:2px solid var(--accent)}
 .notice.good{background:var(--ok-soft);color:var(--fg)}
 .links{display:flex;flex-wrap:wrap;gap:.6rem;justify-content:center;width:100%}
-.badge-svg{width:5.5rem;height:5.5rem}
 
-/* ---- bottom action bar ---- */
+/* ---- 下方按鈕列 ---- */
 .actions{position:sticky;bottom:0;z-index:5;background:var(--bg);border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom,0px)}
-.actions[hidden]{display:none}
 .actions-in{max-width:36rem;margin:0 auto;padding-block:.7rem;display:flex;gap:.6rem;align-items:center}
 .actions .btn-primary{flex:1}
 .actions .btn-ghost{flex:none;min-width:5.5rem}
 
-/* toast + live */
+/* 提示泡泡、彩帶 */
 .toast{
-  position:fixed;left:50%;top:calc(env(safe-area-inset-top,0px) + 4.6rem);transform:translateX(-50%);
-  background:var(--fg);color:var(--bg);font-family:var(--font-display);font-weight:700;font-size:1.05rem;
-  padding:.45rem 1rem;border-radius:999px;pointer-events:none;opacity:0;z-index:20;white-space:nowrap;
+  position:fixed;left:50%;bottom:calc(env(safe-area-inset-bottom,0px) + 5.6rem);transform:translateX(-50%);
+  background:var(--fg);color:var(--bg);font-weight:700;font-size:1rem;
+  padding:.45rem 1rem;border-radius:999px;pointer-events:none;opacity:0;z-index:20;white-space:nowrap;max-width:92vw;overflow:hidden;text-overflow:ellipsis;
 }
-.toast.show{animation:toast 1.1s ease forwards}
+.toast b{color:var(--bird)}
+.toast.show{animation:toast 1.5s ease forwards}
 .confetti{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:30}
 
-/* dialog */
-dialog{
-  border:0;border-radius:var(--radius);background:var(--surface);color:var(--fg);padding:0;
-  width:min(92vw,34rem);max-height:85vh;box-shadow:var(--shadow);
-}
+dialog{border:0;border-radius:var(--radius);background:var(--surface);color:var(--fg);padding:0;width:min(92vw,34rem);max-height:85vh;box-shadow:var(--shadow)}
 dialog::backdrop{background:rgba(10,14,26,.55)}
 .dlg{padding:1.25rem 1.25rem 1.4rem;display:flex;flex-direction:column;gap:.7rem;overflow:auto;max-height:85vh}
 .dlg h2{margin:0;font-size:1.3rem}
 .dlg h3{margin:.4rem 0 0;font-size:1rem;color:var(--accent)}
-.dlg p,.dlg li{margin:0;font-size:.95rem}
-.dlg ol{margin:0;padding-left:1.3rem;display:flex;flex-direction:column;gap:.35rem}
+.dlg p{margin:0;font-size:.95rem}
 .dlg .btn{align-self:flex-end}
 
 @keyframes slideIn{from{opacity:0;transform:translateX(28px)}to{opacity:1;transform:none}}
 @keyframes slideBack{from{opacity:0;transform:translateX(-28px)}to{opacity:1;transform:none}}
-@keyframes hop{0%,100%{transform:none}40%{transform:translateY(-6px) rotate(-6deg)}}
-@keyframes wobble{0%,100%{transform:none}25%{transform:translateX(-4px) rotate(-5deg)}75%{transform:translateX(4px) rotate(5deg)}}
-@keyframes toast{0%{opacity:0;transform:translate(-50%,8px)}15%{opacity:1;transform:translate(-50%,0)}80%{opacity:1}100%{opacity:0;transform:translate(-50%,-10px)}}
+@keyframes hop{0%,100%{transform:none}40%{transform:translateY(-7px) rotate(-6deg)}}
+@keyframes wobble{0%,100%{transform:none}25%{transform:translateX(-5px) rotate(-3deg)}75%{transform:translateX(5px) rotate(3deg)}}
+@keyframes pop{from{transform:scale(.6);opacity:0}to{transform:none;opacity:1}}
+@keyframes thump{0%{transform:scale(1.35) rotate(0)}100%{transform:scale(1) rotate(-12deg)}}
+@keyframes float{0%,100%{transform:none}50%{transform:translateY(-6px)}}
+@keyframes toast{0%{opacity:0;transform:translate(-50%,8px)}12%{opacity:1;transform:translate(-50%,0)}80%{opacity:1}100%{opacity:0;transform:translate(-50%,-10px)}}
 @media (prefers-reduced-motion: reduce){
   *,*::before,*::after{animation:none!important;transition:none!important}
   .toast.show{opacity:1}
 }
 @media (min-width:700px){
-  .card{padding:2rem 2rem 2.2rem}
-  .q-title{font-size:2rem}
+  .card{padding:1.8rem 1.8rem 2rem}
+  .bubble{font-size:1.45rem}
+  .castles{grid-template-columns:repeat(3,minmax(0,1fr))}
 }
 </style>
 </head>
@@ -245,32 +294,25 @@ dialog::backdrop{background:rgba(10,14,26,.55)}
 <header class="topbar" id="topbar">
   <div class="topbar-in gutter">
     <div class="status">
-      <div class="mascot" id="mascot" aria-hidden="true">
-        <svg viewBox="0 0 64 64">
-          <path d="M31 13c-1-6 2-9 6-8-3 2-3 5-2 8z" fill="var(--bird-dark)"/>
-          <circle cx="32" cy="36" r="22" fill="var(--bird)"/>
-          <path d="M13 40c-5 6-3 14 4 16 5-1 9-5 10-10z" fill="var(--bird-dark)"/>
-          <path d="M51 32l11 4-11 4z" fill="#E8590C"/>
-          <circle class="eye" cx="41" cy="30" r="3.2" fill="#141A2A"/>
-          <path class="eye-happy" d="M37 31q4-5 8 0" stroke="#141A2A" stroke-width="3" fill="none" stroke-linecap="round"/>
-          <circle cx="44" cy="38" r="3.5" fill="#FDBA74" opacity=".8"/>
-        </svg>
-      </div>
-      <span class="level" id="level">剛破殼</span>
-      <span class="points" id="points" aria-label="目前分數">0 分</span>
+      <span class="lv" id="lv">Lv.<b>1</b> 新手冒險者</span>
+      <span class="exp" id="exp" aria-label="經驗值">0 EXP</span>
       <span class="counter" id="counter"></span>
       <button class="fs-btn" id="fs" type="button" aria-pressed="false" aria-label="切換大字模式">大字</button>
     </div>
-    <div class="prog" id="prog" role="progressbar" aria-label="填寫進度" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"></div>
+    <div class="map" id="map" role="progressbar" aria-label="冒險進度" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+      <div class="road"></div><div class="road-done" id="road-done"></div>
+      <ol id="nodes"></ol>
+      <div class="walker" id="walker" aria-hidden="true"></div>
+    </div>
   </div>
 </header>
 
 <main class="stage gutter" id="stage" aria-live="off"></main>
 
-<nav class="actions" id="actions" hidden aria-label="上一關與下一關">
+<nav class="actions" id="actions" hidden aria-label="上一站與下一站">
   <div class="actions-in gutter">
-    <button class="btn btn-ghost" id="back" type="button">上一關</button>
-    <button class="btn btn-primary" id="next" type="submit" form="stepform">下一關</button>
+    <button class="btn btn-ghost" id="back" type="button">上一站</button>
+    <button class="btn btn-primary" id="next" type="submit" form="stepform">下一站</button>
   </div>
 </nav>
 
@@ -282,8 +324,8 @@ dialog::backdrop{background:rgba(10,14,26,.55)}
     <h2 id="privacy-title">個人資料蒐集告知事項</h2>
     <p>依個人資料保護法第 8 條，萬能科技大學招生處向你說明：</p>
     <h3>蒐集目的</h3><p>辦理招生宣導、早鳥報名登記、入學相關活動通知與諮詢。</p>
-    <h3>蒐集的資料</h3><p>姓名、手機、電子郵件、身分證字號、就讀學校與年級、有興趣的系所。</p>
-    <h3>利用期間、對象與方式</h3><p>自填寫日起至當學年度招生作業結束；僅供本校招生處與相關系所使用，以電子或書面方式處理，不會提供給第三人。</p>
+    <h3>蒐集的資料</h3><p>姓名、手機、身分證字號、就讀學校、科別、班級、統測群類、志願系所。</p>
+    <h3>利用期間、對象與方式</h3><p>自填寫日起至當學年度招生作業結束；僅供本校招生處與相關系所使用，由招生處登錄至本校早鳥報名系統，以電子或書面方式處理，不會提供給第三人。</p>
     <h3>你的權利</h3><p>你可以向招生處查詢、更正或請求刪除資料。</p>
     <h3>不提供的影響</h3><p>若未提供完整資料，將無法完成早鳥登記。</p>
     <button class="btn btn-primary" type="button" id="privacy-close">我知道了</button>
@@ -293,115 +335,86 @@ dialog::backdrop{background:rgba(10,14,26,.55)}
 <script>
 (function(){
 'use strict';
-document.documentElement.lang = 'zh-Hant-TW';
 
 /* =========================================================
-   設定區：之後對齊學校早鳥系統時，只需要改這裡
+   設定區
+   選項文字要和學校早鳥系統一字不差（見 bot/mapping.mjs 與 bot/schools.json）
    ========================================================= */
 const CONFIG = {
   endpoint: '',                 // Google Apps Script 網頁應用程式網址（空白 = 示範模式，只存在手機裡）
   schoolName: '萬能科技大學',
   unit: '招生處',
-  year: '116',                  // 學年度
-  afterText: '招生處會在 3 個工作天內，用簡訊或 Email 通知你早鳥資格與後續活動。',
-  afterLinks: [                 // 完成畫面的連結按鈕，可留空陣列
-    { label: '萬能科大招生資訊', href: 'https://www.vnu.edu.tw/' }
-  ],
-  // 系所名單：文字要和學校早鳥系統的志願選單一字不差（bot/mapping.mjs 的 DEPARTMENTS）；分組只是方便學生找
-  departments: {
-    '設計・時尚・美容': ['時尚造型設計暨表演藝術系 時尚造型組', '時尚造型設計暨表演藝術系 表演藝術組', '商業設計系', '室內設計與營建科技系', '化妝品應用與管理系'],
-    '觀光・餐飲・航空': ['觀光與休閒事業管理系', '餐飲管理系', '航空暨運輸服務管理系'],
-    '管理・行銷': ['企業管理系', '行銷與流通管理系'],
-    '資訊・電機・機械': ['資訊工程系', '電機工程系', '車輛工程系', '精密機械與工業工程系', '航空光機電系']
-  },
-  // 統測群類：和學校早鳥系統的選單一字不差
+  year: '116',
+  afterText: '招生處會在 3 個工作天內，用簡訊通知你早鳥資格與後續活動。',
+  afterLinks: [{ label: '萬能科大招生資訊', href: 'https://www.vnu.edu.tw/' }],
+  // 學校名單（和學校系統相同），依縣市分組
+  schools: {"桃園市":["大華高中","大園國際高中","大溪高中","大興高中","中央大學附屬中壢高中","中壢家商","中壢高商","內壢高中","六和高中","方曙商工","世紀綠能工商","北科大附屬桃園農工","平鎮高中","永平工商","永豐高中","光啟高中","至善高中","宏德高商進修學校","育達高中","武陵高中","治平高中","南崁高中","振聲高中","桃園高中","啟英高中","清華高中","復旦高中","陽明高中","新屋高中","新興高中","楊梅高中","誠正中學桃園分校","壽山高中","漢英高中","龍潭高中","觀音高中"],"新竹市":["世界高中","光復高中","成德高中","建功高中","科學工業園區實驗高中","香山高中","新竹女中","新竹高工","新竹高中","新竹高商","磐石高中","曙光女中"],"新竹縣":["內思高工","六家高級中學","仰德高中","竹北高中","竹東高中","忠信高中","東泰高中","湖口高中","義民高中","誠正中學","關西高中"],"苗栗縣":["三義高中","大同高中","大成高中","大湖農工","中興商工","全人實驗高中","竹南高中","君毅高中","育民工家","卓蘭高中","建臺高中","苗栗高中","苗栗高商","苗栗農工","苑裡高中","賢德工商","興華高中","龍德家商"],"新北市":["三民高中","三重高中","三重商工","中和高中","中華高中","中華商海","丹鳳高中","及人高中","北大高級中學","永平高中","石碇高中","光仁高中","光復高中","光華高商進修學校","安康高中","竹林高中","竹圍高中","秀峰高中","明德高中","東海高中","林口高中","林口康橋國際高中","板橋高中","金山高中","金陵女中","南山高中","南強工商","恆毅高中","徐匯高中","時雨高中","格致高中","泰山高中","海山高中","能仁家商","崇光女中","崇義高中","康橋高中","淡水商工","淡江高中","清水高中","清傳高商","莊敬工家","復興商工","智光商工","華僑高中","開明工商","新北高工","新北高中","新店高中","新莊高中","瑞芳高工","聖心女中","裕德高中","樟樹國際實中","穀保家商","樹人家商","樹林高中","豫章工商","醒吾高中","錦和高中","豐珠中學","雙溪高中","辭修高中","鶯歌工商"],"臺北市":["士林高商","大同高中","大安高工","大直高中","大理高中","大誠高中","中山女中","中正高中","中崙高中","中興中學","內湖高工","內湖高中","文德女中","方濟中學","木柵高工","北一女中","台北育達高中","幼華高中","永春高中","立人高中","再興中學","成功中學","成淵高中","百齡高中","西松高中","志仁中學進修學校","育成高中","協和祐德高級中學","和平高中","延平中學","明倫高中","東山高中","東方工商","松山工農","松山家商","松山高中","金甌女中","南港高工","南港高中","南湖高中","南華高中進修學校","奎山實驗高級中學","建國中學","政大附中","師大附中","泰北高中","強恕中學","惇敘工商","喬治工商","復興高中","復興實驗高中","景文高中","景美女中","華江高中","華岡藝校","華興中學","開平餐飲","開南商工","陽明高中","萬芳高中","達人女中","滬江高中","臺灣戲曲學院","稻江高商","稻江護家","衛理女中","靜心高中","靜修女中","薇閣高中","麗山高中"],"基隆市":["二信高中","八斗高中","中山高中","光隆家商","安樂高中","基隆女中","基隆海事","基隆高中","基隆商工","培德工家","暖暖高中","輔大聖心高中"],"宜蘭縣":["中道高中","宜蘭高中","宜蘭高商","南澳高中","慈心華德福實中","慧燈高中","頭城家商","羅東高工","羅東高中","羅東高商","蘇澳海事","蘭陽女中"],"臺中市":["大甲高工","大甲高中","大里高中","大明高中","中科實驗高級中學","中港高中","文華高中","弘文高中","玉山高中","立人高中","光華高工","后綜高中","西苑高中","沙鹿高工","宜寧高中","忠明高中","明台高中","明道高中","明德高中","東大附中","東山高中","東勢高工","長億高中","青年高中","致用高中","常春藤高中","清水高中","惠文高中","華盛頓高中","華德福大地實驗學校","慈明高中","新民高中","新社高中","葳格高中","僑泰高中","嘉陽高中","臺中一中","臺中二中","臺中女中","臺中家商","臺中高工","磊川華德福實驗教育學校","衛道高中","曉明女中","興大附中","興大附農","龍津高中","嶺東高中","豐原高中","豐原高商","霧峰農工"],"彰化縣":["二林工商","二林高中","大慶商工","文興高中","北斗家商","正德高中","永靖高工","田中高中","成功高中","秀水高工","和美高中","和美實驗學校","員林家商","員林高中","員林崇實高工","員林農工","鹿港高中","溪湖高中","誠正中學彰化分校","達德商工","彰化女中","彰化高中","彰化高商","彰化藝術高中","彰師附工","精誠高中"],"南投縣":["三育高中","中興高中","五育高中","仁愛高農","水里商工","弘明實驗高中","同德家商","旭光高中","竹山高中","南投高中","南投高商","埔里高工","草屯商工","普台高中","暨大附中"],"雲林縣":["土庫商工","大成商工","大德工商","文生高中","斗六家商","斗六高中","斗南高中","北港高中","北港農工","古坑華德福實驗高級中學","巨人高中","正心高中","永年高中","西螺農工","虎尾高中","虎尾農工","麥寮高中","揚子高中","義峰高中","福智高中","維多利亞實驗高中","蔦松藝術高中"],"嘉義市":["仁義高中","立仁高中","宏仁女中","東吳工家","華南高商","嘉華高中","嘉義女中","嘉義家職","嘉義高工","嘉義高中","嘉義高商","輔仁高中","興華高中"],"嘉義縣":["弘德工商","民雄農工","永慶高中","同濟高中","竹崎高中","協同高中","協志工商","東石高中","新港藝術高中","萬能工商"],"臺南市":["土城高中","大灣高中","六信高中","北門高中","北門農工","永仁高中","玉井工商","白河商工","成功大學附設高工進修學校","育德工家","亞洲餐旅","明達高中","長榮女中","長榮高中","南光高中","南科國際實驗高中","南英商工","南寧高中","後壁高中","家齊高中","崑山高中","曾文家商","曾文農工","港明高中","善化高中","陽明工商","慈幼工商","慈濟高中","新化高工","新化高中","新榮高中","新營高工","新營高中","新豐高中","聖功女中","臺南一中","臺南二中","臺南大學附中","臺南大學附屬啟聰學校","臺南女中","臺南市光華高中","臺南市興國高中","臺南海事","臺南高工","臺南高商","鳳和高中","德光高中","黎明高中","樹德高中進修學校","瀛海高中"],"高雄市":["三民家商","三民高中","三信家商","大榮高中","小港高中","中山大學附屬國光高中","中山工商","中山高中","中正高工","中正高中","中華藝校","仁武高中","六龜高中","文山高中","左營高中","正義高中","立志高中","岡山高中","岡山農工","明陽中學","明誠高中","林園高中","前鎮高中","南海月光實驗學校","海青工商","高英工商","高苑工商","高師大附中","高雄女中","高雄中學","高雄高工","高雄高商","高鳳工家","高餐大附屬餐旅中學","國際商工","復華高中","普門中學","華德工家","新光高中","新莊高中","新興高中","楠梓特殊學校","楠梓高中","瑞祥高中","義大國際高中","路竹高中","道明中學","鼓山高中","旗山農工","旗美高中","旗美商工","福誠高中","鳳山高中","鳳山商工","鳳新高中","樹德家商"],"屏東縣":["大同高中","內埔農工","日新工商","民生家商","佳冬高農","來義高中","枋寮高中","東港海事","東港高中","屏北高中","屏東女中","屏東高工","屏東高中","屏榮高中","恆春工商","美和高中","陸興高中","華洲工家","潮州高中"],"花蓮縣":["上騰工商","四維高中","正德高中","玉里高中","光復商工","花蓮女中","花蓮高工","花蓮高中","花蓮高商","花蓮高農","南平中學","海星高中","慈濟大學附中","體育高中"],"臺東縣":["公東高工","成功商水","均一高中","育仁高中","臺東大學附屬體育高中","臺東女中","臺東高中","臺東高商","臺東專科學校","關山工商","蘭嶼高中"],"澎湖縣":["馬公高中","澎湖海事水產"],"金門縣":["金門高中","金門農工"],"連江縣":["馬祖高中"]},
+  // 學生常講的簡稱 → 學校系統的名稱
+  schoolAliases: { 中壢高中: '中央大學附屬中壢高中', 桃園農工: '北科大附屬桃園農工', 莊敬高職: '莊敬工家', 中山女高: '中山女中', 北大高中: '北大高級中學', 崇光高中: '崇光女中', 強恕高中: '強恕中學', 建中: '建國中學', 北一女: '北一女中' },
+  majors: ['普通科', '美容科', '時尚模特兒科', '表演藝術科', '服裝科', '幼兒保育科', '餐飲管理科', '觀光事業科', '資料處理科', '商業經營科', '廣告設計科', '多媒體設計科', '電機科', '電子科', '資訊科', '汽車科', '機械科'],
   testGroups: ['01 機械群', '02 動力機械群', '03 電機與電子群電機類', '04 電機與電子群資電類', '05 化工群', '06 土木與建築群',
     '07 設計群', '08 工程與管理類', '09 商業與管理群', '10 衛生與護理類', '11 食品群', '12 家政群幼保類',
     '13 家政群生活應用類', '14 農業群', '15 外語群英語類', '16 外語群日語類', '17 餐旅群', '18 海事群', '19 水產群',
     '20 藝術群影視類', '21未考統測', '22報考學測', '23進修部'],
-  needs: ['都不需要', '需要工讀機會', '需要住宿', '兩個都需要'],
-  skills: ['乙級證照', '技能(藝)比賽獲獎', '全國性比賽獲獎'],
-  // 學校快速選取名單：和學校早鳥系統一致（bot/schools.json）；同名的學校後面加縣市
-  schools: [
-    // 桃園市
-    '大華高中','大園國際高中','大溪高中','大興高中','中央大學附屬中壢高中','中壢家商','中壢高商','內壢高中','六和高中','方曙商工','世紀綠能工商','北科大附屬桃園農工','平鎮高中','永平工商','永豐高中','光啟高中','至善高中','宏德高商進修學校','育達高中','武陵高中','治平高中','南崁高中','振聲高中','桃園高中','啟英高中','清華高中','復旦高中','陽明高中（桃園市）','新屋高中','新興高中（桃園市）','楊梅高中','誠正中學桃園分校','壽山高中','漢英高中','龍潭高中','觀音高中',
-    // 新竹市
-    '世界高中','光復高中（新竹市）','成德高中','建功高中','科學工業園區實驗高中','香山高中','新竹女中','新竹高工','新竹高中','新竹高商','磐石高中','曙光女中',
-    // 新竹縣
-    '內思高工','六家高級中學','仰德高中','竹北高中','竹東高中','忠信高中','東泰高中','湖口高中','義民高中','誠正中學','關西高中',
-    // 苗栗縣
-    '三義高中','大同高中（苗栗縣）','大成高中','大湖農工','中興商工','全人實驗高中','竹南高中','君毅高中','育民工家','卓蘭高中','建臺高中','苗栗高中','苗栗高商','苗栗農工','苑裡高中','賢德工商','興華高中（苗栗縣）','龍德家商',
-    // 新北市
-    '三民高中（新北市）','三重高中','三重商工','中和高中','中華高中','中華商海','丹鳳高中','及人高中','北大高級中學','永平高中','石碇高中','光仁高中','光復高中（新北市）','光華高商進修學校','安康高中','竹林高中','竹圍高中','秀峰高中','明德高中（新北市）','東海高中','林口高中','林口康橋國際高中','板橋高中','金山高中','金陵女中','南山高中','南強工商','恆毅高中','徐匯高中','時雨高中','格致高中','泰山高中','海山高中','能仁家商','崇光女中','崇義高中','康橋高中','淡水商工','淡江高中','清水高中（新北市）','清傳高商','莊敬工家','復興商工','智光商工','華僑高中','開明工商','新北高工','新北高中','新店高中','新莊高中（新北市）','瑞芳高工','聖心女中','裕德高中','樟樹國際實中','穀保家商','樹人家商','樹林高中','豫章工商','醒吾高中','錦和高中','豐珠中學','雙溪高中','辭修高中','鶯歌工商',
-    // 臺北市
-    '士林高商','大同高中（臺北市）','大安高工','大直高中','大理高中','大誠高中','中山女中','中正高中（臺北市）','中崙高中','中興中學','內湖高工','內湖高中','文德女中','方濟中學','木柵高工','北一女中','台北育達高中','幼華高中','永春高中','立人高中（臺北市）','再興中學','成功中學','成淵高中','百齡高中','西松高中','志仁中學進修學校','育成高中','協和祐德高級中學','和平高中','延平中學','明倫高中','東山高中（臺北市）','東方工商','松山工農','松山家商','松山高中','金甌女中','南港高工','南港高中','南湖高中','南華高中進修學校','奎山實驗高級中學','建國中學','政大附中','師大附中','泰北高中','強恕中學','惇敘工商','喬治工商','復興高中','復興實驗高中','景文高中','景美女中','華江高中','華岡藝校','華興中學','開平餐飲','開南商工','陽明高中（臺北市）','萬芳高中','達人女中','滬江高中','臺灣戲曲學院','稻江高商','稻江護家','衛理女中','靜心高中','靜修女中','薇閣高中','麗山高中',
-    // 基隆市
-    '二信高中','八斗高中','中山高中（基隆市）','光隆家商','安樂高中','基隆女中','基隆海事','基隆高中','基隆商工','培德工家','暖暖高中','輔大聖心高中',
-    // 宜蘭縣
-    '中道高中','宜蘭高中','宜蘭高商','南澳高中','慈心華德福實中','慧燈高中','頭城家商','羅東高工','羅東高中','羅東高商','蘇澳海事','蘭陽女中',
-    // 臺中市
-    '大甲高工','大甲高中','大里高中','大明高中','中科實驗高級中學','中港高中','文華高中','弘文高中','玉山高中','立人高中（臺中市）','光華高工','后綜高中','西苑高中','沙鹿高工','宜寧高中','忠明高中','明台高中','明道高中','明德高中（臺中市）','東大附中','東山高中（臺中市）','東勢高工','長億高中','青年高中','致用高中','常春藤高中','清水高中（臺中市）','惠文高中','華盛頓高中','華德福大地實驗學校','慈明高中','新民高中','新社高中','葳格高中','僑泰高中','嘉陽高中','臺中一中','臺中二中','臺中女中','臺中家商','臺中高工','磊川華德福實驗教育學校','衛道高中','曉明女中','興大附中','興大附農','龍津高中','嶺東高中','豐原高中','豐原高商','霧峰農工',
-    // 彰化縣
-    '二林工商','二林高中','大慶商工','文興高中','北斗家商','正德高中（彰化縣）','永靖高工','田中高中','成功高中','秀水高工','和美高中','和美實驗學校','員林家商','員林高中','員林崇實高工','員林農工','鹿港高中','溪湖高中','誠正中學彰化分校','達德商工','彰化女中','彰化高中','彰化高商','彰化藝術高中','彰師附工','精誠高中',
-    // 南投縣
-    '三育高中','中興高中','五育高中','仁愛高農','水里商工','弘明實驗高中','同德家商','旭光高中','竹山高中','南投高中','南投高商','埔里高工','草屯商工','普台高中','暨大附中',
-    // 雲林縣
-    '土庫商工','大成商工','大德工商','文生高中','斗六家商','斗六高中','斗南高中','北港高中','北港農工','古坑華德福實驗高級中學','巨人高中','正心高中','永年高中','西螺農工','虎尾高中','虎尾農工','麥寮高中','揚子高中','義峰高中','福智高中','維多利亞實驗高中','蔦松藝術高中',
-    // 嘉義市
-    '仁義高中','立仁高中','宏仁女中','東吳工家','華南高商','嘉華高中','嘉義女中','嘉義家職','嘉義高工','嘉義高中','嘉義高商','輔仁高中','興華高中（嘉義市）',
-    // 嘉義縣
-    '弘德工商','民雄農工','永慶高中','同濟高中','竹崎高中','協同高中','協志工商','東石高中','新港藝術高中','萬能工商',
-    // 臺南市
-    '土城高中','大灣高中','六信高中','北門高中','北門農工','永仁高中','玉井工商','白河商工','成功大學附設高工進修學校','育德工家','亞洲餐旅','明達高中','長榮女中','長榮高中','南光高中','南科國際實驗高中','南英商工','南寧高中','後壁高中','家齊高中','崑山高中','曾文家商','曾文農工','港明高中','善化高中','陽明工商','慈幼工商','慈濟高中','新化高工','新化高中','新榮高中','新營高工','新營高中','新豐高中','聖功女中','臺南一中','臺南二中','臺南大學附中','臺南大學附屬啟聰學校','臺南女中','臺南市光華高中','臺南市興國高中','臺南海事','臺南高工','臺南高商','鳳和高中','德光高中','黎明高中','樹德高中進修學校','瀛海高中',
-    // 高雄市
-    '三民家商','三民高中（高雄市）','三信家商','大榮高中','小港高中','中山大學附屬國光高中','中山工商','中山高中（高雄市）','中正高工','中正高中（高雄市）','中華藝校','仁武高中','六龜高中','文山高中','左營高中','正義高中','立志高中','岡山高中','岡山農工','明陽中學','明誠高中','林園高中','前鎮高中','南海月光實驗學校','海青工商','高英工商','高苑工商','高師大附中','高雄女中','高雄中學','高雄高工','高雄高商','高鳳工家','高餐大附屬餐旅中學','國際商工','復華高中','普門中學','華德工家','新光高中','新莊高中（高雄市）','新興高中（高雄市）','楠梓特殊學校','楠梓高中','瑞祥高中','義大國際高中','路竹高中','道明中學','鼓山高中','旗山農工','旗美高中','旗美商工','福誠高中','鳳山高中','鳳山商工','鳳新高中','樹德家商',
-    // 屏東縣
-    '大同高中（屏東縣）','內埔農工','日新工商','民生家商','佳冬高農','來義高中','枋寮高中','東港海事','東港高中','屏北高中','屏東女中','屏東高工','屏東高中','屏榮高中','恆春工商','美和高中','陸興高中','華洲工家','潮州高中',
-    // 花蓮縣
-    '上騰工商','四維高中','正德高中（花蓮縣）','玉里高中','光復商工','花蓮女中','花蓮高工','花蓮高中','花蓮高商','花蓮高農','南平中學','海星高中','慈濟大學附中','體育高中',
-    // 臺東縣
-    '公東高工','成功商水','均一高中','育仁高中','臺東大學附屬體育高中','臺東女中','臺東高中','臺東高商','臺東專科學校','關山工商','蘭嶼高中',
-    // 澎湖縣
-    '馬公高中','澎湖海事水產',
-    // 金門縣
-    '金門高中','金門農工',
-    // 連江縣
-    '馬祖高中'
+  // 依科別猜統測群類（猜完會讓學生確認）；由上往下比對，先中先贏
+  groupRules: [
+    [/普通/, '22報考學測'],
+    [/幼保|幼兒/, '12 家政群幼保類'],
+    [/美容|美髮|美顏|時尚|造型|模特|服裝|服飾|流行|家政/, '13 家政群生活應用類'],
+    [/表演|影劇|戲劇|影視|電影|劇場/, '20 藝術群影視類'],
+    [/餐飲|觀光|旅館|旅遊|廚藝/, '17 餐旅群'],
+    [/資料處理|商業|國際貿易|國貿|會計|電子商務|流通|多媒體應用/, '09 商業與管理群'],
+    [/廣告|美工|室內|圖文|家具|設計/, '07 設計群'],
+    [/電機|冷凍|空調/, '03 電機與電子群電機類'],
+    [/電子|資訊|控制|通訊/, '04 電機與電子群資電類'],
+    [/汽車|機車|動力|飛機|重機/, '02 動力機械群'],
+    [/機械|製圖|模具|鑄造|板金|配管|機電/, '01 機械群'],
+    [/建築|土木|營造/, '06 土木與建築群'],
+    [/化工|紡織|染整/, '05 化工群'],
+    [/食品/, '11 食品群'],
+    [/園藝|農|畜|森林|造園/, '14 農業群'],
+    [/護理|衛生/, '10 衛生與護理類'],
+    [/英語|英文/, '15 外語群英語類'],
+    [/日語|日文/, '16 外語群日語類'],
+    [/航海|輪機|海事|航運/, '18 海事群'],
+    [/水產|漁/, '19 水產群'],
   ],
-  // 得知管道：對應學校系統的 1～7 項（bot/mapping.mjs 的 INFO_FROM_ALIASES）
-  sources: ['萬能科大老師推薦', '高中職老師推薦', '親友推薦', '萬能官網', 'Facebook', 'Instagram', 'LINE 官方帳號'],
-  // 學校系統只收 116 年畢業（今年高三）、115 年、114 年以前；高一、高二會先存著，不會自動登錄
-  grades: ['高三（116 年畢業）', '已畢業（115 年畢業）', '已畢業（114 年以前）', '高二', '高一', '其他'],
-  pointsRequired: 10,
-  pointsOptional: 5,
-  pointsFinish: 20
+  // 系所＝學校系統的志願選項；tag 只是方便學生找
+  departments: [
+    ['時尚造型設計暨表演藝術系 時尚造型組', '設計・時尚'], ['時尚造型設計暨表演藝術系 表演藝術組', '設計・時尚'],
+    ['化妝品應用與管理系', '設計・時尚'], ['商業設計系', '設計・時尚'], ['室內設計與營建科技系', '設計・時尚'],
+    ['觀光與休閒事業管理系', '觀光・餐飲・航空'], ['餐飲管理系', '觀光・餐飲・航空'], ['航空暨運輸服務管理系', '觀光・餐飲・航空'],
+    ['企業管理系', '管理・行銷'], ['行銷與流通管理系', '管理・行銷'],
+    ['資訊工程系', '資訊・工程'], ['電機工程系', '資訊・工程'], ['車輛工程系', '資訊・工程'], ['精密機械與工業工程系', '資訊・工程'], ['航空光機電系', '資訊・工程'],
+  ],
+  expPerStage: 10,
+  expFinish: 30,
+  levels: ['新手冒險者', '見習早鳥', '熟練早鳥', '早鳥勇者'],
 };
 
-/* 題目：一題一關。enabled:false 可關閉；順序即關卡順序 */
+/* 關卡：一站一題，全部是學校系統的必填欄位 */
 const QUESTIONS = [
-  { key: 'name', type: 'text', label: '姓名', title: '先認識一下，你的名字是？', hint: '請填身分證上的姓名（最多 8 個字）。', placeholder: '例如：林小鳥', autocomplete: 'name', maxlength: 8,
-    validate: v => /^[㐀-䶿一-鿿A-Za-z·‧\s]{2,8}$/.test(v) ? '' : '請輸入 2 到 8 個字的中文或英文姓名。' },
-  { key: 'phone', type: 'tel', label: '手機', title: '你的手機號碼？', hint: '早鳥資格和活動通知會用簡訊寄給你。', placeholder: '09xx xxx xxx', inputmode: 'numeric', autocomplete: 'tel', maxlength: 14,
+  { key: 'name', type: 'text', label: '姓名', place: '報到處', item: '冒險者名牌',
+    say: () => '嗨，冒險者！先報上你的名字吧。', hint: '請填身分證上的姓名，最多 8 個字。', placeholder: '例如：林小鳥', autocomplete: 'name', maxlength: 8,
+    normalize: v => v.trim(), validate: v => /^[㐀-䶿一-鿿A-Za-z·‧\s]{2,8}$/.test(v) ? '' : '請輸入 2 到 8 個字的中文或英文姓名。' },
+  { key: 'phone', type: 'tel', label: '手機', place: '傳訊塔', item: '傳訊水晶',
+    say: a => `${a.name || '冒險者'}，留個手機，早鳥消息第一個傳給你！`, hint: '09 開頭的 10 碼數字。', placeholder: '0912 345 678', inputmode: 'numeric', autocomplete: 'tel', maxlength: 14,
     normalize: v => v.replace(/\D/g, ''), validate: v => /^09\d{8}$/.test(v) ? '' : '手機要是 09 開頭的 10 碼數字，例如 0912345678。' },
-  { key: 'line', type: 'text', label: 'LINE ID', title: '你的 LINE ID？', hint: '選填，方便老師用 LINE 聯絡你。', placeholder: '例如：vnu_bird', optional: true, autocomplete: 'off', maxlength: 30,
-    normalize: v => v.trim() },
-  { key: 'email', type: 'email', label: 'Email', title: '你的電子郵件？', hint: '收錄取通知、活動資訊會用到。', placeholder: 'name@example.com', inputmode: 'email', autocomplete: 'email', maxlength: 80,
-    normalize: v => v.trim().toLowerCase(), validate: v => /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v) ? '' : '看起來少了 @ 或網域，請再確認一次。' },
-  { key: 'idno', type: 'text', label: '身分證字號', title: '身分證字號', hint: '用來核對早鳥資格，只有招生處看得到。', placeholder: 'A123456789', autocomplete: 'off', maxlength: 10, upper: true,
-    normalize: v => v.toUpperCase().replace(/\s/g, ''), validate: v => validTwId(v) ? '' : '字號格式不對，請再對一次（1 個英文字母＋9 個數字）。' },
-  { key: 'school', type: 'school', label: '就讀學校', title: '你現在讀哪所學校？', hint: '輸入幾個字會出現建議，請從建議裡選；同名的學校後面有縣市。', placeholder: '例如：中壢家商', autocomplete: 'off', maxlength: 40,
-    normalize: v => v.trim(), validate: v => v.length >= 2 ? '' : '請輸入學校名稱。' },
-  { key: 'major', type: 'text', label: '科別', title: '你讀什麼科？', hint: '高中普通科就填「普通科」。', placeholder: '例如：美容科、資料處理科', autocomplete: 'off', maxlength: 15,
-    normalize: v => v.trim() },
-  { key: 'klass', type: 'text', label: '班級', title: '你是哪一班？', placeholder: '例如：三年忠班、301', autocomplete: 'off', maxlength: 15,
-    normalize: v => v.trim() },
-  { key: 'grade', type: 'choice', label: '年級', title: '你是幾年級？', options: CONFIG.grades },
-  { key: 'group', type: 'choice', label: '統測群類', title: '你考統測的群類是？', hint: '高中普通科選「22報考學測」；還沒決定考不考統測選「21未考統測」。', options: CONFIG.testGroups },
-  { key: 'depts', type: 'multi', label: '有興趣的系', title: '對哪些系有興趣？', hint: '最多選 3 個，先選的是第一志願。', max: 3, groups: CONFIG.departments, emptyMsg: '至少選一個有興趣的系。' },
-  { key: 'needs', type: 'choice', label: '工讀／住宿', title: '入學後需要工讀或住宿嗎？', hint: '先填想法就好，之後還可以改。', options: CONFIG.needs },
-  { key: 'skills', type: 'multi', label: '特殊表現', title: '有這些特殊表現嗎？', hint: '有的話勾起來；都沒有就直接按「下一關」。', max: 3, optional: true, groups: { '可以複選': CONFIG.skills } },
-  { key: 'source', type: 'choice', label: '得知管道', title: '你是怎麼知道這次早鳥的？', options: CONFIG.sources, skipIfParam: 'src' },
-  { key: 'consent', type: 'consent', label: '個資同意', title: '最後一步', hint: '看完同意後，就可以檢查資料並送出。' }
+  { key: 'idno', type: 'idcard', label: '身分證字號', place: '守門員', item: '通行證',
+    say: () => '出示你的通行證號碼，讓守門員驗證一下！', hint: '就是身分證字號，只有招生處看得到。', placeholder: 'A123456789' },
+  { key: 'school', type: 'school', label: '就讀學校', place: '公會大廳', item: '公會徽章',
+    say: () => '你是從哪個公會（學校）來的？', hint: '打兩個字就會跳出學校，點一下就好。', placeholder: '例如：中壢家商' },
+  { key: 'major', type: 'major', label: '科別', place: '職業所', item: '職業證書',
+    say: a => `${a.school ? '原來是' + schoolShort(a.school) + '的同學！' : ''}你的職業（科別）是？`, hint: '點一個，或在下面打出你的科別。' },
+  { key: 'klass', type: 'text', label: '班級', place: '小隊集合', item: '小隊旗幟',
+    say: a => `${a.major || '冒險者'}的哪一個小隊（班級）？`, hint: '例如：三年忠班、301。', placeholder: '三年忠班', maxlength: 15,
+    normalize: v => v.trim(), validate: v => v ? '' : '班級還沒填喔。' },
+  { key: 'group', type: 'group', label: '統測群類', place: '技能樹', item: '技能樹',
+    say: () => state.guess ? '我猜到你的技能樹（統測群類）了！' : '你考統測的技能樹（群類）是哪一個？' },
+  { key: 'depts', type: 'dept', label: '第一志願', place: '目標城堡', item: '目標地圖',
+    say: () => '選一座你最想去的城堡（系）！', hint: '這是你的第一志願，之後還可以再改。' },
+  { key: 'consent', type: 'consent', label: '個資同意', place: '冒險契約', item: '冒險契約',
+    say: () => '出發前，在冒險契約上蓋個章吧！' },
 ];
 
 /* ---------- 工具 ---------- */
@@ -412,11 +425,12 @@ const LS = {
   set(k, v){ try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} },
   del(k){ try { localStorage.removeItem(k); } catch (e) {} }
 };
-const K_DRAFT = 'vnu-eb-draft', K_QUEUE = 'vnu-eb-queue', K_FS = 'vnu-eb-fs';
+const K_DRAFT = 'vnu-eb-draft2', K_QUEUE = 'vnu-eb-queue', K_FS = 'vnu-eb-fs';
 const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]));
 const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
 const params = new URLSearchParams(location.search);
 const meta = { src: (params.get('src') || '').slice(0, 80), by: (params.get('by') || '').slice(0, 80), evt: (params.get('evt') || '').slice(0, 80) };
+const buzz = ms => { try { if (navigator.vibrate) navigator.vibrate(ms); } catch (e) {} };
 
 const ID_MAP = { A:10,B:11,C:12,D:13,E:14,F:15,G:16,H:17,I:34,J:18,K:19,L:20,M:21,N:22,O:35,P:23,Q:24,R:25,S:26,T:27,U:28,V:29,W:32,X:30,Y:31,Z:33 };
 function validTwId(s){
@@ -425,10 +439,8 @@ function validTwId(s){
   if (!/^[A-Z][1289]\d{8}$/.test(s)) return false;           // 身分證 / 新式統一證號
   const n = ID_MAP[s[0]];
   let sum = Math.floor(n / 10) + (n % 10) * 9;
-  const w = [8, 7, 6, 5, 4, 3, 2, 1];
-  for (let i = 0; i < 8; i++) sum += (+s[i + 1]) * w[i];
-  sum += +s[9];
-  return sum % 10 === 0;
+  [8, 7, 6, 5, 4, 3, 2, 1].forEach((w, i) => { sum += (+s[i + 1]) * w; });
+  return (sum + (+s[9])) % 10 === 0;
 }
 function makeRef(){
   const d = new Date(), p = n => String(n).padStart(2, '0');
@@ -437,100 +449,141 @@ function makeRef(){
   return 'EB' + d.getFullYear() + p(d.getMonth() + 1) + p(d.getDate()) + '-' + r;
 }
 
-/* ---------- 關卡 ---------- */
-const QS = QUESTIONS.filter(q => q.enabled !== false && !(q.skipIfParam && meta[q.skipIfParam]));
-const STEPS = [{ type: 'welcome' }].concat(QS.map(q => ({ type: 'q', q })), [{ type: 'review' }, { type: 'done' }]);
-const TOTAL = QS.length;
-const LEVELS = ['剛破殼', '學飛中', '展翅了', '早鳥達人'];
-const CHEERS = ['好耶', '太棒了', '就是這樣', '很順喔', '快完成了', '厲害'];
+// 學校名單：同名的學校在名稱後面加縣市，送出的值就是畫面上看到的文字
+const SCHOOL_LIST = (() => {
+  const count = {};
+  Object.values(CONFIG.schools).forEach(l => l.forEach(n => { count[n] = (count[n] || 0) + 1; }));
+  const out = [];
+  Object.entries(CONFIG.schools).forEach(([c, l]) => l.forEach(n => out.push({ n, c, label: count[n] > 1 ? `${n}（${c}）` : n })));
+  return out;
+})();
+const SCHOOL_BY_LABEL = Object.fromEntries(SCHOOL_LIST.map(s => [s.label, s]));
+const normS = s => String(s || '').normalize('NFKC').replace(/\s/g, '').replace(/台/g, '臺');
+function searchSchools(q){
+  const t = normS(q);
+  if (t.length < 1) return [];
+  const alias = CONFIG.schoolAliases[t];
+  const hits = SCHOOL_LIST.filter(s => normS(s.n).includes(t) || (alias && s.n === alias));
+  hits.sort((a, b) => (normS(a.n).startsWith(t) ? 0 : 1) - (normS(b.n).startsWith(t) ? 0 : 1) || a.n.length - b.n.length);
+  return hits.slice(0, 8);
+}
+function schoolShort(label){ const s = SCHOOL_BY_LABEL[label]; return s ? s.n : label; }
+function guessGroup(major){ const r = CONFIG.groupRules.find(([re]) => re.test(major || '')); return r ? r[1] : ''; }
+const groupName = g => String(g || '').replace(/^\d+\s*/, '');
 
-let state = { i: 0, answers: {}, points: 0, ref: null, returnToReview: false, result: null, dir: 1 };
+const BIRD = `<svg class="bird-svg" viewBox="0 0 64 64" aria-hidden="true">
+  <path d="M31 13c-1-6 2-9 6-8-3 2-3 5-2 8z" fill="var(--bird-dark)"/>
+  <circle cx="32" cy="36" r="22" fill="var(--bird)"/>
+  <path d="M13 40c-5 6-3 14 4 16 5-1 9-5 10-10z" fill="var(--bird-dark)"/>
+  <path d="M51 32l11 4-11 4z" fill="#E8590C"/>
+  <circle cx="41" cy="30" r="3.2" fill="#141A2A"/>
+  <circle cx="44" cy="38" r="3.5" fill="#FDBA74" opacity=".8"/>
+</svg>`;
+
+/* ---------- 關卡流程 ---------- */
+const STEPS = [{ type: 'welcome' }].concat(QUESTIONS.map(q => ({ type: 'q', q })), [{ type: 'review' }, { type: 'done' }]);
+const TOTAL = QUESTIONS.length;
+
+let state = { i: 0, answers: {}, exp: 0, items: [], ref: null, returnToReview: false, result: null, dir: 1, guess: '', groupOpen: false, schoolOk: false };
 let lastPointer = false;
 
 const stage = $('#stage'), actions = $('#actions'), backBtn = $('#back'), nextBtn = $('#next');
-const live = $('#live'), toast = $('#toast'), mascot = $('#mascot');
+const live = $('#live'), toast = $('#toast');
+$('#walker').innerHTML = BIRD;
 
 function announce(t){ live.textContent = ''; setTimeout(() => { live.textContent = t; }, 40); }
-function cheer(pts, i){
-  if (pts) { state.points += pts; $('#points').textContent = state.points + ' 分'; }
-  toast.textContent = (pts ? '+' + pts + ' ' : '') + CHEERS[i % CHEERS.length];
-  toast.classList.remove('show'); void toast.offsetWidth; toast.classList.add('show');
-  mascot.classList.remove('happy'); void mascot.offsetWidth; mascot.classList.add('happy');
-  setTimeout(() => mascot.classList.remove('happy'), 700);
+function levelOf(exp){ return Math.min(CONFIG.levels.length - 1, Math.floor(exp / 30)); }
+function showToast(html){ toast.innerHTML = html; toast.classList.remove('show'); void toast.offsetWidth; toast.classList.add('show'); }
+function reward(q, first){
+  const before = levelOf(state.exp);
+  if (first) { state.exp += CONFIG.expPerStage; if (!state.items.includes(q.item)) state.items.push(q.item); }
+  const up = levelOf(state.exp) > before;
+  showToast(first ? `+${CONFIG.expPerStage} EXP・獲得<b>「${esc(q.item)}」</b>${up ? '・升級！' : ''}` : '已更新');
+  if (first) announce(`獲得${q.item}${up ? '，升級了' : ''}`);
+  const w = $('#walker'); w.classList.remove('hop'); void w.offsetWidth; w.classList.add('hop');
+  buzz(first ? 15 : 0);
 }
-function oops(){ mascot.classList.remove('oops'); void mascot.offsetWidth; mascot.classList.add('oops'); setTimeout(() => mascot.classList.remove('oops'), 600); }
-function saveDraft(){ LS.set(K_DRAFT, { answers: state.answers, i: state.i, points: state.points, t: Date.now() }); }
-function qIndex(step){ return STEPS[step].type === 'q' ? QS.indexOf(STEPS[step].q) : -1; }
+function oops(){ const b = stage.querySelector('.npc-bird'); if (b) { b.classList.remove('oops'); void b.offsetWidth; b.classList.add('oops'); } buzz([30, 40, 30]); }
+function saveDraft(){ LS.set(K_DRAFT, { answers: state.answers, i: state.i, exp: state.exp, items: state.items, guess: state.guess, t: Date.now() }); }
+function qIndex(step){ return STEPS[step].type === 'q' ? QUESTIONS.indexOf(STEPS[step].q) : -1; }
+const isEmpty = v => v == null || v === '' || v === false;
 
 /* ---------- 畫面 ---------- */
 function renderTop(){
   const step = STEPS[state.i];
-  const done = step.type === 'done' ? TOTAL : step.type === 'review' ? TOTAL : Math.max(0, qIndex(state.i));
-  const prog = $('#prog');
-  prog.innerHTML = QS.map((q, k) => `<span class="${k < done ? 'on' : (k === done && step.type === 'q') ? 'now' : ''}"></span>`).join('');
-  const pct = Math.round(done / TOTAL * 100);
-  prog.setAttribute('aria-valuenow', pct);
-  prog.setAttribute('aria-valuetext', `已完成 ${done} 關，共 ${TOTAL} 關`);
-  const lv = step.type === 'done' ? 3 : Math.min(2, Math.floor(done / TOTAL * 3));
-  $('#level').textContent = LEVELS[lv];
-  $('#points').textContent = state.points + ' 分';
-  $('#counter').innerHTML = step.type === 'q' ? `<b>${done + 1}</b> / ${TOTAL}` : step.type === 'review' ? '檢查' : step.type === 'done' ? '完成' : `${TOTAL} 關`;
+  const done = step.type === 'done' || step.type === 'review' ? TOTAL : Math.max(0, qIndex(state.i));
+  const pos = k => (k / TOTAL) * 100;
+  $('#nodes').innerHTML = QUESTIONS.map((q, k) => `<li class="${k < done ? 'done' : (k === done && step.type === 'q') ? 'now' : ''}" style="left:${pos(k)}%"></li>`).join('')
+    + `<li class="goal ${step.type === 'done' ? 'done' : ''}" style="left:100%"></li>`;
+  const at = step.type === 'welcome' ? 0 : step.type === 'review' || step.type === 'done' ? 100 : pos(done);
+  $('#walker').style.left = at + '%';
+  $('#road-done').style.width = at + '%';
+  const map = $('#map');
+  map.setAttribute('aria-valuenow', Math.round(done / TOTAL * 100));
+  map.setAttribute('aria-valuetext', `已完成 ${done} 站，共 ${TOTAL} 站`);
+  const lv = levelOf(state.exp);
+  $('#lv').innerHTML = `Lv.<b>${lv + 1}</b> ${CONFIG.levels[lv]}`;
+  $('#exp').textContent = state.exp + ' EXP';
+  $('#counter').innerHTML = step.type === 'q' ? `<b>${done + 1}</b> / ${TOTAL}` : step.type === 'review' ? '檢查' : step.type === 'done' ? '抵達' : `${TOTAL} 站`;
 }
 
 function render(opts){
   opts = opts || {};
   const step = STEPS[state.i];
   renderTop();
-  let html = '';
-  if (step.type === 'welcome') html = viewWelcome();
-  else if (step.type === 'q') html = viewQuestion(step.q);
-  else if (step.type === 'review') html = viewReview();
-  else html = viewDone();
-  stage.innerHTML = html;
+  stage.innerHTML = step.type === 'welcome' ? viewWelcome() : step.type === 'q' ? viewQuestion(step.q) : step.type === 'review' ? viewReview() : viewDone();
   const card = stage.firstElementChild;
   if (card && !reduced) card.classList.add(state.dir < 0 ? 'enter-back' : 'enter');
-
   actions.hidden = (step.type === 'welcome' || step.type === 'done');
-  backBtn.hidden = false;
   if (step.type === 'q') {
     const k = qIndex(state.i);
-    nextBtn.textContent = state.returnToReview ? '回到檢查' : (k === TOTAL - 1 ? '檢查資料' : '下一關');
-    backBtn.textContent = k === 0 ? '回首頁' : '上一關';
+    nextBtn.textContent = state.returnToReview ? '回到檢查' : (k === TOTAL - 1 ? '看我的冒險者檔案' : '下一站');
+    backBtn.textContent = k === 0 ? '回首頁' : '上一站';
   } else if (step.type === 'review') {
     nextBtn.textContent = '送出報名';
-    backBtn.textContent = '上一關';
+    backBtn.textContent = '上一站';
   }
   nextBtn.disabled = false; nextBtn.removeAttribute('aria-busy');
-
   bind(step);
+  if (step.type === 'q') typeSay(step.q);
   if (!opts.silent) {
-    if (step.type === 'q') announce(`第 ${qIndex(state.i) + 1} 關，共 ${TOTAL} 關。${step.q.title}`);
-    else if (step.type === 'review') announce('檢查資料。請確認每一項都正確，再按送出報名。');
-    else if (step.type === 'done') announce('報名完成。');
+    if (step.type === 'q') announce(`第 ${qIndex(state.i) + 1} 站，共 ${TOTAL} 站，${step.q.place}。${step.q.say(state.answers)}`);
+    else if (step.type === 'review') announce('冒險者檔案。請確認每一項都正確，再按送出報名。');
+    else if (step.type === 'done') announce('報名完成，抵達終點。');
   }
   focusStep(step, opts);
   window.scrollTo({ top: 0, behavior: 'auto' });
 }
 
+// 小鳥說話：一個字一個字打出來（減少動態效果時直接顯示）
+let typeTimer = 0;
+function typeSay(q){
+  clearInterval(typeTimer);
+  const el = stage.querySelector('.say');
+  if (!el) return;
+  const text = q.say(state.answers);
+  if (reduced) { el.textContent = text; return; }
+  let n = 0; el.textContent = '';
+  typeTimer = setInterval(() => { n += 1; el.textContent = text.slice(0, n); if (n >= text.length) clearInterval(typeTimer); }, 28);
+}
+
 function focusStep(step, opts){
   if (step.type === 'welcome' && !opts.focus) return;
   let el = null;
-  if (step.type === 'q') {
-    const q = step.q;
-    if (q.type === 'choice') el = stage.querySelector('input:checked') || stage.querySelector('input[type=radio]');
-    else if (q.type === 'multi') el = stage.querySelector('.q-title');
-    else if (q.type === 'consent') el = stage.querySelector('.q-title');
-    else el = stage.querySelector('.field');
-  } else el = stage.querySelector('h1');
+  if (step.type === 'q') el = stage.querySelector('.field') || stage.querySelector('.bubble');
+  else el = stage.querySelector('h1');
   if (!el) return;
-  if (el.tagName === 'H1' || el.tagName === 'LEGEND' || el.classList.contains('q-title')) el.setAttribute('tabindex', '-1');
+  if (!/^(INPUT|BUTTON)$/.test(el.tagName)) el.setAttribute('tabindex', '-1');
   el.focus({ preventScroll: true });
 }
 
-function eyebrow(q){
-  const k = QS.indexOf(q) + 1;
-  return `<p class="eyebrow">Level ${k} <span class="zh">／ 共 ${TOTAL} 關${q.optional ? ' · 選填' : ''}</span></p>`;
+function npc(q){
+  return `<p class="eyebrow">第 ${QUESTIONS.indexOf(q) + 1} 站 <span class="zh">／ ${esc(q.place)}</span></p>
+    <div class="npc"><div class="npc-bird" aria-hidden="true">${BIRD}</div>
+      <div class="bubble" id="say-${q.key}"><span class="say" aria-hidden="true"></span><span class="sr-only">${esc(q.say(state.answers))}</span></div></div>
+    ${q.hint ? `<p class="q-hint" id="hint-${q.key}">${esc(q.hint)}</p>` : ''}`;
 }
+const errBox = q => `<p class="err" id="err-${q.key}" role="alert" hidden></p>`;
 
 function viewWelcome(){
   const draft = LS.get(K_DRAFT);
@@ -538,106 +591,104 @@ function viewWelcome(){
   const fresh = draft && draft.t && (Date.now() - draft.t) < 7 * 864e5 && n > 0;
   return `
   <section class="card hero" aria-labelledby="w-title">
-    <div class="mascot-big" aria-hidden="true">${mascot.innerHTML}</div>
-    <p class="eyebrow">Early Bird <span class="zh">／ ${esc(CONFIG.schoolName)}${esc(CONFIG.unit)} · ${esc(CONFIG.year)} 學年度</span></p>
-    <h1 id="w-title">早鳥報名</h1>
-    <p class="lead">一次一題，大約三分鐘。答錯可以回上一關改，不用急。</p>
-    ${meta.src ? `<span class="badge">活動：${esc(meta.src)}${meta.by ? '（' + esc(meta.by) + '）' : ''}</span>` : ''}
-    <ul aria-label="說明">
-      <li>共 ${TOTAL} 個小關卡，每一關只問一件事</li>
-      <li>沒有時間限制，可以隨時回頭修改</li>
-      <li>右上角「大字」可以放大字體</li>
-    </ul>
-    ${fresh ? `<button class="btn btn-primary btn-wide" type="button" id="resume">繼續上次（已填 ${n} 題）</button>
+    <div class="bird-big" aria-hidden="true">${BIRD}</div>
+    <p class="eyebrow">Early Bird Quest <span class="zh">／ ${esc(CONFIG.schoolName)} ${esc(CONFIG.year)} 學年度</span></p>
+    <h1 id="w-title">早鳥大冒險</h1>
+    <p class="lead">${TOTAL} 個關卡、大約 1 分鐘。每過一關拿一個道具，走到終點就完成早鳥報名！</p>
+    ${meta.src || meta.by ? `<span class="badge">${meta.src ? '活動：' + esc(meta.src) : ''}${meta.by ? (meta.src ? '・' : '') + '推薦老師：' + esc(meta.by) : ''}</span>` : ''}
+    <ol class="route" aria-label="冒險路線">${QUESTIONS.map(q => `<li>${esc(q.place)}</li>`).join('')}</ol>
+    ${fresh ? `<button class="btn btn-primary btn-wide" type="button" id="resume">繼續冒險（已過 ${n} 關）</button>
                <button class="btn btn-ghost btn-wide" type="button" id="start">重新開始</button>`
-            : `<button class="btn btn-primary btn-wide" type="button" id="start">開始</button>`}
-    <button class="link" type="button" data-privacy>填寫前先看個資告知</button>
+            : `<button class="btn btn-primary btn-wide" type="button" id="start">出發！</button>`}
+    <button class="link" type="button" data-privacy>出發前先看個資告知</button>
   </section>`;
 }
 
 function viewQuestion(q){
-  const v = state.answers[q.key];
+  const a = state.answers, v = a[q.key];
   let body = '';
-  const descr = `hint-${q.key} err-${q.key}`;
-  if (q.type === 'choice') {
-    body = `<fieldset>
-      <legend class="q-title">${esc(q.title)}</legend>
-      ${q.hint ? `<p class="q-hint" id="hint-${q.key}">${esc(q.hint)}</p>` : ''}
-      <div class="opts">
-        ${q.options.map((o, k) => `<label class="opt"><input type="radio" name="${q.key}" value="${esc(o)}" ${v === o ? 'checked' : ''}><span class="opt-body"><span class="opt-key" aria-hidden="true">${k + 1}</span>${esc(o)}<span class="opt-mark" aria-hidden="true"></span></span></label>`).join('')}
-      </div>
-      <p class="err" id="err-${q.key}" role="alert" hidden></p>
-    </fieldset>`;
-  } else if (q.type === 'multi') {
-    const sel = Array.isArray(v) ? v : [];
-    const groups = Object.keys(q.groups);
-    body = `<fieldset>
-      <legend class="q-title">${esc(q.title)}</legend>
-      <p class="q-hint" id="hint-${q.key}">${esc(q.hint || '')}</p>
-      <p class="count" aria-live="polite">已選 <b id="cnt-${q.key}">${sel.length}</b> / ${q.max}</p>
-      ${groups.map(g => `<p class="group-label">${esc(g)}</p><div class="chips">${q.groups[g].map(o => `<label class="chip"><input type="checkbox" name="${q.key}" value="${esc(o)}" ${sel.includes(o) ? 'checked' : ''}><span class="chip-body">${esc(o)}</span></label>`).join('')}</div>`).join('')}
-      <p class="err" id="err-${q.key}" role="alert" hidden></p>
-    </fieldset>`;
+  if (q.type === 'text' || q.type === 'tel') {
+    body = `<input class="field" id="f-${q.key}" name="${q.key}" type="${q.type}" value="${esc(v || '')}" aria-labelledby="say-${q.key}" aria-describedby="hint-${q.key} err-${q.key}"
+      placeholder="${esc(q.placeholder || '')}" ${q.inputmode ? `inputmode="${q.inputmode}"` : ''} autocomplete="${q.autocomplete || 'off'}" ${q.maxlength ? `maxlength="${q.maxlength}"` : ''} enterkeyhint="next">`;
+  } else if (q.type === 'idcard') {
+    const s = (v || '').padEnd(10, ' ');
+    body = `<div class="cells${v && validTwId(v) ? ' ok' : ''}" id="cells" aria-hidden="true">${[...s].map(c => `<span class="${c.trim() ? 'filled' : ''}">${esc(c.trim())}</span>`).join('')}</div>
+      <input class="field id-input" id="f-idno" name="idno" type="text" value="${esc(v || '')}" maxlength="10" autocomplete="off" autocapitalize="characters" spellcheck="false"
+        aria-labelledby="say-idno" aria-describedby="hint-idno err-idno ok-idno" placeholder="${esc(q.placeholder)}" enterkeyhint="next">
+      <p class="good" id="ok-idno" ${v && validTwId(v) ? '' : 'hidden'}>通行證驗證通過！</p>`;
+  } else if (q.type === 'school') {
+    body = `<input class="field" id="f-school" name="school" type="text" value="${esc(v || '')}" autocomplete="off" maxlength="40"
+        aria-labelledby="say-school" aria-describedby="hint-school err-school" aria-controls="sch-list" placeholder="${esc(q.placeholder)}" enterkeyhint="next">
+      <div class="chips" id="sch-list" aria-label="符合的學校"></div>
+      <p class="picked" id="sch-picked" hidden></p>`;
+  } else if (q.type === 'major') {
+    body = `<div class="chips" role="group" aria-labelledby="say-major">${CONFIG.majors.map(m => `<button type="button" class="chip" data-major="${esc(m)}" aria-pressed="${v === m}">${esc(m)}</button>`).join('')}</div>
+      <p class="or">或自己打</p>
+      <input class="field" id="f-major" name="major" type="text" value="${esc(v && !CONFIG.majors.includes(v) ? v : '')}" maxlength="15" autocomplete="off"
+        aria-label="其他科別" aria-describedby="hint-major err-major" placeholder="例如：烘焙科" enterkeyhint="next">`;
+  } else if (q.type === 'group') {
+    const showList = state.groupOpen || !state.guess;
+    body = `${state.guess && !state.groupOpen ? `
+      <div class="reveal${reduced ? '' : ' pop'}" aria-labelledby="say-group"><span>依你的科別「${esc(a.major || '')}」</span><strong>${esc(groupName(state.guess))}</strong></div>
+      <div class="btn-row"><button type="button" class="btn btn-primary" id="g-yes">對，就是這個</button><button type="button" class="btn btn-ghost" id="g-no">不是，我自己選</button></div>` : ''}
+      <div class="chips" id="g-list" role="group" aria-labelledby="say-group" ${showList ? '' : 'hidden'}>${CONFIG.testGroups.map(g => `<button type="button" class="chip" data-group="${esc(g)}" aria-pressed="${v === g}">${esc(groupName(g))}</button>`).join('')}</div>
+      <p class="q-hint" ${showList ? '' : 'hidden'} id="hint-group">高中普通科選「報考學測」；還沒決定考不考統測選「未考統測」。</p>`;
+  } else if (q.type === 'dept') {
+    body = `<div class="castles" role="group" aria-labelledby="say-depts">${CONFIG.departments.map(([d, tag]) => `<button type="button" class="castle" data-dept="${esc(d)}" aria-pressed="${v === d}"><small>${esc(tag)}</small>${esc(d.replace(' ', '・'))}</button>`).join('')}</div>`;
   } else if (q.type === 'consent') {
-    body = `<h1 class="q-title">${esc(q.title)}</h1>
-      <p class="q-hint" id="hint-${q.key}">${esc(q.hint || '')}</p>
-      <p class="q-hint"><button class="link" type="button" data-privacy>打開個資告知事項</button></p>
-      <label class="opt consent"><input type="checkbox" id="f-${q.key}" name="${q.key}" ${v ? 'checked' : ''} aria-describedby="${descr}"><span class="opt-body"><span class="opt-mark" aria-hidden="true"></span><span>我已閱讀個資告知事項，同意${esc(CONFIG.schoolName)}${esc(CONFIG.unit)}使用以上資料辦理早鳥報名與活動通知。</span></span></label>
-      <input class="sr-only" type="text" name="company" tabindex="-1" autocomplete="off" aria-hidden="true">
-      <p class="err" id="err-${q.key}" role="alert" hidden></p>`;
-  } else {
-    const type = q.type === 'school' ? 'text' : q.type;
-    body = `<h1 class="q-title"><label for="f-${q.key}">${esc(q.title)}</label></h1>
-      ${q.hint ? `<p class="q-hint" id="hint-${q.key}">${esc(q.hint)}</p>` : ''}
-      <input class="field${q.upper ? ' upper' : ''}" id="f-${q.key}" name="${q.key}" type="${type}" value="${esc(v || '')}"
-        placeholder="${esc(q.placeholder || '')}" ${q.inputmode ? `inputmode="${q.inputmode}"` : ''} autocomplete="${q.autocomplete || 'off'}"
-        ${q.maxlength ? `maxlength="${q.maxlength}"` : ''} ${q.type === 'school' ? 'list="school-list"' : ''} aria-describedby="${descr}" enterkeyhint="next" autocapitalize="${q.upper ? 'characters' : 'off'}">
-      ${q.type === 'school' ? `<datalist id="school-list">${CONFIG.schools.map(s => `<option value="${esc(s)}"></option>`).join('')}</datalist>` : ''}
-      <p class="err" id="err-${q.key}" role="alert" hidden></p>
-      ${q.optional ? `<button class="skip" type="button" id="skip">這題先跳過</button>` : ''}`;
+    body = `<div class="contract">
+        <p>我已閱讀<button class="link" type="button" data-privacy>個資告知事項</button>，同意${esc(CONFIG.schoolName)}${esc(CONFIG.unit)}使用以上資料辦理早鳥報名與活動通知。</p>
+        <button type="button" class="stamp-btn" id="stamp" aria-pressed="${v ? 'true' : 'false'}" aria-describedby="err-consent">${v ? '已蓋章<small>同意</small>' : '點我蓋章<small>表示同意</small>'}</button>
+      </div>
+      <input class="sr-only" type="text" name="company" tabindex="-1" autocomplete="off" aria-hidden="true">`;
   }
-  return `<form class="card" id="stepform" novalidate>${eyebrow(q)}${body}</form>`;
+  return `<form class="card" id="stepform" novalidate>${npc(q)}${body}${errBox(q)}</form>`;
 }
 
 function displayValue(q){
   const v = state.answers[q.key];
-  if (q.type === 'multi') return (v || []).join('、');
-  if (q.type === 'consent') return v ? '已同意' : '未同意';
+  if (q.type === 'consent') return v ? '已蓋章同意' : '';
+  if (q.type === 'group') return groupName(v);
   return v || '';
 }
 
 function viewReview(){
-  const rows = QS.filter(q => q.type !== 'consent').map(q => `
+  const rows = QUESTIONS.filter(q => q.type !== 'consent').map(q => `
     <div><dt>${esc(q.label)}</dt><dd><span>${esc(displayValue(q)) || '<em>（未填）</em>'}</span><button type="button" class="edit" data-edit="${q.key}" aria-label="修改${esc(q.label)}">修改</button></dd></div>`).join('');
-  const extra = meta.src ? `<div><dt>活動</dt><dd><span>${esc(meta.src)}${meta.by ? '（' + esc(meta.by) + '）' : ''}</span></dd></div>` : '';
   return `<form class="card" id="stepform" novalidate>
-    <p class="eyebrow">Final Check <span class="zh">／ 檢查一下</span></p>
+    <p class="eyebrow">Final Check <span class="zh">／ 冒險者檔案</span></p>
     <h1 class="q-title">資料都對嗎？</h1>
-    <p class="q-hint">按「修改」可以回到那一關，改完會自動回來這裡。</p>
-    <dl class="review">${rows}${extra}</dl>
-    <p class="err" id="err-submit" role="alert" hidden></p>
+    <p class="q-hint">按「修改」可以回到那一站，改完會自動回來這裡。</p>
+    <dl class="review">${rows}</dl>
   </form>`;
 }
 
 function viewDone(){
-  const r = state.result || {};
-  const name = state.answers.name || '';
+  const r = state.result || {}, a = state.answers;
+  const lv = levelOf(state.exp);
   let notice = '';
   if (r.mode === 'demo') notice = `<p class="notice warn">示範模式：還沒接上後台，這筆資料只留在這支手機裡。</p>`;
   else if (r.mode === 'queued') notice = `<p class="notice warn">網路不穩，資料已先暫存在手機。連上網後再打開這個頁面，會自動補送。</p>`;
-  else notice = `<p class="notice good">資料已送到${esc(CONFIG.unit)}。</p>`;
+  else notice = `<p class="notice good">資料已送到${esc(CONFIG.unit)}，老師會幫你登錄到學校的早鳥系統。</p>`;
   return `
-  <section class="card hero done" aria-labelledby="d-title">
-    <svg class="badge-svg" viewBox="0 0 96 96" aria-hidden="true">
-      <circle cx="48" cy="48" r="44" fill="var(--accent-soft)"/>
-      <circle cx="48" cy="48" r="34" fill="var(--accent)"/>
-      <path d="M31 49l11 11 23-25" fill="none" stroke="var(--accent-ink)" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
-    </svg>
-    <p class="eyebrow">Complete <span class="zh">／ 報名完成</span></p>
-    <h1 id="d-title">太棒了${name ? '，' + esc(name) : ''}！</h1>
-    <p class="lead">你已完成 ${esc(CONFIG.schoolName)} ${esc(CONFIG.year)} 學年度早鳥登記。</p>
+  <section class="card hero" aria-labelledby="d-title">
+    <p class="eyebrow">Quest Complete <span class="zh">／ 抵達終點</span></p>
+    <h1 id="d-title">早鳥報名完成！</h1>
+    <div class="hero-card" role="group" aria-label="冒險者卡">
+      <div class="hero-card-in">
+        <div class="hc-top"><div class="bird-mini" aria-hidden="true">${BIRD}</div>
+          <div><p class="hc-name">${esc(a.name || '冒險者')}</p><p class="hc-lv">Lv.${lv + 1} ${esc(CONFIG.levels[lv])}・${state.exp} EXP</p></div></div>
+        <dl class="hc-rows">
+          <dt>公會</dt><dd>${esc(schoolShort(a.school))}</dd>
+          <dt>職業</dt><dd>${esc(a.major || '')} ${esc(a.klass || '')}</dd>
+          <dt>技能樹</dt><dd>${esc(groupName(a.group))}</dd>
+          <dt>目標城堡</dt><dd>${esc(String(a.depts || '').replace(' ', '・'))}</dd>
+        </dl>
+        <div class="items" aria-label="收集到的道具">${state.items.map(i => `<span>${esc(i)}</span>`).join('')}</div>
+      </div>
+    </div>
+    <p class="note">截圖這張冒險者卡，分享給同學一起來冒險！</p>
     <div class="ref"><span>受理編號（截圖留存）</span><strong id="ref">${esc(state.ref)}</strong><button class="copy" type="button" id="copy-ref">複製編號</button></div>
-    <p class="score">本次獲得 <b>${state.points}</b> 分 · 稱號「早鳥達人」</p>
     ${notice}
     <p class="note">${esc(CONFIG.afterText)}</p>
     <div class="links">
@@ -648,72 +699,115 @@ function viewDone(){
   </section>`;
 }
 
-/* ---------- 事件 ---------- */
+/* ---------- 互動 ---------- */
+function autoNext(q, ms){ if (lastPointer) setTimeout(() => { if (STEPS[state.i].q === q) submitQuestion(q); }, ms || 420); }
+
 function bind(step){
   stage.querySelectorAll('[data-privacy]').forEach(b => b.addEventListener('click', openPrivacy));
   if (step.type === 'welcome') {
     const start = $('#start'), resume = $('#resume');
-    if (start) start.addEventListener('click', () => { LS.del(K_DRAFT); state.answers = {}; state.points = 0; go(1, { focus: true }); });
+    if (start) start.addEventListener('click', () => { LS.del(K_DRAFT); state = Object.assign(state, { answers: {}, exp: 0, items: [], guess: '', groupOpen: false }); go(1, { focus: true }); });
     if (resume) resume.addEventListener('click', () => {
       const d = LS.get(K_DRAFT) || {};
-      state.answers = d.answers || {}; state.points = d.points || 0;
-      const firstEmpty = QS.findIndex(q => !q.optional && (state.answers[q.key] == null || state.answers[q.key] === '' || state.answers[q.key] === false));
+      Object.assign(state, { answers: d.answers || {}, exp: d.exp || 0, items: d.items || [], guess: d.guess || '' });
+      const firstEmpty = QUESTIONS.findIndex(q => isEmpty(state.answers[q.key]));
       go(firstEmpty < 0 ? STEPS.length - 2 : firstEmpty + 1, { focus: true });
     });
     return;
   }
   const form = $('#stepform');
-  if (step.type === 'q') {
-    const q = step.q;
-    form.addEventListener('submit', e => { e.preventDefault(); submitQuestion(q); });
-    if (q.type === 'choice') {
-      form.querySelectorAll('input[type=radio]').forEach(r => r.addEventListener('change', () => {
-        hideErr(q.key);
-        if (lastPointer) setTimeout(() => { if (STEPS[state.i] === step && r.checked) submitQuestion(q); }, 380);
-      }));
-    } else if (q.type === 'multi') {
-      const boxes = form.querySelectorAll('input[type=checkbox]');
-      const sync = () => {
-        const n = form.querySelectorAll('input[type=checkbox]:checked').length;
-        $('#cnt-' + q.key).textContent = n;
-        boxes.forEach(b => { b.disabled = !b.checked && n >= q.max; });
-        hideErr(q.key);
-      };
-      boxes.forEach(b => b.addEventListener('change', sync)); sync();
-    } else if (q.type === 'consent') {
-      form.querySelector('#f-' + q.key).addEventListener('change', () => hideErr(q.key));
-    } else {
-      const inp = form.querySelector('.field');
-      inp.addEventListener('input', () => hideErr(q.key));
-      const skip = $('#skip');
-      if (skip) skip.addEventListener('click', () => { state.answers[q.key] = ''; saveDraft(); advance(); });
-    }
-  } else if (step.type === 'review') {
+  if (step.type === 'review') {
     form.addEventListener('submit', e => { e.preventDefault(); doSubmit(); });
     form.querySelectorAll('[data-edit]').forEach(b => b.addEventListener('click', () => {
-      const k = QS.findIndex(q => q.key === b.dataset.edit);
-      state.returnToReview = true; go(k + 1, { focus: true });
+      state.returnToReview = true; go(QUESTIONS.findIndex(q => q.key === b.dataset.edit) + 1, { focus: true });
     }));
-  } else if (step.type === 'done') {
+    return;
+  }
+  if (step.type === 'done') {
     $('#again').addEventListener('click', () => {
-      state = { i: 0, answers: {}, points: 0, ref: null, returnToReview: false, result: null, dir: 1 };
+      state = { i: 0, answers: {}, exp: 0, items: [], ref: null, returnToReview: false, result: null, dir: 1, guess: '', groupOpen: false, schoolOk: false };
       LS.del(K_DRAFT); hist.replace({ i: 0 }); render({ focus: true });
     });
     $('#copy-ref').addEventListener('click', e => {
-      const t = state.ref, btn = e.currentTarget;
-      const ok = () => { btn.textContent = '已複製'; setTimeout(() => btn.textContent = '複製編號', 1500); };
+      const btn = e.currentTarget;
+      const ok = () => { btn.textContent = '已複製'; setTimeout(() => { btn.textContent = '複製編號'; }, 1500); };
       const fallback = () => { const sel = window.getSelection(), rg = document.createRange(); rg.selectNodeContents($('#ref')); sel.removeAllRanges(); sel.addRange(rg); btn.textContent = '請長按複製'; };
-      if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(t).then(ok, fallback); else fallback();
+      if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(state.ref).then(ok, fallback); else fallback();
     });
     const retry = $('#retry');
     if (retry) retry.addEventListener('click', async () => { retry.disabled = true; retry.textContent = '送出中…'; await flushQueue(); const q = LS.get(K_QUEUE) || []; state.result = { mode: q.some(x => x.ref === state.ref) ? 'queued' : 'sent' }; render({ silent: true }); });
+    return;
+  }
+  const q = step.q;
+  form.addEventListener('submit', e => { e.preventDefault(); submitQuestion(q); });
+  const inp = form.querySelector('.field');
+  if (inp) inp.addEventListener('input', () => hideErr(q.key));
+
+  if (q.type === 'idcard') {
+    const cells = $('#cells');
+    inp.addEventListener('input', () => {
+      const v = inp.value.toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 10);
+      if (inp.value !== v) inp.value = v;
+      [...cells.children].forEach((c, k) => { c.textContent = v[k] || ''; c.classList.toggle('filled', !!v[k]); });
+      const ok = v.length === 10 && validTwId(v);
+      cells.classList.toggle('ok', ok);
+      $('#ok-idno').hidden = !ok;
+      if (v.length === 10 && !ok) { cells.classList.remove('bad'); void cells.offsetWidth; cells.classList.add('bad'); showErr(q.key, '號碼好像不對，再對一次身分證？', true); }
+      if (ok) buzz(20);
+    });
+  } else if (q.type === 'school') {
+    const list = $('#sch-list'), picked = $('#sch-picked');
+    const paint = () => {
+      const v = inp.value.trim(), exact = SCHOOL_BY_LABEL[v];
+      state.schoolOk = !!exact;
+      picked.hidden = !exact;
+      if (exact) picked.textContent = `找到了：${exact.c}・${exact.n}`;
+      const hits = exact ? [] : searchSchools(v);
+      list.innerHTML = hits.map(s => `<button type="button" class="chip" data-school="${esc(s.label)}">${esc(s.n)}<small>${esc(s.c)}</small></button>`).join('');
+    };
+    inp.addEventListener('input', paint);
+    list.addEventListener('click', e => {
+      const b = e.target.closest('[data-school]'); if (!b) return;
+      inp.value = b.dataset.school; paint(); hideErr(q.key); autoNext(q, 450);
+    });
+    paint();
+  } else if (q.type === 'major') {
+    form.querySelectorAll('[data-major]').forEach(b => b.addEventListener('click', () => {
+      form.querySelectorAll('[data-major]').forEach(x => x.setAttribute('aria-pressed', String(x === b)));
+      inp.value = ''; state.answers.major = b.dataset.major; hideErr(q.key); autoNext(q);
+    }));
+    inp.addEventListener('input', () => { if (inp.value.trim()) form.querySelectorAll('[data-major]').forEach(x => x.setAttribute('aria-pressed', 'false')); });
+  } else if (q.type === 'group') {
+    const yes = $('#g-yes'), no = $('#g-no');
+    if (yes) yes.addEventListener('click', () => { state.answers.group = state.guess; submitQuestion(q); });
+    if (no) no.addEventListener('click', () => { state.groupOpen = true; render({ silent: true }); const f = stage.querySelector('[data-group]'); if (f) f.focus(); });
+    form.querySelectorAll('[data-group]').forEach(b => b.addEventListener('click', () => {
+      form.querySelectorAll('[data-group]').forEach(x => x.setAttribute('aria-pressed', String(x === b)));
+      state.answers.group = b.dataset.group; hideErr(q.key); autoNext(q);
+    }));
+  } else if (q.type === 'dept') {
+    form.querySelectorAll('[data-dept]').forEach(b => b.addEventListener('click', () => {
+      form.querySelectorAll('[data-dept]').forEach(x => x.setAttribute('aria-pressed', String(x === b)));
+      state.answers.depts = b.dataset.dept; hideErr(q.key); autoNext(q, 550);
+    }));
+  } else if (q.type === 'consent') {
+    const st = $('#stamp');
+    st.addEventListener('click', () => {
+      const on = st.getAttribute('aria-pressed') !== 'true';
+      st.setAttribute('aria-pressed', String(on));
+      st.innerHTML = on ? '已蓋章<small>同意</small>' : '點我蓋章<small>表示同意</small>';
+      if (on && !reduced) { st.classList.remove('thump'); void st.offsetWidth; st.classList.add('thump'); }
+      if (on) buzz(40);
+      state.answers.consent = on || '';
+      hideErr(q.key);
+    });
   }
 }
 
-function showErr(key, msg){
+function showErr(key, msg, soft){
   const el = $('#err-' + key); if (!el) return;
   el.textContent = msg; el.hidden = false;
-  const f = $('#f-' + key); if (f) { f.setAttribute('aria-invalid', 'true'); f.focus(); }
+  const f = $('#f-' + key); if (f) { f.setAttribute('aria-invalid', 'true'); if (!soft) f.focus(); }
   oops();
 }
 function hideErr(key){
@@ -723,35 +817,52 @@ function hideErr(key){
 
 function submitQuestion(q){
   const form = $('#stepform');
+  const inp = form.querySelector('.field');
   let val;
-  if (q.type === 'choice') {
-    const c = form.querySelector('input[type=radio]:checked');
-    if (!c) return showErr(q.key, '請選一個答案。');
-    val = c.value;
-  } else if (q.type === 'multi') {
-    val = Array.from(form.querySelectorAll('input[type=checkbox]:checked')).map(b => b.value);
-    if (!val.length && !q.optional) return showErr(q.key, q.emptyMsg || '至少選一個。');
-  } else if (q.type === 'consent') {
-    const hp = form.querySelector('input[name=company]');
-    if (hp && hp.value) { state.answers.__bot = true; }
-    if (!form.querySelector('#f-' + q.key).checked) return showErr(q.key, '要勾選同意才能送出喔。');
-    val = true;
-  } else {
-    const inp = form.querySelector('.field');
+  if (q.type === 'text' || q.type === 'tel') {
     val = q.normalize ? q.normalize(inp.value) : inp.value.trim();
-    if (!val && q.optional) { state.answers[q.key] = ''; saveDraft(); return advance(); }
     if (!val) return showErr(q.key, '這題還沒填喔。');
     if (q.validate) { const m = q.validate(val); if (m) return showErr(q.key, m); }
+  } else if (q.type === 'idcard') {
+    val = inp.value.toUpperCase().replace(/\s/g, '');
+    if (!validTwId(val)) return showErr(q.key, val.length < 10 ? '通行證號碼是 1 個英文字母加 9 個數字。' : '號碼好像不對，再對一次身分證？');
+  } else if (q.type === 'school') {
+    val = inp.value.trim();
+    if (val.length < 2) return showErr(q.key, '打兩個字以上，再從跳出來的學校點一個。');
+    if (!SCHOOL_BY_LABEL[val] && !state.schoolWarned) { state.schoolWarned = true; return showErr(q.key, '名單裡找不到這所學校。可以再找找看，或直接按「下一站」，老師會幫你確認。', true); }
+  } else if (q.type === 'major') {
+    val = inp.value.trim() || state.answers.major || '';
+    if (!val) return showErr(q.key, '點一個科別，或在下面打出來。');
+    if (val !== state.answers.major || !state.answers.group) {
+      state.guess = guessGroup(val); state.groupOpen = false;
+      if (val !== state.answers.major) delete state.answers.group;
+    }
+  } else if (q.type === 'group') {
+    val = state.answers.group;
+    if (!val) return showErr(q.key, '選一個技能樹（群類）。');
+  } else if (q.type === 'dept') {
+    val = state.answers.depts;
+    if (!val) return showErr(q.key, '選一座最想去的城堡（系）。');
+  } else if (q.type === 'consent') {
+    const hp = form.querySelector('input[name=company]');
+    if (hp && hp.value) state.answers.__bot = true;
+    if ($('#stamp').getAttribute('aria-pressed') !== 'true') return showErr(q.key, '要蓋章同意才能出發喔。');
+    val = true;
   }
-  const first = state.answers[q.key] == null || state.answers[q.key] === '';
+  const first = !state.items.includes(q.item);
   state.answers[q.key] = val;
+  if (q.type !== 'school') state.schoolWarned = false;
   saveDraft();
-  cheer(first ? (q.optional ? CONFIG.pointsOptional : CONFIG.pointsRequired) : 0, QS.indexOf(q));
+  reward(q, first);
   advance();
 }
 
 function advance(){
-  if (state.returnToReview) { state.returnToReview = false; return go(STEPS.length - 2, { focus: true }); }
+  if (state.returnToReview) {
+    // 改了科別要順便確認群類
+    if (STEPS[state.i].q && STEPS[state.i].q.key === 'major' && !state.answers.group) return go(QUESTIONS.findIndex(q => q.key === 'group') + 1, { focus: true });
+    state.returnToReview = false; return go(STEPS.length - 2, { focus: true });
+  }
   go(state.i + 1, { focus: true });
 }
 
@@ -759,6 +870,7 @@ function go(i, opts){
   opts = opts || {};
   state.dir = i >= state.i ? 1 : -1;
   state.i = Math.max(0, Math.min(STEPS.length - 1, i));
+  if (STEPS[state.i].type !== 'q' || STEPS[state.i].q.key !== 'group') state.groupOpen = false;
   if (!opts.fromHistory) hist.push({ i: state.i });
   saveDraft();
   render(opts);
@@ -775,19 +887,11 @@ window.addEventListener('popstate', e => {
   state.dir = i < state.i ? -1 : 1; state.i = Math.min(i, STEPS.length - 2); render({ fromHistory: true, focus: true });
 });
 document.addEventListener('pointerdown', () => { lastPointer = true; }, true);
-document.addEventListener('keydown', e => {
-  lastPointer = false;
-  const step = STEPS[state.i];
-  if (step.type !== 'q' || step.q.type !== 'choice') return;
-  if (/^[1-9]$/.test(e.key) && !(e.target && /^(INPUT|TEXTAREA)$/.test(e.target.tagName) && e.target.type !== 'radio')) {
-    const r = stage.querySelectorAll('input[type=radio]')[+e.key - 1];
-    if (r) { r.checked = true; r.focus(); hideErr(step.q.key); e.preventDefault(); }
-  }
-});
+document.addEventListener('keydown', () => { lastPointer = false; }, true);
 
 /* 大字模式 */
 const fsBtn = $('#fs');
-function applyFs(on){ document.documentElement.toggleAttribute('data-fs', on); if (on) document.documentElement.setAttribute('data-fs', 'lg'); fsBtn.setAttribute('aria-pressed', on ? 'true' : 'false'); }
+function applyFs(on){ if (on) document.documentElement.setAttribute('data-fs', 'lg'); else document.documentElement.removeAttribute('data-fs'); fsBtn.setAttribute('aria-pressed', on ? 'true' : 'false'); }
 applyFs(LS.get(K_FS) === true);
 fsBtn.addEventListener('click', () => { const on = fsBtn.getAttribute('aria-pressed') !== 'true'; applyFs(on); LS.set(K_FS, on); });
 
@@ -798,9 +902,12 @@ $('#privacy-close').addEventListener('click', () => dlg.close ? dlg.close() : dl
 
 /* ---------- 送出 ---------- */
 function payload(){
-  const p = { ref: state.ref, submittedAt: new Date().toISOString(), src: meta.src, by: meta.by, evt: meta.evt, points: state.points, page: location.href.split('?')[0] };
-  QS.forEach(q => { p[q.key] = q.type === 'multi' ? (state.answers[q.key] || []).join('、') : (q.type === 'consent' ? (state.answers[q.key] ? '同意' : '') : (state.answers[q.key] || '')); });
-  return p;
+  const a = state.answers;
+  return {
+    ref: state.ref, submittedAt: new Date().toISOString(), src: meta.src, by: meta.by, evt: meta.evt, points: state.exp, page: location.href.split('?')[0],
+    name: a.name || '', phone: a.phone || '', idno: a.idno || '', school: a.school || '', major: a.major || '', klass: a.klass || '',
+    group: a.group || '', depts: a.depts || '', consent: a.consent ? '同意' : '',
+  };
 }
 async function send(p){
   if (!CONFIG.endpoint) return { mode: 'demo' };
@@ -813,8 +920,8 @@ async function send(p){
 }
 async function doSubmit(){
   if (state.answers.__bot) { state.ref = makeRef(); state.result = { mode: 'sent' }; return finish(); }
-  const missing = QS.find(q => !q.optional && (state.answers[q.key] == null || state.answers[q.key] === '' || state.answers[q.key] === false));
-  if (missing) { state.returnToReview = true; return go(QS.indexOf(missing) + 1, { focus: true }); }
+  const missing = QUESTIONS.find(q => isEmpty(state.answers[q.key]));
+  if (missing) { state.returnToReview = true; return go(QUESTIONS.indexOf(missing) + 1, { focus: true }); }
   nextBtn.disabled = true; nextBtn.setAttribute('aria-busy', 'true'); nextBtn.textContent = '送出中…';
   state.ref = state.ref || makeRef();
   const p = payload();
@@ -825,12 +932,14 @@ async function doSubmit(){
   finish();
 }
 function finish(){
-  state.points += CONFIG.pointsFinish;
+  state.exp += CONFIG.expFinish;
+  if (!state.items.includes('早鳥徽章')) state.items.push('早鳥徽章');
   LS.del(K_DRAFT);
   state.i = STEPS.length - 1; state.dir = 1;
   hist.push({ i: state.i });
   render({ focus: true });
   confetti();
+  buzz([40, 60, 80]);
 }
 async function flushQueue(){
   const q = LS.get(K_QUEUE) || [];
@@ -864,7 +973,7 @@ function start(snap){
   render({ silent: true });
   flushQueue();
 }
-if (window.claude && window.claude.hot && window.claude.hot.snapshot) window.claude.hot.snapshot(() => ({ i: state.i, answers: state.answers, points: state.points, returnToReview: state.returnToReview }));
+if (window.claude && window.claude.hot && window.claude.hot.snapshot) window.claude.hot.snapshot(() => ({ i: state.i, answers: state.answers, exp: state.exp, items: state.items, guess: state.guess, returnToReview: state.returnToReview }));
 if (window.claude && window.claude.hot && window.claude.hot.ready) window.claude.hot.ready(start); else start((window.claude && window.claude.hot && window.claude.hot.data) || null);
 })();
 </script>

@@ -78,6 +78,7 @@ export function findSchool(input) {
 // 年級 → 畢業年：學校系統只收 116（今年高三）、115、114前
 function graduYear(grade) {
   const g = String(grade || '');
+  if (!g.trim()) return '116'; // App 沒問年級：比照學校系統的預設值（今年高三）
   if (/高三|116/.test(g)) return '116';
   if (/115/.test(g)) return '115';
   if (/114|以前|更早/.test(g)) return '114前';

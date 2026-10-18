@@ -71,24 +71,33 @@ out.page = await page.evaluate(dumpFields);
 fs.writeFileSync(path.join(OUT, 'saip-form.html'), await page.content());
 await page.screenshot({ path: path.join(OUT, 'saip-form.png'), fullPage: true });
 
-// 連動選單：每個下拉選單逐一選過每個選項，記下其他選單的選項怎麼變
+// 連動選單：有 __doPostBack 的選單會整頁重新載入，要等載入完再讀
 const snapshot = () => page.evaluate(() => Object.fromEntries([...document.querySelectorAll('select')]
   .map((s, i) => [s.name || s.id || 'select#' + i, [...s.options].map(o => [o.value, o.text.trim()])])));
-const selects = (out.page.fields.filter(f => f.tag === 'select' && f.visible));
+const values = () => page.evaluate(() => Object.fromEntries([...document.querySelectorAll('input, select, textarea')]
+  .filter(e => e.type !== 'hidden').map(e => [e.name, e.type === 'checkbox' ? e.checked : e.value + (e.disabled ? ' (disabled)' : '')])));
+async function choose(selector, value, postback) {
+  if (!postback) { await page.selectOption(selector, value, { timeout: 5000 }); return; }
+  await Promise.all([
+    page.waitForNavigation({ waitUntil: 'load', timeout: 15000 }).catch(() => {}),
+    page.selectOption(selector, value, { timeout: 5000 }),
+  ]);
+  await page.waitForLoadState('networkidle', { timeout: 8000 }).catch(() => {});
+}
+const selects = out.page.fields.filter(f => f.tag === 'select' && f.visible);
 out.cascades = {};
 const started = Date.now();
 for (const s of selects) {
   const key = s.name || s.id;
-  if (!key) continue;
+  const postback = /__doPostBack/.test(s.onchange || '');
+  if (!key || !postback) continue; // 沒有 postback 的選單不會改變其他欄位
   const selector = s.id ? `[id="${s.id}"]` : `select[name="${s.name}"]`;
   const base = await snapshot();
   const changes = {};
   for (const [value, label] of s.options.slice(0, 60)) {
-    if (!value || Date.now() - started > 12 * 60 * 1000) continue;
+    if (!value || value === '0' || Date.now() - started > 12 * 60 * 1000) continue;
     try {
-      await page.selectOption(selector, value, { timeout: 5000 });
-      await page.waitForLoadState('networkidle', { timeout: 8000 }).catch(() => {});
-      await page.waitForTimeout(300);
+      await choose(selector, value, true);
       const now = await snapshot();
       for (const [k, opts] of Object.entries(now)) {
         if (k === key) continue;
@@ -99,8 +108,28 @@ for (const s of selects) {
     }
   }
   if (Object.keys(changes).length) out.cascades[key] = changes;
-  // 回到乾淨的表單再測下一個選單
   await page.goto(TARGET, { waitUntil: 'networkidle', timeout: 60000 }).catch(() => {});
+}
+
+// 選了學校、勾了同意之後，其他欄位會發生什麼事（只看，不按「申請」）
+out.probe = {};
+try {
+  await page.fill('#TX_bef_dept_name', '測試科');
+  await choose('#LB_District', { label: '桃園市' }, true);
+  const schools = (await snapshot()).LB_DistrictSchoolName || [];
+  const pick = schools.find(([v]) => v && v !== '0' && v !== '同等學力');
+  if (pick) {
+    await choose('#LB_DistrictSchoolName', pick[0], true);
+    out.probe.afterSchool = { picked: pick, values: await values() };
+  }
+  await Promise.all([
+    page.waitForNavigation({ waitUntil: 'load', timeout: 15000 }).catch(() => {}),
+    page.click('#CKB_Iagree'),
+  ]);
+  await page.waitForLoadState('networkidle', { timeout: 8000 }).catch(() => {});
+  out.probe.afterAgree = { values: await values(), text: (await page.evaluate(() => document.body.innerText)).slice(-800) };
+} catch (e) {
+  out.probe.error = e.message.split('\n')[0];
 }
 
 out.dialogs = dialogs;

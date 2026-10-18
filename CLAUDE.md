@@ -23,6 +23,10 @@
 ## 聯絡資訊
 rino1133@gmail.com / IG @rinolin1133 / 0953-032-362 / LINE rinolin
 
+## 其他工具（子資料夾）
+- `earlybird/`：早鳥報名學生端
+- `idgen/`：身分證字號產生器＋報名表測試資料（加密、白名單通行碼）。repo 裡只有加密檔，改版或增刪白名單用 `node idgen/build.mjs`（見 idgen/README.md）；主密碼向使用者索取，絕不寫入任何檔案或 commit
+
 ## 慣例
 - 使用者偏好：直接執行、成品導向、少問多做；回覆用繁體中文
 - 修改後直接 commit + push 到 main（Pages 自動部署）

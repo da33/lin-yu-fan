@@ -1,0 +1,60 @@
+name: 早鳥報名自動登錄
+
+# 每 15 分鐘把試算表裡「待處理」的學生資料登錄到學校早鳥系統。
+# 需要的設定（Settings → Secrets and variables → Actions）：
+#   Secrets：EARLYBIRD_API（Apps Script 網址）、EARLYBIRD_TOKEN（setupBotToken() 產生的 token）
+#   Variables：BOT_ENABLED = true 才會定時執行；BOT_MODE = submit 才會真的按「申請」，否則只預演
+on:
+  schedule:
+    - cron: '*/15 * * * *'
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: 'dry-run＝只填不送；submit＝真的送出；sample＝用假資料測試欄位對應'
+        required: false
+        default: ''
+
+concurrency:
+  group: earlybird-bot
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  run:
+    if: github.event_name == 'workflow_dispatch' || vars.BOT_ENABLED == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    defaults:
+      run:
+        working-directory: earlybird/bot
+    env:
+      EARLYBIRD_API: ${{ secrets.EARLYBIRD_API }}
+      EARLYBIRD_TOKEN: ${{ secrets.EARLYBIRD_TOKEN }}
+      BOT_MODE: ${{ inputs.mode || vars.BOT_MODE || 'dry-run' }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - run: npm install --no-audit --no-fund
+      - name: 有沒有待處理
+        id: check
+        if: env.BOT_MODE != 'sample'
+        run: node run.mjs --check
+      - name: 安裝瀏覽器
+        if: env.BOT_MODE == 'sample' || steps.check.outputs.pending != '0'
+        run: npx playwright install --with-deps chromium
+      - name: 登錄
+        if: env.BOT_MODE != 'sample' && steps.check.outputs.pending != '0'
+        run: node run.mjs
+      - name: 假資料測試（不送出）
+        if: env.BOT_MODE == 'sample'
+        run: node run.mjs --sample
+      - uses: actions/upload-artifact@v4
+        if: env.BOT_MODE == 'sample' && always()
+        with:
+          name: sample-screenshot
+          path: earlybird/bot/out/
+          retention-days: 3

@@ -1,0 +1,12 @@
+{
+  "name": "vnu-earlybird-bot",
+  "private": true,
+  "type": "module",
+  "description": "早鳥報名中介工作流：把學生端資料對應並登錄到學校早鳥系統",
+  "scripts": {
+    "inspect": "node inspect.mjs"
+  },
+  "dependencies": {
+    "playwright": "1.56.1"
+  }
+}

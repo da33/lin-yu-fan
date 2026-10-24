@@ -25,6 +25,7 @@ rino1133@gmail.com / IG @rinolin1133 / 0953-032-362 / LINE rinolin
 
 ## 其他工具（子資料夾）
 - `earlybird/`：早鳥報名學生端
+- `flight/`：東京搶票作戰室（私人工具，noindex）。`trip-grab.user.js` 是 Trip.com 限時秒殺的 Tampermonkey 腳本，改版記得把 `@version` 加一（見 flight/README.md）
 - `idgen/`：身分證字號產生器＋報名表測試資料（加密、白名單通行碼）。repo 裡只有加密檔，改版或增刪白名單用 `node idgen/build.mjs`（見 idgen/README.md）；主密碼向使用者索取，絕不寫入任何檔案或 commit
 
 ## 慣例

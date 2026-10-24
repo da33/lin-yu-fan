@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="zh-Hant-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<title>東京搶票作戰室</title>
+<meta name="description" content="TPE ⇄ TYO 2027/1/17–2/3：Trip.com 限時秒殺自動盯盤腳本、校時倒數、作戰流程與任何航空比價。">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800;900&family=Noto+Sans+TC:wght@400;500;700;900&display=swap">
+<style>
+:root{
+  --bg:#0a0a0a;
+  --fg:#f5f4f0;
+  --muted:#a3a19b;
+  --line:#262626;
+  --panel:#141414;
+  --accent:#ff3c00;
+  --ok:#00c46a;
+  --font:Inter,"Noto Sans TC",system-ui,-apple-system,"PingFang TC","Microsoft JhengHei",sans-serif;
+  color-scheme:dark;
+}
+html{font-size:18px;-webkit-text-size-adjust:100%}
+*,*::before,*::after{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);font-family:var(--font);line-height:1.6;overflow-x:hidden}
+a{color:inherit}
+:focus-visible{outline:3px solid var(--accent);outline-offset:3px}
+.wrap{max-width:1080px;margin:0 auto;padding:0 max(16px,env(safe-area-inset-left,0px))}
+header.top{display:flex;justify-content:space-between;align-items:center;padding:18px 0;border-bottom:1px solid var(--line);font-size:.78rem;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+header.top a{text-decoration:none}
+section{padding:56px 0;border-bottom:1px solid var(--line)}
+.kicker{font-size:.78rem;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);font-weight:800;margin:0 0 14px}
+h1{font-size:clamp(2.6rem,9vw,6.4rem);line-height:1;letter-spacing:-.04em;font-weight:900;margin:0}
+h2{font-size:clamp(1.8rem,5vw,3rem);line-height:1.05;letter-spacing:-.03em;font-weight:900;margin:0 0 28px}
+.route{display:flex;flex-wrap:wrap;gap:10px 28px;margin-top:22px;font-size:clamp(1.1rem,2.6vw,1.6rem);font-weight:800}
+.route span{white-space:nowrap}
+.route em{font-style:normal;color:var(--accent)}
+
+/* 倒數 */
+.cd-label{font-weight:700;font-size:1.05rem}
+.cd{font-family:Inter,system-ui,sans-serif;font-weight:900;font-variant-numeric:tabular-nums;letter-spacing:-.04em;font-size:clamp(3rem,13vw,8.5rem);line-height:1;margin:14px 0 10px;color:var(--fg)}
+.cd.hot{color:var(--accent)}
+.cd small{font-size:.32em;letter-spacing:0;color:var(--muted);font-weight:800;margin-left:.15em}
+.sync{color:var(--muted);font-size:.9rem;font-variant-numeric:tabular-nums}
+
+/* 時間表 */
+.sales{display:grid;gap:12px}
+.sale{display:grid;grid-template-columns:auto 1fr auto;gap:6px 22px;align-items:center;padding:20px 22px;background:var(--panel);border:1px solid var(--line);border-radius:14px}
+.sale.main{border:2px solid var(--accent)}
+.sale .when{font-weight:900;font-size:1.25rem;font-variant-numeric:tabular-nums;white-space:nowrap}
+.sale .what{font-weight:700}
+.sale .what span{display:block;color:var(--muted);font-weight:400;font-size:.88rem}
+.tag{font-size:.72rem;font-weight:800;letter-spacing:.06em;padding:5px 10px;border-radius:999px;white-space:nowrap;border:1px solid var(--line);color:var(--muted)}
+.tag.now{background:var(--accent);border-color:var(--accent);color:#0a0a0a}
+.tag.past{opacity:.6;text-decoration:line-through}
+@media (max-width:640px){.sale{grid-template-columns:1fr auto}.sale .what{grid-column:1/-1;grid-row:2}}
+
+/* 安裝 */
+.steps{list-style:none;padding:0;margin:0;display:grid;gap:12px;counter-reset:s}
+.steps li{counter-increment:s;display:grid;grid-template-columns:52px 1fr;gap:14px;padding:18px 20px;background:var(--panel);border:1px solid var(--line);border-radius:14px}
+.steps li::before{content:counter(s);font:900 1.6rem/1 Inter,sans-serif;color:var(--accent)}
+.steps b{display:block;font-size:1.05rem}
+.steps p{margin:4px 0 0;color:var(--muted);font-size:.92rem}
+.steps code{background:#222;padding:1px 6px;border-radius:6px;color:var(--fg);font-size:.86rem}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:48px;padding:12px 20px;border-radius:12px;font-weight:800;text-decoration:none;background:#222;color:var(--fg);border:1px solid #333;margin:10px 8px 0 0}
+.btn:hover{background:#2c2c2c}
+.btn.primary{background:var(--accent);color:#0a0a0a;border-color:var(--accent);font-size:1.1rem}
+.btn.primary:hover{filter:brightness(1.08)}
+
+/* 流程 */
+.phase{margin:0 0 30px}
+.phase h3{display:flex;gap:12px;align-items:baseline;font-size:1.25rem;margin:0 0 12px;font-weight:900}
+.phase h3 span{font-size:.8rem;color:var(--accent);font-weight:800;letter-spacing:.06em}
+.check{display:grid;grid-template-columns:28px 1fr;gap:12px;align-items:start;padding:12px 0;border-top:1px solid var(--line);cursor:pointer}
+.check input{width:24px;height:24px;margin:2px 0 0;accent-color:var(--accent);cursor:pointer}
+.check:has(input:checked) .t{color:var(--muted);text-decoration:line-through}
+.progress{font-size:.9rem;color:var(--muted);margin:-14px 0 26px}
+
+/* 行情 */
+.fares{display:grid;gap:12px}
+.fare{padding:20px 22px;background:var(--panel);border:1px solid var(--line);border-radius:14px;display:grid;grid-template-columns:1fr auto;gap:8px 20px}
+.fare .name{font-weight:900;font-size:1.05rem}
+.fare .price{font:900 1.6rem/1 Inter,sans-serif;font-variant-numeric:tabular-nums;text-align:right}
+.fare .legs{grid-column:1/-1;color:var(--muted);font-size:.9rem;display:grid;gap:2px}
+.fare .legs b{color:var(--fg);font-weight:600}
+.note{color:var(--muted);font-size:.88rem;margin-top:14px}
+.verdict{margin-top:18px;padding:16px 20px;border-left:4px solid var(--accent);background:#140c09;font-weight:600}
+
+/* 比價 */
+.links{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px}
+.links a{display:flex;flex-direction:column;justify-content:center;min-height:76px;padding:14px 18px;background:var(--panel);border:1px solid var(--line);border-radius:12px;text-decoration:none;font-weight:800}
+.links a:hover{border-color:var(--accent)}
+.links a span{font-weight:400;font-size:.8rem;color:var(--muted)}
+.links a.dated{border-color:#3a2016}
+.links a.dated span{color:var(--accent)}
+.sub{font-size:1rem;font-weight:800;margin:26px 0 12px;color:var(--muted)}
+
+ul.facts{margin:0;padding:0;list-style:none;display:grid;gap:12px}
+ul.facts li{padding:16px 20px;background:var(--panel);border:1px solid var(--line);border-radius:14px}
+ul.facts b{color:var(--fg)}
+footer{padding:36px 0 60px;color:var(--muted);font-size:.85rem}
+@media (prefers-reduced-motion:no-preference){.cd.hot{animation:pulse 1s steps(2) infinite}@keyframes pulse{50%{opacity:.55}}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top"><a href="../">Rino Lin</a><span>Flight Ops · 私人工具</span></header>
+
+  <section>
+    <p class="kicker">東京搶票作戰室</p>
+    <h1>準時到<br>0.1 秒。</h1>
+    <div class="route"><span>TPE <em>⇄</em> TYO</span><span>2027.01.17 → 02.03</span><span>任何航空</span></div>
+  </section>
+
+  <section aria-labelledby="cd-h">
+    <p class="kicker" id="cd-h">倒數</p>
+    <div class="cd-label" id="cdLabel">—</div>
+    <div class="cd" id="cd" aria-live="off">--:--:--</div>
+    <div class="sync" id="sync">校時中…</div>
+  </section>
+
+  <section aria-labelledby="t-h">
+    <h2 id="t-h">三場時間表</h2>
+    <div class="sales" id="sales"></div>
+    <p class="note">活動頁：<a href="https://tw.trip.com/t/JTUkYr9zpW2" target="_blank" rel="noopener">tw.trip.com/t/JTUkYr9zpW2</a>　時間到進活動頁，價格會自動跳出來。</p>
+  </section>
+
+  <section aria-labelledby="i-h">
+    <h2 id="i-h">安裝自動搶票腳本<br><span style="color:var(--muted);font-size:.5em;font-weight:700;letter-spacing:0">電腦版 Chrome／Edge，3 分鐘</span></h2>
+    <ol class="steps">
+      <li><div><b>裝 Tampermonkey 擴充功能</b>
+        <p>免費的使用者腳本管理器，腳本就跑在你已登入的瀏覽器裡。</p>
+        <a class="btn" href="https://chromewebstore.google.com/detail/tampermonkey/dhdgffkkebhmkfjojejmpbldmpobfkfo" target="_blank" rel="noopener">Chrome 版</a><a class="btn" href="https://microsoftedge.microsoft.com/addons/detail/tampermonkey/iikmkjmpaadaobahmlepeloendndfphd" target="_blank" rel="noopener">Edge 版</a></div></li>
+      <li><div><b>打開「允許使用者指令碼」</b>
+        <p>網址列輸入 <code>chrome://extensions</code> → Tampermonkey 的「詳細資料」→ 打開「允許使用者指令碼」。舊版 Chrome 沒有這個開關的話，改打開右上角「開發人員模式」。</p></div></li>
+      <li><div><b>安裝搶票腳本</b>
+        <p>按下去，Tampermonkey 會跳出安裝頁，按「安裝」。</p>
+        <a class="btn primary" href="trip-grab.user.js">⚔ 安裝東京搶票助手</a></div></li>
+      <li><div><b>打開活動頁確認</b>
+        <p>右下角出現橘框的「✈︎ 東京搶票助手」面板就成功了。按「⏩ 30 秒演練」跑一次，會響鈴、會說話。</p>
+        <a class="btn" href="https://tw.trip.com/t/JTUkYr9zpW2" target="_blank" rel="noopener">打開 Trip.com 活動頁 ↗</a></div></li>
+    </ol>
+  </section>
+
+  <section aria-labelledby="f-h">
+    <h2 id="f-h">作戰流程</h2>
+    <p class="progress" id="progress"></p>
+
+    <div class="phase">
+      <h3>現在就做 <span>10/24–10/25</span></h3>
+      <label class="check"><input type="checkbox" data-k="login"><span class="t">電腦和手機的 Trip.com 都登入<b>同一個帳號</b></span></label>
+      <label class="check"><input type="checkbox" data-k="pax"><span class="t">「常用旅客」先存好：護照英文姓名、護照號碼、效期、生日（下單時一點就帶入，省下最多時間）</span></label>
+      <label class="check"><input type="checkbox" data-k="card"><span class="t">信用卡先綁好或放手邊，確認可刷網路交易、額度夠</span></label>
+      <label class="check"><input type="checkbox" data-k="install"><span class="t">裝好腳本，在活動頁按「⏩ 30 秒演練」確認會響</span></label>
+    </div>
+
+    <div class="phase">
+      <h3>彩排 <span>10/26（一）11:50</span></h3>
+      <label class="check"><input type="checkbox" data-k="r1"><span class="t">開活動頁 → 面板「設定」選「10/26 沖繩 4,999（彩排）」→ 🔍 測試掃描，橘框框到沖繩那張卡就對了；框錯就按 🎯 指定按鈕，點那張卡的搶購鈕</span></label>
+      <label class="check"><input type="checkbox" data-k="r2"><span class="t">按 ⚔ 武裝，看 12:00 腳本會不會自動按下去、跳到哪一頁（只看流程，不用付款）</span></label>
+      <label class="check"><input type="checkbox" data-k="r3"><span class="t">記下：價格是時間到自動跳出來，還是要重整才出現？按下去是開新頁還是跳出選日期？有問題回來找我調</span></label>
+    </div>
+
+    <div class="phase">
+      <h3>正式 <span>10/27（二）11:45</span></h3>
+      <label class="check"><input type="checkbox" data-k="g1"><span class="t">電腦開活動頁 → 「設定」選「10/27 東京 999」→ 🔍 測試掃描確認框到東京 → ⚔ 武裝</span></label>
+      <label class="check"><input type="checkbox" data-k="g2"><span class="t">搶票分頁保持在<b>最前面</b>、電腦插電、關掉螢幕保護和睡眠、開聲音</span></label>
+      <label class="check"><input type="checkbox" data-k="g3"><span class="t">手機 Trip.com App 也開到活動頁，當第二條路（手動按）</span></label>
+      <label class="check"><input type="checkbox" data-k="g4"><span class="t">12:00 腳本按下去 → 響鈴 → 你接手：選 <b>1/17 去、2/3 回</b> → 帶入常用旅客 → 付款</span></label>
+      <label class="check"><input type="checkbox" data-k="g5"><span class="t">付款前看一眼：姓名拼音和護照一致、日期對（這種特價票多半不能退改）</span></label>
+    </div>
+
+    <div class="phase">
+      <h3>沒搶到 <span>備案</span></h3>
+      <label class="check"><input type="checkbox" data-k="b1"><span class="t">用下面「任何航空一鍵比價」，比行情 NT$15,779 便宜就是賺到</span></label>
+    </div>
+  </section>
+
+  <section aria-labelledby="p-h">
+    <h2 id="p-h">這趟的行情</h2>
+    <div class="fares">
+      <div class="fare"><div class="name">最便宜的直飛</div><div class="price">NT$15,779</div>
+        <div class="legs"><span><b>去 1/17</b>　泰國獅航 SL394　12:10 桃園 → 16:25 成田</span><span><b>回 2/3</b>　台灣虎航 IT217　05:00 羽田 → 07:55 桃園</span></div></div>
+      <div class="fare"><div class="name">虎航來回直飛</div><div class="price">NT$15,937</div>
+        <div class="legs"><span><b>去 1/17</b>　台灣虎航 IT202　15:35 桃園 → 19:35 成田</span><span><b>回 2/3</b>　台灣虎航 IT217　05:00 羽田 → 07:55 桃園</span></div></div>
+      <div class="fare"><div class="name">最便宜（經沖繩轉機）</div><div class="price">NT$11,637</div>
+        <div class="legs"><span><b>去 1/17</b>　泰越捷＋捷星日本　14:45 桃園 → 22:25 成田（6 小時 40 分）</span><span><b>回 2/3</b>　捷星日本＋泰獅航　12:50 成田 → 20:05 桃園（8 小時 15 分）</span></div></div>
+    </div>
+    <p class="note">Kiwi.com 2026/10/24 查詢，1 位大人、含手提行李、不含托運。Kiwi 會加自己的服務費，航空公司官網常常更便宜，這裡當比價基準。</p>
+    <div class="verdict">就算東京 999 是單程、去回各搶一張，票面也才 NT$1,998，大約是行情的一成多。搶不到的話，直飛來回壓在 NT$12,000 以下就很漂亮。</div>
+  </section>
+
+  <section aria-labelledby="l-h">
+    <h2 id="l-h">任何航空一鍵比價</h2>
+    <div class="links">
+      <a class="dated" href="https://tw.trip.com/flights/showfarefirst?dcity=tpe&amp;acity=tyo&amp;ddate=2027-01-17&amp;rdate=2027-02-03&amp;triptype=rt&amp;class=y&amp;quantity=1&amp;locale=zh-TW&amp;curr=TWD" target="_blank" rel="noopener">Trip.com<span>已帶 1/17–2/3</span></a>
+      <a class="dated" href="https://www.google.com/travel/flights?q=Flights%20from%20TPE%20to%20TYO%20on%202027-01-17%20through%202027-02-03&amp;hl=zh-TW&amp;curr=TWD" target="_blank" rel="noopener">Google 航班<span>已帶 1/17–2/3</span></a>
+      <a class="dated" href="https://www.skyscanner.com.tw/transport/flights/tpe/tyoa/270117/270203/?adultsv2=1&amp;cabinclass=economy" target="_blank" rel="noopener">Skyscanner<span>已帶 1/17–2/3</span></a>
+      <a class="dated" href="https://kiwi.com/u/gh2d5m" target="_blank" rel="noopener">Kiwi.com<span>剛查到的直飛最低價</span></a>
+    </div>
+    <p class="sub">航空公司官網（特價常常只在官網）</p>
+    <div class="links">
+      <a href="https://www.tigerairtw.com/zh-tw" target="_blank" rel="noopener">台灣虎航<span>桃園 ⇄ 成田／羽田</span></a>
+      <a href="https://www.flypeach.com/tw" target="_blank" rel="noopener">樂桃航空<span>桃園 ⇄ 羽田／成田</span></a>
+      <a href="https://www.jetstar.com/tw/zh" target="_blank" rel="noopener">捷星<span>桃園 ⇄ 成田</span></a>
+      <a href="https://www.starlux-airlines.com/zh-TW" target="_blank" rel="noopener">星宇航空<span>桃園 ⇄ 成田</span></a>
+      <a href="https://www.evaair.com/zh-tw/index.html" target="_blank" rel="noopener">長榮航空<span>桃園／松山 ⇄ 成田／羽田</span></a>
+      <a href="https://www.china-airlines.com/tw/zh" target="_blank" rel="noopener">中華航空<span>桃園／松山 ⇄ 成田／羽田</span></a>
+      <a href="https://www.jal.co.jp/tw/zhtw/" target="_blank" rel="noopener">日本航空<span>桃園／松山 ⇄ 成田／羽田</span></a>
+      <a href="https://www.ana.co.jp/zh/tw/" target="_blank" rel="noopener">全日空<span>桃園／松山 ⇄ 成田／羽田</span></a>
+      <a href="https://www.flyscoot.com/zh-tw" target="_blank" rel="noopener">酷航<span>桃園 ⇄ 成田</span></a>
+    </div>
+  </section>
+
+  <section aria-labelledby="n-h">
+    <h2 id="n-h">先講清楚</h2>
+    <ul class="facts">
+      <li><b>腳本做的事：</b>用 Trip.com 伺服器時間校時到 0.1 秒內，開搶前盯住東京那張卡，時間一到、按鈕一能按就按下去；價格沒出來就自動重整，按到就響鈴、說話、跳桌面通知。<b>登入、驗證碼、付款一定是你本人。</b>這也是它不會被當成機器人封鎖的原因。</li>
+      <li><b>999 名額非常少，</b>通常幾秒內就沒了，而且多半是單程、可能未稅、只限特定航班和日期。開搶前先看活動規則的「適用搭乘日期」有沒有包含 1/17 和 2/3。2027 年春節是 2/6，2/3 很接近，有可能被排除。</li>
+      <li><b>不要開一堆分頁狂刷。</b>同一帳號多分頁加上高頻重整最容易被擋。腳本每次重整至少隔 4 秒、最多 25 次，開搶 2 分鐘後自動收手。</li>
+      <li><b>Trip.com 頁面改版、自動找不到方案時，</b>按「🎯 指定按鈕」，在頁面上點一下那張卡的搶購鈕就鎖定了，重整後也記得。</li>
+    </ul>
+  </section>
+
+  <footer>私人工具，不公開索引。<a href="../">← 回 Rino Lin 個人網站</a></footer>
+</div>
+
+<script>
+// 台灣時間的三場秒殺；東京那場是主戰場
+const SALES = [
+  { at: '2026-10-26T12:00:00+08:00', when: '10/26（一）12:00', title: '日航 沖繩來回 4,999', sub: '不是東京：拿來彩排，看活動頁時間到會怎麼變', tag: '彩排' },
+  { at: '2026-10-27T12:00:00+08:00', when: '10/27（二）12:00', title: '東京機票 999', sub: '主戰場：1/17 去、2/3 回', tag: '主戰場', main: true },
+  { at: '2026-10-29T12:00:00+08:00', when: '10/29（四）12:00', title: '星宇 大阪來回 6,999', sub: '不是東京：大阪進出想換路線再考慮', tag: '備用' },
+].map(s => ({ ...s, t: Date.parse(s.at) }));
+
+let offset = 0; // 伺服器 − 本機（ms）
+
+function renderSales() {
+  const now = Date.now() + offset;
+  document.getElementById('sales').innerHTML = SALES.map(s => {
+    const past = now > s.t + 120000;
+    const live = !past && now >= s.t;
+    const cls = live || (s.main && !past) ? 'tag now' : past ? 'tag past' : 'tag';
+    return `<div class="sale${s.main ? ' main' : ''}"><div class="when">${s.when}</div><div class="what">${s.title}<span>${s.sub}</span></div><div class="${cls}">${live ? '開搶中' : past ? '已結束' : s.tag}</div></div>`;
+  }).join('');
+}
+
+const pad = n => String(n).padStart(2, '0');
+function tick() {
+  const now = Date.now() + offset;
+  const next = SALES.find(s => s.main && now < s.t + 120000) || SALES.find(s => now < s.t + 120000);
+  const cd = document.getElementById('cd');
+  if (!next) {
+    document.getElementById('cdLabel').textContent = '三場都結束了';
+    cd.innerHTML = '改打備案 ↓';
+    cd.classList.remove('hot');
+    return;
+  }
+  document.getElementById('cdLabel').textContent = `${next.when}　${next.title}`;
+  const ms = next.t - now;
+  if (ms <= 0) { cd.textContent = '開搶中'; cd.classList.add('hot'); return; }
+  const d = Math.floor(ms / 86400000), h = Math.floor(ms / 3600000) % 24, m = Math.floor(ms / 60000) % 60, s = Math.floor(ms / 1000) % 60, t = Math.floor(ms / 100) % 10;
+  cd.innerHTML = (d ? `${d}<small>天</small> ` : '') + `${pad(h)}:${pad(m)}:${pad(s)}<small>.${t}</small>`;
+  cd.classList.toggle('hot', ms < 60000);
+}
+
+// 用網站伺服器的 Date 標頭校時（只到秒，錯開相位取樣後取交集）
+async function sync() {
+  let lo = -Infinity, hi = Infinity, ok = 0;
+  for (let i = 0; i < 5; i++) {
+    try {
+      const t0 = Date.now();
+      const r = await fetch(location.pathname + '?sync=' + t0, { method: 'HEAD', cache: 'no-store' });
+      const t1 = Date.now();
+      const S = Date.parse(r.headers.get('date'));
+      if (S) { lo = Math.max(lo, S - t1); hi = Math.min(hi, S + 1000 - t0); ok++; }
+    } catch (e) { /* 離線就用本機時間 */ }
+    if (i < 4) await new Promise(r => setTimeout(r, 1137));
+  }
+  const el = document.getElementById('sync');
+  if (!ok || lo > hi) { el.textContent = '無法校時，顯示的是本機時間。搶票腳本在 Trip.com 上會自己再校一次。'; return; }
+  offset = Math.round((lo + hi) / 2);
+  const sec = (Math.abs(offset) / 1000).toFixed(2);
+  el.textContent = Math.abs(offset) < 150
+    ? `已校時：你的電腦時間很準（誤差 ±${((hi - lo) / 2000).toFixed(2)} 秒）`
+    : `已校時：你的電腦${offset > 0 ? '慢' : '快'}了 ${sec} 秒，上面的倒數已修正。`;
+  renderSales();
+}
+
+// 作戰清單：只記在這台裝置
+const KEY = 'flight-ops-v1';
+let done = {};
+try { done = JSON.parse(localStorage.getItem(KEY) || '{}'); } catch (e) { done = {}; }
+const boxes = [...document.querySelectorAll('.check input')];
+function progress() {
+  const n = boxes.filter(b => b.checked).length;
+  document.getElementById('progress').textContent = `完成 ${n} / ${boxes.length} 項（只記在這台裝置）`;
+}
+boxes.forEach(b => {
+  b.checked = !!done[b.dataset.k];
+  b.addEventListener('change', () => {
+    done[b.dataset.k] = b.checked;
+    try { localStorage.setItem(KEY, JSON.stringify(done)); } catch (e) { /* 無痕模式存不了也沒關係 */ }
+    progress();
+  });
+});
+progress();
+
+renderSales();
+tick();
+setInterval(tick, 100);
+setInterval(renderSales, 30000);
+sync();
+</script>
+</body>
+</html>

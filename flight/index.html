@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="robots" content="noindex, nofollow">
 <title>東京搶票作戰室</title>
-<meta name="description" content="TPE ⇄ TYO 2027/1/17–2/3：Trip.com 限時秒殺自動盯盤腳本、校時倒數、作戰流程與任何航空比價。">
+<meta name="description" content="TPE ⇄ TYO 2027/1/17–2/3：特價雷達、自動駕駛搶票腳本、作戰流程與任何航空比價。">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800;900&family=Noto+Sans+TC:wght@400;500;700;900&display=swap">
@@ -18,6 +18,7 @@
   --panel:#141414;
   --accent:#ff3c00;
   --ok:#00c46a;
+  --warn:#f5b400;
   --font:Inter,"Noto Sans TC",system-ui,-apple-system,"PingFang TC","Microsoft JhengHei",sans-serif;
   color-scheme:dark;
 }
@@ -33,28 +34,46 @@ section{padding:56px 0;border-bottom:1px solid var(--line)}
 .kicker{font-size:.78rem;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);font-weight:800;margin:0 0 14px}
 h1{font-size:clamp(2.6rem,9vw,6.4rem);line-height:1;letter-spacing:-.04em;font-weight:900;margin:0}
 h2{font-size:clamp(1.8rem,5vw,3rem);line-height:1.05;letter-spacing:-.03em;font-weight:900;margin:0 0 28px}
+h2 small{display:block;color:var(--muted);font-size:.5em;font-weight:700;letter-spacing:0;margin-top:8px;line-height:1.4}
 .route{display:flex;flex-wrap:wrap;gap:10px 28px;margin-top:22px;font-size:clamp(1.1rem,2.6vw,1.6rem);font-weight:800}
 .route span{white-space:nowrap}
 .route em{font-style:normal;color:var(--accent)}
+
+/* 自動駕駛狀態 */
+.pilot{display:flex;gap:14px;align-items:center;margin-top:30px;padding:16px 20px;border-radius:14px;border:1px solid var(--line);background:var(--panel);font-weight:700}
+.pilot .dot{width:14px;height:14px;border-radius:50%;background:#555;flex:none}
+.pilot.on{border-color:var(--ok)}
+.pilot.on .dot{background:var(--ok);box-shadow:0 0 0 6px rgba(0,196,106,.18)}
+.pilot span{color:var(--muted);font-weight:400;display:block;font-size:.88rem}
 
 /* 倒數 */
 .cd-label{font-weight:700;font-size:1.05rem}
 .cd{font-family:Inter,system-ui,sans-serif;font-weight:900;font-variant-numeric:tabular-nums;letter-spacing:-.04em;font-size:clamp(3rem,13vw,8.5rem);line-height:1;margin:14px 0 10px;color:var(--fg)}
 .cd.hot{color:var(--accent)}
 .cd small{font-size:.32em;letter-spacing:0;color:var(--muted);font-weight:800;margin-left:.15em}
-.sync{color:var(--muted);font-size:.9rem;font-variant-numeric:tabular-nums}
+.sync,.nextauto{color:var(--muted);font-size:.9rem;font-variant-numeric:tabular-nums}
+.nextauto{margin-bottom:6px;color:var(--fg)}
 
-/* 時間表 */
-.sales{display:grid;gap:12px}
-.sale{display:grid;grid-template-columns:auto 1fr auto;gap:6px 22px;align-items:center;padding:20px 22px;background:var(--panel);border:1px solid var(--line);border-radius:14px}
+/* 雷達 */
+.radar{display:grid;gap:10px}
+.sale{display:grid;grid-template-columns:150px 1fr auto;gap:6px 20px;align-items:start;padding:18px 20px;background:var(--panel);border:1px solid var(--line);border-radius:14px}
 .sale.main{border:2px solid var(--accent)}
-.sale .when{font-weight:900;font-size:1.25rem;font-variant-numeric:tabular-nums;white-space:nowrap}
-.sale .what{font-weight:700}
-.sale .what span{display:block;color:var(--muted);font-weight:400;font-size:.88rem}
-.tag{font-size:.72rem;font-weight:800;letter-spacing:.06em;padding:5px 10px;border-radius:999px;white-space:nowrap;border:1px solid var(--line);color:var(--muted)}
-.tag.now{background:var(--accent);border-color:var(--accent);color:#0a0a0a}
-.tag.past{opacity:.6;text-decoration:line-through}
-@media (max-width:640px){.sale{grid-template-columns:1fr auto}.sale .what{grid-column:1/-1;grid-row:2}}
+.sale.dim{opacity:.62}
+.sale .when{font-weight:900;font-size:1.05rem;font-variant-numeric:tabular-nums;line-height:1.3}
+.sale .when span{display:block;color:var(--muted);font-weight:600;font-size:.8rem}
+.sale .what b{display:block;font-size:1.02rem}
+.sale .what .brand{color:var(--muted);font-weight:700;font-size:.8rem;letter-spacing:.04em}
+.sale .what p{margin:4px 0 6px;color:var(--muted);font-size:.86rem}
+.sale .what a{font-size:.8rem;color:var(--muted);margin-right:12px}
+.tags{display:flex;flex-direction:column;gap:6px;align-items:flex-end}
+.tag{font-size:.72rem;font-weight:800;letter-spacing:.04em;padding:4px 10px;border-radius:999px;white-space:nowrap;border:1px solid #333;color:var(--muted)}
+.tag.auto{background:var(--accent);border-color:var(--accent);color:#0a0a0a}
+.tag.yes{border-color:var(--ok);color:var(--ok)}
+.tag.partial{border-color:var(--warn);color:var(--warn)}
+.tag.pred{border-style:dashed}
+@media (max-width:680px){.sale{grid-template-columns:1fr auto}.sale .what{grid-column:1/-1;grid-row:2}.tags{flex-direction:row;flex-wrap:wrap;justify-content:flex-end}}
+.sub{font-size:1rem;font-weight:800;margin:30px 0 12px;color:var(--muted)}
+.updated{color:var(--muted);font-size:.85rem;margin-top:14px}
 
 /* 安裝 */
 .steps{list-style:none;padding:0;margin:0;display:grid;gap:12px;counter-reset:s}
@@ -70,7 +89,7 @@ h2{font-size:clamp(1.8rem,5vw,3rem);line-height:1.05;letter-spacing:-.03em;font-
 
 /* 流程 */
 .phase{margin:0 0 30px}
-.phase h3{display:flex;gap:12px;align-items:baseline;font-size:1.25rem;margin:0 0 12px;font-weight:900}
+.phase h3{display:flex;flex-wrap:wrap;gap:4px 12px;align-items:baseline;font-size:1.25rem;margin:0 0 12px;font-weight:900}
 .phase h3 span{font-size:.8rem;color:var(--accent);font-weight:800;letter-spacing:.06em}
 .check{display:grid;grid-template-columns:28px 1fr;gap:12px;align-items:start;padding:12px 0;border-top:1px solid var(--line);cursor:pointer}
 .check input{width:24px;height:24px;margin:2px 0 0;accent-color:var(--accent);cursor:pointer}
@@ -94,7 +113,6 @@ h2{font-size:clamp(1.8rem,5vw,3rem);line-height:1.05;letter-spacing:-.03em;font-
 .links a span{font-weight:400;font-size:.8rem;color:var(--muted)}
 .links a.dated{border-color:#3a2016}
 .links a.dated span{color:var(--accent)}
-.sub{font-size:1rem;font-weight:800;margin:26px 0 12px;color:var(--muted)}
 
 ul.facts{margin:0;padding:0;list-style:none;display:grid;gap:12px}
 ul.facts li{padding:16px 20px;background:var(--panel);border:1px solid var(--line);border-radius:14px}
@@ -109,25 +127,29 @@ footer{padding:36px 0 60px;color:var(--muted);font-size:.85rem}
 
   <section>
     <p class="kicker">東京搶票作戰室</p>
-    <h1>準時到<br>0.1 秒。</h1>
+    <h1>開著這頁，<br>時間到它自己搶。</h1>
     <div class="route"><span>TPE <em>⇄</em> TYO</span><span>2027.01.17 → 02.03</span><span>任何航空</span></div>
+    <div class="pilot" id="pilot"><div class="dot"></div><div id="pilotText">偵測搶票腳本中…<span>&nbsp;</span></div></div>
   </section>
 
   <section aria-labelledby="cd-h">
-    <p class="kicker" id="cd-h">倒數</p>
+    <p class="kicker" id="cd-h">主戰場倒數</p>
     <div class="cd-label" id="cdLabel">—</div>
     <div class="cd" id="cd" aria-live="off">--:--:--</div>
+    <div class="nextauto" id="nextAuto"></div>
     <div class="sync" id="sync">校時中…</div>
   </section>
 
-  <section aria-labelledby="t-h">
-    <h2 id="t-h">三場時間表</h2>
-    <div class="sales" id="sales"></div>
-    <p class="note">活動頁：<a href="https://tw.trip.com/t/JTUkYr9zpW2" target="_blank" rel="noopener">tw.trip.com/t/JTUkYr9zpW2</a>　時間到進活動頁，價格會自動跳出來。</p>
+  <section aria-labelledby="r-h">
+    <h2 id="r-h">特價雷達<small>每天早上 7:51、晚上 8:51 自動掃描各家航空和訂票網站，更新這張表</small></h2>
+    <div class="radar" id="radarTimed"><p class="note">讀取排程中…</p></div>
+    <p class="sub">現在就能買（不用搶）</p>
+    <div class="radar" id="radarOngoing"></div>
+    <p class="updated" id="updated"></p>
   </section>
 
   <section aria-labelledby="i-h">
-    <h2 id="i-h">安裝自動搶票腳本<br><span style="color:var(--muted);font-size:.5em;font-weight:700;letter-spacing:0">電腦版 Chrome／Edge，3 分鐘</span></h2>
+    <h2 id="i-h">安裝自動搶票腳本<small>電腦版 Chrome／Edge，3 分鐘</small></h2>
     <ol class="steps">
       <li><div><b>裝 Tampermonkey 擴充功能</b>
         <p>免費的使用者腳本管理器，腳本就跑在你已登入的瀏覽器裡。</p>
@@ -135,11 +157,10 @@ footer{padding:36px 0 60px;color:var(--muted);font-size:.85rem}
       <li><div><b>打開「允許使用者指令碼」</b>
         <p>網址列輸入 <code>chrome://extensions</code> → Tampermonkey 的「詳細資料」→ 打開「允許使用者指令碼」。舊版 Chrome 沒有這個開關的話，改打開右上角「開發人員模式」。</p></div></li>
       <li><div><b>安裝搶票腳本</b>
-        <p>按下去，Tampermonkey 會跳出安裝頁，按「安裝」。</p>
+        <p>按下去，Tampermonkey 會跳出安裝頁，按「安裝」。已經裝過舊版的會跳出更新，一樣按安裝。</p>
         <a class="btn primary" href="trip-grab.user.js">⚔ 安裝東京搶票助手</a></div></li>
-      <li><div><b>打開活動頁確認</b>
-        <p>右下角出現橘框的「✈︎ 東京搶票助手」面板就成功了。按「⏩ 30 秒演練」跑一次，會響鈴、會說話。</p>
-        <a class="btn" href="https://tw.trip.com/t/JTUkYr9zpW2" target="_blank" rel="noopener">打開 Trip.com 活動頁 ↗</a></div></li>
+      <li><div><b>重新整理這一頁</b>
+        <p>右下角出現「🤖 自動駕駛」面板、最上面的燈變綠就成功了。按一下面板的「🔊 點一下開聲音」，開搶時這頁也會響。</p></div></li>
     </ol>
   </section>
 
@@ -148,32 +169,38 @@ footer{padding:36px 0 60px;color:var(--muted);font-size:.85rem}
     <p class="progress" id="progress"></p>
 
     <div class="phase">
-      <h3>現在就做 <span>10/24–10/25</span></h3>
+      <h3>現在就做 <span>10/24</span></h3>
       <label class="check"><input type="checkbox" data-k="login"><span class="t">電腦和手機的 Trip.com 都登入<b>同一個帳號</b></span></label>
       <label class="check"><input type="checkbox" data-k="pax"><span class="t">「常用旅客」先存好：護照英文姓名、護照號碼、效期、生日（下單時一點就帶入，省下最多時間）</span></label>
-      <label class="check"><input type="checkbox" data-k="card"><span class="t">信用卡先綁好或放手邊，確認可刷網路交易、額度夠</span></label>
-      <label class="check"><input type="checkbox" data-k="install"><span class="t">裝好腳本，在活動頁按「⏩ 30 秒演練」確認會響</span></label>
+      <label class="check"><input type="checkbox" data-k="card"><span class="t">信用卡先綁好或放手邊，確認可刷網路交易、額度夠；刷卡簡訊驗證碼要收得到</span></label>
+      <label class="check"><input type="checkbox" data-k="install"><span class="t">裝好腳本，回這頁看到綠燈，按「🔊 點一下開聲音」</span></label>
+      <label class="check"><input type="checkbox" data-k="power"><span class="t">電腦設定成插電時<b>不睡眠</b>（螢幕可以關），Chrome 開著這頁不要關</span></label>
     </div>
 
     <div class="phase">
-      <h3>彩排 <span>10/26（一）11:50</span></h3>
-      <label class="check"><input type="checkbox" data-k="r1"><span class="t">開活動頁 → 面板「設定」選「10/26 沖繩 4,999（彩排）」→ 🔍 測試掃描，橘框框到沖繩那張卡就對了；框錯就按 🎯 指定按鈕，點那張卡的搶購鈕</span></label>
-      <label class="check"><input type="checkbox" data-k="r2"><span class="t">按 ⚔ 武裝，看 12:00 腳本會不會自動按下去、跳到哪一頁（只看流程，不用付款）</span></label>
-      <label class="check"><input type="checkbox" data-k="r3"><span class="t">記下：價格是時間到自動跳出來，還是要重整才出現？按下去是開新頁還是跳出選日期？有問題回來找我調</span></label>
+      <h3>今晚起每天 00:00 <span>自動領優惠碼</span></h3>
+      <label class="check"><input type="checkbox" data-k="c1"><span class="t">10/25–10/30 每晚 23:58 自動駕駛會打開活動頁，00:00 把當天的優惠碼複製下來（最高折 NT$300，效期到 11/8）。早上起來看面板紀錄就有</span></label>
     </div>
 
     <div class="phase">
-      <h3>正式 <span>10/27（二）11:45</span></h3>
-      <label class="check"><input type="checkbox" data-k="g1"><span class="t">電腦開活動頁 → 「設定」選「10/27 東京 999」→ 🔍 測試掃描確認框到東京 → ⚔ 武裝</span></label>
-      <label class="check"><input type="checkbox" data-k="g2"><span class="t">搶票分頁保持在<b>最前面</b>、電腦插電、關掉螢幕保護和睡眠、開聲音</span></label>
-      <label class="check"><input type="checkbox" data-k="g3"><span class="t">手機 Trip.com App 也開到活動頁，當第二條路（手動按）</span></label>
-      <label class="check"><input type="checkbox" data-k="g4"><span class="t">12:00 腳本按下去 → 響鈴 → 你接手：選 <b>1/17 去、2/3 回</b> → 帶入常用旅客 → 付款</span></label>
-      <label class="check"><input type="checkbox" data-k="g5"><span class="t">付款前看一眼：姓名拼音和護照一致、日期對（這種特價票多半不能退改）</span></label>
+      <h3>彩排 <span>10/26（一）11:57</span></h3>
+      <label class="check"><input type="checkbox" data-k="r1"><span class="t">什麼都不用按：11:57 自動駕駛自己打開活動頁、校時，12:00 按下「沖繩 4,999」。你只要在旁邊看它有沒有框到對的卡、有沒有跳頁（不用付款）</span></label>
+      <label class="check"><input type="checkbox" data-k="r2"><span class="t">框錯卡的話：在活動頁面板按 🎯 指定按鈕，點一下正確的搶購鈕就好</span></label>
+      <label class="check"><input type="checkbox" data-k="r3"><span class="t">記下：價格是時間到自動跳出來，還是要重整才出現？按下去是開新頁還是跳出選日期？有怪怪的就截圖回來找我調</span></label>
+    </div>
+
+    <div class="phase">
+      <h3>正式 <span>10/27（二）11:50</span></h3>
+      <label class="check"><input type="checkbox" data-k="g1"><span class="t">確認這頁開著、綠燈、聲音開。11:57 會自動打開活動頁接手</span></label>
+      <label class="check"><input type="checkbox" data-k="g2"><span class="t">手機 Trip.com App 也開到活動頁當第二條路（一口價常常限 App）</span></label>
+      <label class="check"><input type="checkbox" data-k="g3"><span class="t">12:00 腳本按下去 → 響鈴 → 你接手：選 <b>1/17 去、2/3 回</b> → 帶入常用旅客 → 付款</span></label>
+      <label class="check"><input type="checkbox" data-k="g4"><span class="t">付款前看一眼：姓名拼音和護照一致、日期對（特價票多半不能退改）</span></label>
     </div>
 
     <div class="phase">
       <h3>沒搶到 <span>備案</span></h3>
-      <label class="check"><input type="checkbox" data-k="b1"><span class="t">用下面「任何航空一鍵比價」，比行情 NT$15,779 便宜就是賺到</span></label>
+      <label class="check"><input type="checkbox" data-k="b1"><span class="t">雷達會繼續掃：11 月旅展、雙 11、11/25 月底救星確定時間後會自動排進來</span></label>
+      <label class="check"><input type="checkbox" data-k="b2"><span class="t">回程可以先看捷星「成田 → 桃園 ¥9,090 起」；全程用下面比價，直飛來回壓在 NT$12,000 以下就很漂亮</span></label>
     </div>
   </section>
 
@@ -216,10 +243,11 @@ footer{padding:36px 0 60px;color:var(--muted);font-size:.85rem}
   <section aria-labelledby="n-h">
     <h2 id="n-h">先講清楚</h2>
     <ul class="facts">
-      <li><b>腳本做的事：</b>用 Trip.com 伺服器時間校時到 0.1 秒內，開搶前盯住東京那張卡，時間一到、按鈕一能按就按下去；價格沒出來就自動重整，按到就響鈴、說話、跳桌面通知。<b>登入、驗證碼、付款一定是你本人。</b>這也是它不會被當成機器人封鎖的原因。</li>
-      <li><b>999 名額非常少，</b>通常幾秒內就沒了，而且多半是單程、可能未稅、只限特定航班和日期。開搶前先看活動規則的「適用搭乘日期」有沒有包含 1/17 和 2/3。2027 年春節是 2/6，2/3 很接近，有可能被排除。</li>
-      <li><b>不要開一堆分頁狂刷。</b>同一帳號多分頁加上高頻重整最容易被擋。腳本每次重整至少隔 4 秒、最多 25 次，開搶 2 分鐘後自動收手。</li>
-      <li><b>Trip.com 頁面改版、自動找不到方案時，</b>按「🎯 指定按鈕」，在頁面上點一下那張卡的搶購鈕就鎖定了，重整後也記得。</li>
+      <li><b>全自動做到哪裡：</b>雷達每天掃特價、排進時間表 → 這頁在開搶前 3 分鐘自動打開活動頁 → 校時到 0.1 秒 → 時間到、按鈕一能按就按下去，沒開就重整，遇到排隊不重整 → 響鈴、說話、桌面通知叫你。每晚 00:00 的優惠碼會自動複製下來。<b>登入、驗證碼、刷卡簡訊驗證一定要你本人</b>，這也是它不會被當成機器人封鎖的原因。</li>
+      <li><b>一口價常常限 App 購買，</b>而且每筆訂單只能 1 位旅客、限成人票、每人最多兩筆。如果活動頁寫「限 App」，電腦腳本只能幫你準時叫醒、盯畫面，真正下單請用手機 App。</li>
+      <li><b>999 名額非常少，</b>通常幾秒內就沒了，多半是單程、可能未稅、只限特定航班和日期。開搶前先看活動規則的「適用搭乘日期」有沒有包含 1/17 和 2/3。2027 年春節是 2/6，2/3 很接近，有可能被排除。</li>
+      <li><b>航空公司官網的特價</b>（虎航、樂桃這類），自動駕駛會準時打開官網、還在倒數就重整、排隊時不重整，開賣就叫你。各家訂位畫面不同，選日期和航班請你自己按。</li>
+      <li><b>電腦要醒著、Chrome 要開著這一頁。</b>電腦睡著或這頁被關掉，自動駕駛就不會動。</li>
     </ul>
   </section>
 
@@ -227,42 +255,93 @@ footer{padding:36px 0 60px;color:var(--muted);font-size:.85rem}
 </div>
 
 <script>
-// 台灣時間的三場秒殺；東京那場是主戰場
-const SALES = [
-  { at: '2026-10-26T12:00:00+08:00', when: '10/26（一）12:00', title: '日航 沖繩來回 4,999', sub: '不是東京：拿來彩排，看活動頁時間到會怎麼變', tag: '彩排' },
-  { at: '2026-10-27T12:00:00+08:00', when: '10/27（二）12:00', title: '東京機票 999', sub: '主戰場：1/17 去、2/3 回', tag: '主戰場', main: true },
-  { at: '2026-10-29T12:00:00+08:00', when: '10/29（四）12:00', title: '星宇 大阪來回 6,999', sub: '不是東京：大阪進出想換路線再考慮', tag: '備用' },
-].map(s => ({ ...s, t: Date.parse(s.at) }));
-
+// 排程讀不到時的備用資料
+let SALES = [
+  { id: 'tc-1026-oka4999', start: '2026-10-26T12:00:00+08:00', brand: 'Trip.com', title: '沖繩來回 4,999（彩排）', mode: 'grab', auto: true, covers: 'no', status: 'confirmed', url: 'https://tw.trip.com/t/JTUkYr9zpW2' },
+  { id: 'tc-1027-tyo999', start: '2026-10-27T12:00:00+08:00', brand: 'Trip.com', title: '東京機票 999', mode: 'grab', auto: true, covers: 'unknown', status: 'confirmed', main: true, url: 'https://tw.trip.com/t/JTUkYr9zpW2' },
+  { id: 'tc-1029-kix6999', start: '2026-10-29T12:00:00+08:00', brand: 'Trip.com', title: '星宇 大阪來回 6,999', mode: 'grab', auto: false, covers: 'no', status: 'confirmed', url: 'https://tw.trip.com/t/JTUkYr9zpW2' },
+];
+let UPDATED = '';
 let offset = 0; // 伺服器 − 本機（ms）
+const t0 = s => Date.parse(s.start);
+const TIMED = ['grab', 'code', 'open'];
+const pad = n => String(n).padStart(2, '0');
+const esc = s => String(s == null ? '' : s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+const fmtWhen = new Intl.DateTimeFormat('zh-TW', { timeZone: 'Asia/Taipei', month: 'numeric', day: 'numeric', weekday: 'short' });
+const fmtTime = new Intl.DateTimeFormat('zh-TW', { timeZone: 'Asia/Taipei', hourCycle: 'h23', hour: '2-digit', minute: '2-digit' });
+const fmtDate = new Intl.DateTimeFormat('zh-TW', { timeZone: 'Asia/Taipei', month: 'numeric', day: 'numeric' });
 
-function renderSales() {
+function span(ms) {
+  if (ms <= 0) return '開搶中';
+  const d = Math.floor(ms / 86400000), h = Math.floor(ms / 3600000) % 24, m = Math.floor(ms / 60000) % 60, s = Math.floor(ms / 1000) % 60;
+  return (d ? `${d} 天 ` : '') + `${pad(h)}:${pad(m)}:${pad(s)}`;
+}
+const COVERS = { yes: ['yes', '涵蓋你的日期'], partial: ['partial', '涵蓋一段'], no: ['', '不是東京'], unknown: ['', '日期待確認'] };
+const STATUS = { confirmed: '', predicted: '預測', ongoing: '進行中', ended: '已結束' };
+
+function card(s, now, extra) {
+  const timed = TIMED.includes(s.mode);
+  const T = t0(s);
+  const when = timed
+    ? `${fmtWhen.format(T)}<span>${fmtTime.format(T)}・${now < T ? '還有 ' + span(T - now) : '開搶中'}</span>`
+    : `至 ${s.end ? fmtDate.format(Date.parse(s.end)) : '未定'}<span>隨時可買</span>`;
+  const cv = COVERS[s.covers] || COVERS.unknown;
+  const tags = [
+    timed ? (s.auto ? '<span class="tag auto">🤖 自動</span>' : '<span class="tag">👀 只列出</span>') : '<span class="tag">🛒 現在可買</span>',
+    `<span class="tag ${cv[0]}">${cv[1]}</span>`,
+    STATUS[s.status] ? `<span class="tag ${s.status === 'predicted' ? 'pred' : ''}">${STATUS[s.status]}</span>` : '',
+  ].join('');
+  const note = [s.note, extra].filter(Boolean).join(' ');
+  const links = [s.url ? `<a href="${esc(s.url)}" target="_blank" rel="noopener">活動頁 ↗</a>` : '', s.source ? `<a href="${esc(s.source)}" target="_blank" rel="noopener">消息來源 ↗</a>` : ''].join('');
+  const cls = ['sale', s.main ? 'main' : '', s.covers === 'no' || s.status === 'predicted' ? 'dim' : ''].join(' ');
+  return `<div class="${cls}"><div class="when">${when}</div><div class="what"><span class="brand">${esc(s.brand)}</span><b>${esc(s.title)}</b>${note ? `<p>${esc(note)}</p>` : ''}${links}</div><div class="tags">${tags}</div></div>`;
+}
+const upcoming = now => SALES.filter(s => TIMED.includes(s.mode) && t0(s) + 120000 > now).sort((a, b) => t0(a) - t0(b));
+function renderRadar() {
   const now = Date.now() + offset;
-  document.getElementById('sales').innerHTML = SALES.map(s => {
-    const past = now > s.t + 120000;
-    const live = !past && now >= s.t;
-    const cls = live || (s.main && !past) ? 'tag now' : past ? 'tag past' : 'tag';
-    return `<div class="sale${s.main ? ' main' : ''}"><div class="when">${s.when}</div><div class="what">${s.title}<span>${s.sub}</span></div><div class="${cls}">${live ? '開搶中' : past ? '已結束' : s.tag}</div></div>`;
-  }).join('');
+  // 每日優惠碼只列最近一晚，其餘收成一句
+  const timed = upcoming(now);
+  const codes = timed.filter(s => s.mode === 'code');
+  const shown = timed.filter(s => s.mode !== 'code' || s === codes[0]);
+  document.getElementById('radarTimed').innerHTML = shown.length
+    ? shown.map(s => card(s, now, s === codes[0] && codes.length > 1 ? `之後還有 ${codes.length - 1} 晚，一樣 00:00 自動領。` : '')).join('')
+    : '<p class="note">目前沒有排定的開搶。雷達會繼續掃。</p>';
+  const ongoing = SALES.filter(s => s.mode === 'ongoing' && (!s.end || Date.parse(s.end) > now));
+  document.getElementById('radarOngoing').innerHTML = ongoing.length ? ongoing.map(s => card(s, now)).join('') : '<p class="note">目前沒有。</p>';
+  document.getElementById('updated').textContent = UPDATED ? `排程更新：${new Date(UPDATED).toLocaleString('zh-TW', { timeZone: 'Asia/Taipei', hourCycle: 'h23' })}` : '';
 }
 
-const pad = n => String(n).padStart(2, '0');
 function tick() {
   const now = Date.now() + offset;
-  const next = SALES.find(s => s.main && now < s.t + 120000) || SALES.find(s => now < s.t + 120000);
+  const timed = upcoming(now);
+  const main = timed.find(s => s.main) || timed.find(s => s.auto) || timed[0];
   const cd = document.getElementById('cd');
-  if (!next) {
-    document.getElementById('cdLabel').textContent = '三場都結束了';
-    cd.innerHTML = '改打備案 ↓';
+  if (!main) {
+    document.getElementById('cdLabel').textContent = '目前沒有排定的開搶';
+    cd.textContent = '雷達掃描中';
     cd.classList.remove('hot');
-    return;
+  } else {
+    const T = t0(main), ms = T - now;
+    document.getElementById('cdLabel').textContent = `${fmtWhen.format(T)} ${fmtTime.format(T)}　${main.brand}｜${main.title}`;
+    if (ms <= 0) { cd.textContent = '開搶中'; cd.classList.add('hot'); }
+    else {
+      const d = Math.floor(ms / 86400000), h = Math.floor(ms / 3600000) % 24, m = Math.floor(ms / 60000) % 60, s = Math.floor(ms / 1000) % 60, t = Math.floor(ms / 100) % 10;
+      cd.innerHTML = (d ? `${d}<small>天</small> ` : '') + `${pad(h)}:${pad(m)}:${pad(s)}<small>.${t}</small>`;
+      cd.classList.toggle('hot', ms < 60000);
+    }
   }
-  document.getElementById('cdLabel').textContent = `${next.when}　${next.title}`;
-  const ms = next.t - now;
-  if (ms <= 0) { cd.textContent = '開搶中'; cd.classList.add('hot'); return; }
-  const d = Math.floor(ms / 86400000), h = Math.floor(ms / 3600000) % 24, m = Math.floor(ms / 60000) % 60, s = Math.floor(ms / 1000) % 60, t = Math.floor(ms / 100) % 10;
-  cd.innerHTML = (d ? `${d}<small>天</small> ` : '') + `${pad(h)}:${pad(m)}:${pad(s)}<small>.${t}</small>`;
-  cd.classList.toggle('hot', ms < 60000);
+  const next = timed.find(s => s.auto && s !== main && t0(s) < (main ? t0(main) : Infinity));
+  document.getElementById('nextAuto').textContent = next ? `在那之前的自動任務：${fmtWhen.format(t0(next))} ${fmtTime.format(t0(next))} ${next.title}（還有 ${span(t0(next) - now)}）` : '';
+}
+
+// 搶票腳本裝好、在這頁跑起來時會留一個記號
+function pilot() {
+  const v = document.documentElement.dataset.rinoGrab;
+  const el = document.getElementById('pilot');
+  el.classList.toggle('on', !!v);
+  document.getElementById('pilotText').innerHTML = v
+    ? `自動駕駛運作中（腳本 v${esc(v)}）<span>這頁開著、電腦醒著就好。右下角面板按一次「🔊 點一下開聲音」。</span>`
+    : '還沒偵測到搶票腳本<span>照下面「安裝」步驟裝好，回來重新整理這頁。</span>';
 }
 
 // 用網站伺服器的 Date 標頭校時（只到秒，錯開相位取樣後取交集）
@@ -270,28 +349,34 @@ async function sync() {
   let lo = -Infinity, hi = Infinity, ok = 0;
   for (let i = 0; i < 5; i++) {
     try {
-      const t0 = Date.now();
-      const r = await fetch(location.pathname + '?sync=' + t0, { method: 'HEAD', cache: 'no-store' });
-      const t1 = Date.now();
+      const a = Date.now();
+      const r = await fetch(location.pathname + '?sync=' + a, { method: 'HEAD', cache: 'no-store' });
+      const b = Date.now();
       const S = Date.parse(r.headers.get('date'));
-      if (S) { lo = Math.max(lo, S - t1); hi = Math.min(hi, S + 1000 - t0); ok++; }
+      if (S) { lo = Math.max(lo, S - b); hi = Math.min(hi, S + 1000 - a); ok++; }
     } catch (e) { /* 離線就用本機時間 */ }
     if (i < 4) await new Promise(r => setTimeout(r, 1137));
   }
   const el = document.getElementById('sync');
-  if (!ok || lo > hi) { el.textContent = '無法校時，顯示的是本機時間。搶票腳本在 Trip.com 上會自己再校一次。'; return; }
+  if (!ok || lo > hi) { el.textContent = '無法校時，顯示的是本機時間。搶票腳本在活動頁上會自己再校一次。'; return; }
   offset = Math.round((lo + hi) / 2);
-  const sec = (Math.abs(offset) / 1000).toFixed(2);
   el.textContent = Math.abs(offset) < 150
     ? `已校時：你的電腦時間很準（誤差 ±${((hi - lo) / 2000).toFixed(2)} 秒）`
-    : `已校時：你的電腦${offset > 0 ? '慢' : '快'}了 ${sec} 秒，上面的倒數已修正。`;
-  renderSales();
+    : `已校時：你的電腦${offset > 0 ? '慢' : '快'}了 ${(Math.abs(offset) / 1000).toFixed(2)} 秒，上面的倒數已修正。`;
+}
+
+function loadSchedule() {
+  return fetch('sales.json?_=' + Date.now(), { cache: 'no-store' })
+    .then(r => r.json())
+    .then(d => { if (Array.isArray(d.sales)) { SALES = d.sales; UPDATED = d.updated || ''; } })
+    .catch(() => { /* 用備用資料 */ })
+    .then(renderRadar);
 }
 
 // 作戰清單：只記在這台裝置
-const KEY = 'flight-ops-v1';
+const KEY = 'flight-ops-v2';
 let done = {};
-try { done = JSON.parse(localStorage.getItem(KEY) || '{}'); } catch (e) { done = {}; }
+try { done = JSON.parse(localStorage.getItem(KEY) || localStorage.getItem('flight-ops-v1') || '{}'); } catch (e) { done = {}; }
 const boxes = [...document.querySelectorAll('.check input')];
 function progress() {
   const n = boxes.filter(b => b.checked).length;
@@ -307,10 +392,14 @@ boxes.forEach(b => {
 });
 progress();
 
-renderSales();
+renderRadar();
 tick();
+pilot();
 setInterval(tick, 100);
-setInterval(renderSales, 30000);
+setInterval(renderRadar, 1000);
+setInterval(pilot, 2000);
+setInterval(loadSchedule, 20 * 60000);
+loadSchedule();
 sync();
 </script>
 </body>

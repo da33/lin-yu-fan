@@ -1,0 +1,8 @@
+# 下載的模型（fetch-model.sh 會抓）
+Model/*.onnx
+Model/tokens.txt
+# XcodeGen 產生的
+XiaoDaiDai.xcodeproj/
+XiaoDaiDai/Info.plist
+Local.xcconfig
+build/

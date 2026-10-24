@@ -1,0 +1,70 @@
+name: 小呆呆 iPhone App 編譯測試
+
+# 在 GitHub 的 Mac 雲端機器上：產生 Xcode 專案、在 iPhone 模擬器跑喚醒詞測試、再編一次實機版（不簽名）
+on:
+  push:
+    branches: [main]
+    paths:
+      - '小呆呆/ios/**'
+      - '.github/workflows/xiaodaidai-ios.yml'
+  workflow_dispatch:
+
+concurrency:
+  group: xiaodaidai-ios-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  build-and-test:
+    runs-on: macos-latest
+    timeout-minutes: 45
+    defaults:
+      run:
+        working-directory: 小呆呆/ios
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Xcode 版本
+        run: |
+          xcodebuild -version
+          swift --version
+
+      - name: 下載喚醒詞模型
+        run: ./fetch-model.sh
+
+      - name: 產生 Xcode 專案
+        run: |
+          brew install xcodegen
+          touch Local.xcconfig
+          xcodegen generate
+
+      - name: 在 iPhone 模擬器跑測試
+        run: |
+          set -o pipefail
+          udid="$(xcrun simctl list devices available -j | python3 -c '
+          import json, sys
+          data = json.load(sys.stdin)["devices"]
+          ios = sorted((r for r in data if "iOS" in r), reverse=True)
+          print(next(d["udid"] for r in ios for d in data[r] if d["name"].startswith("iPhone")))
+          ')"
+          echo "模擬器：$udid"
+          xcodebuild test \
+            -project XiaoDaiDai.xcodeproj -scheme XiaoDaiDai \
+            -destination "id=$udid" \
+            -skipPackagePluginValidation \
+            CODE_SIGNING_ALLOWED=NO | tee test.log | grep -E "error:|warning: .*XiaoDaiDai|Test Case|Executed|TEST (SUCCEEDED|FAILED)" || true
+          grep -q "TEST SUCCEEDED" test.log
+
+      - name: 編譯實機版（不簽名）
+        run: |
+          set -o pipefail
+          xcodebuild build \
+            -project XiaoDaiDai.xcodeproj -scheme XiaoDaiDai \
+            -destination 'generic/platform=iOS' \
+            -skipPackagePluginValidation \
+            CODE_SIGNING_ALLOWED=NO | tee device.log | grep -E "error:|BUILD (SUCCEEDED|FAILED)" || true
+          grep -q "BUILD SUCCEEDED" device.log

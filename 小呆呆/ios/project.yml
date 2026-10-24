@@ -1,0 +1,67 @@
+# 小呆呆 iPhone App（XcodeGen 專案設定）
+# 產生 Xcode 專案：xcodegen generate（setup-mac.sh 會自動跑）
+name: XiaoDaiDai
+options:
+  bundleIdPrefix: tw.rino
+  deploymentTarget:
+    iOS: "16.0"
+  createIntermediateGroups: true
+packages:
+  SherpaOnnx:
+    url: https://github.com/k2-fsa/sherpa-onnx
+    exactVersion: 2.0.0
+settings:
+  base:
+    SWIFT_VERSION: "5.0"
+    MARKETING_VERSION: "0.1.0"
+    CURRENT_PROJECT_VERSION: "1"
+targets:
+  XiaoDaiDai:
+    type: application
+    platform: iOS
+    # Local.xcconfig 記住你在 Xcode 選的 Apple ID（Team），重新產生專案也不會掉
+    configFiles:
+      Debug: Local.xcconfig
+      Release: Local.xcconfig
+    sources:
+      - path: XiaoDaiDai
+      - path: Model
+        type: folder
+    info:
+      path: XiaoDaiDai/Info.plist
+      properties:
+        CFBundleDisplayName: 小呆呆
+        CFBundleShortVersionString: $(MARKETING_VERSION)
+        CFBundleVersion: $(CURRENT_PROJECT_VERSION)
+        UILaunchScreen: {}
+        UISupportedInterfaceOrientations: [UIInterfaceOrientationPortrait]
+        NSMicrophoneUsageDescription: 小呆呆要用麥克風聽你喊「小呆呆」。聲音只在手機上處理，不會上傳。
+        UIBackgroundModes: [audio]
+        UIFileSharingEnabled: true
+        LSSupportsOpeningDocumentsInPlace: true
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: tw.rino.xiaodaidai
+        TARGETED_DEVICE_FAMILY: "1"
+        CODE_SIGN_STYLE: Automatic
+        GENERATE_INFOPLIST_FILE: NO
+    dependencies:
+      - package: SherpaOnnx
+        product: sherpa-onnx
+  XiaoDaiDaiTests:
+    type: bundle.unit-test
+    platform: iOS
+    sources:
+      - path: XiaoDaiDaiTests
+    settings:
+      base:
+        GENERATE_INFOPLIST_FILE: YES
+    dependencies:
+      - target: XiaoDaiDai
+schemes:
+  XiaoDaiDai:
+    build:
+      targets:
+        XiaoDaiDai: all
+    test:
+      targets: [XiaoDaiDaiTests]

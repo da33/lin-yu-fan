@@ -26,7 +26,7 @@ rino1133@gmail.com / IG @rinolin1133 / 0953-032-362 / LINE rinolin
 ## 其他工具（子資料夾）
 - `earlybird/`：早鳥報名學生端
 - `flight/`：東京搶票作戰室（私人工具，noindex）。只收航空公司官網的原生特價，不放 Trip.com、Kiwi 等第三方。`trip-grab.user.js` 是自動駕駛搶票的 Tampermonkey 腳本，改版記得把 `@version` 和 `VERSION` 加一；`sales.json` 是特價雷達排程（排程任務每天 07:51、20:51 更新，欄位見 flight/README.md）
-- `jarvis/`：Jarvis 語音助理（私人工具）。Mac 本機跑 claude-voice 0.1.5 ＋ whisper.cpp 多語言模型 ＋ macOS「美佳」台灣國語語音（`say-tts-server.mjs` 假扮 Kokoro 介面），大腦只用 claude CLI（訂閱、不用 API key）。`install-mac.sh` 一鍵安裝到 `~/.jarvis`，`test-mac.mjs` 測辨識／插話／速度並產生報告；雲端驗證結果與已知限制見 jarvis/README.md。改 Mac 端步驟前先在雲端模擬驗證再給使用者
+- `小呆呆/`：小呆呆語音助理（私人工具，原名 Jarvis，舊賈維斯已放棄）。喊「小呆呆」喚醒，iPhone App 聽／傳／播，辦公室 Mac 用 Claude（claude CLI、訂閱）執行。目前在評估階段：新專案先評估討論再動手，最新決定在 Notion Memory「小呆呆語音助理」，評估紀錄見 小呆呆/README.md。資料夾裡的 install-mac.sh 等是第一輪 claude-voice 舊方案，不要叫使用者執行。給使用者動手的步驟要先在雲端驗證
 - `idgen/`：身分證字號產生器＋報名表測試資料（加密、白名單通行碼）。repo 裡只有加密檔，改版或增刪白名單用 `node idgen/build.mjs`（見 idgen/README.md）；主密碼向使用者索取，絕不寫入任何檔案或 commit
 
 ## 慣例

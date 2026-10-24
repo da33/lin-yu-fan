@@ -1,14 +1,16 @@
 #!/usr/bin/env bash
-# Jarvis 第一步：在 Mac 安裝 claude-voice 本機免費模式
+# ⚠ 舊方案（第一輪評估，已不採用）：只留作參考，不要執行。小呆呆現在的方向見 README.md。
+#
+# 第一輪：在 Mac 安裝 claude-voice 本機免費模式
 #   語音辨識：whisper.cpp + 多語言模型 large-v3-turbo（Metal 加速）
 #   中文語音：macOS 內建台灣國語「美佳」（取代原本念不好中文的 Kokoro）
 #   大腦：你已登入的 claude CLI（用訂閱，不用 API key）
 #
-# 用法：curl -fsSL https://raw.githubusercontent.com/da33/lin-yu-fan/main/jarvis/install-mac.sh | bash
+# 用法：curl -fsSL https://raw.githubusercontent.com/da33/lin-yu-fan/main/%E5%B0%8F%E5%91%86%E5%91%86/install-mac.sh | bash
 # 重跑安全：已經裝好的步驟會跳過。全部裝在 ~/.jarvis，不動系統的全域 npm。
 set -euo pipefail
 
-BASE_URL="${JARVIS_BASE_URL:-https://raw.githubusercontent.com/da33/lin-yu-fan/main/jarvis}"
+BASE_URL="${JARVIS_BASE_URL:-https://raw.githubusercontent.com/da33/lin-yu-fan/main/%E5%B0%8F%E5%91%86%E5%91%86}"
 JARVIS_HOME="$HOME/.jarvis"
 WORKDIR="$HOME/Jarvis"
 CV_HOME="$HOME/.claude-voice"

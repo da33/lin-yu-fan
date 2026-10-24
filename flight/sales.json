@@ -1,64 +1,169 @@
 {
-  "updated": "2026-10-24T09:20:00+08:00",
-  "trip": { "from": "TPE", "to": "TYO", "out": "2027-01-17", "back": "2027-02-03" },
+  "updated": "2026-10-24T09:25:43+08:00",
+  "trip": {
+    "from": "TPE",
+    "to": "TYO",
+    "out": "2027-01-17",
+    "back": "2027-02-03"
+  },
   "policy": "只收航空公司官網自己的特價，不收 Trip.com、Kiwi、Skyscanner、Klook、KKday、易遊網、雄獅等第三方。",
   "sales": [
     {
-      "id": "gk-sss-2610", "start": "2026-10-23T11:00:00+08:00", "end": "2026-10-26T15:59:00+08:00",
-      "brand": "捷星日本", "title": "スーパースターセール（超級巨星促銷）", "mode": "ongoing", "auto": false, "main": true,
-      "url": "https://www.jetstar.com/tw/zh", "covers": "unknown", "status": "ongoing",
-      "note": "現在就在賣，10/26 15:59（台灣時間）截止。亞洲線單程 ¥7,990 起、搭乘 11/2–2027/2/28，涵蓋你的 1/17 和 2/3；但台北線有沒有在這次名單上、有沒有除外日，要上官網查一下。Club Jetstar 會員再折 ¥200。上一波成田→台北是 ¥9,290 起。",
-      "source": "https://tabiris.com/archives/jetstarsale20261023/"
+      "id": "gk-sss-2610",
+      "start": "2026-10-23T11:00:00+08:00",
+      "end": "2026-10-26T15:59:00+08:00",
+      "brand": "捷星日本",
+      "title": "スーパースターセール（超級巨星促銷）",
+      "mode": "ongoing",
+      "auto": false,
+      "main": true,
+      "url": "https://www.jetstar.com/tw/zh",
+      "covers": "unknown",
+      "status": "ongoing",
+      "note": "現在就在賣，10/26 15:59（台灣時間，日本 16:59）截止、賣完為止。已確認台北線在名單上：成田⇄桃園 ¥9,290 起（Starter 票價，稅金、行李、選位另計，免燃油附加費）。亞洲線搭乘 11/2–2027/2/28，日期上涵蓋 1/17 和 2/3，但連假、年末年始有除外日，下單前用官網低價月曆確認這兩天有沒有特價。Club Jetstar 會員再折 ¥200。",
+      "source": "https://sky-budget.com/2026/10/22/jetstar-sale-oct2026/"
     },
     {
-      "id": "itf-ci", "start": "2026-10-19T00:00:00+08:00", "end": "2026-11-21T23:59:00+08:00", "brand": "中華航空", "title": "ITF 線上旅展 指定航點 76 折起",
-      "mode": "ongoing", "auto": false, "url": "https://www.china-airlines.com/tw/zh", "covers": "unknown", "status": "ongoing",
+      "id": "itf-ci",
+      "start": "2026-10-19T00:00:00+08:00",
+      "end": "2026-11-21T23:59:00+08:00",
+      "brand": "中華航空",
+      "title": "ITF 線上旅展 指定航點 76 折起",
+      "mode": "ongoing",
+      "auto": false,
+      "url": "https://www.china-airlines.com/tw/zh",
+      "covers": "unknown",
+      "status": "ongoing",
       "note": "官網直購，隨時可買，不用搶。春節前後可能排除，下單前看票價日曆。",
       "source": "https://news.tvbs.com.tw/life/4040292"
     },
     {
-      "id": "itf-br", "start": "2026-10-21T00:00:00+08:00", "end": "2026-11-15T23:59:00+08:00", "brand": "長榮航空", "title": "ITF 線上旅展 精選航線 82 折起",
-      "mode": "ongoing", "auto": false, "url": "https://flights.evaair.com/zh-tw/online-travel-fair", "covers": "unknown", "status": "ongoing",
+      "id": "itf-br",
+      "start": "2026-10-21T00:00:00+08:00",
+      "end": "2026-11-15T23:59:00+08:00",
+      "brand": "長榮航空",
+      "title": "ITF 線上旅展 精選航線 82 折起",
+      "mode": "ongoing",
+      "auto": false,
+      "url": "https://flights.evaair.com/zh-tw/online-travel-fair",
+      "covers": "unknown",
+      "status": "ongoing",
       "note": "官網直購，隨時可買。報導寫松山–羽田最低 11,305 元起（未稅）。搭乘期間到 2027/6/30。",
       "source": "https://news.tvbs.com.tw/life/4040292"
     },
     {
-      "id": "itf-jx", "start": "2026-10-15T00:00:00+08:00", "end": "2026-11-23T23:59:00+08:00", "brand": "星宇航空", "title": "ITF 線上旅展 全航線 85 折起",
-      "mode": "ongoing", "auto": false, "url": "https://www.starlux-airlines.com/zh-TW", "covers": "unknown", "status": "ongoing",
+      "id": "itf-jx",
+      "start": "2026-10-15T00:00:00+08:00",
+      "end": "2026-11-23T23:59:00+08:00",
+      "brand": "星宇航空",
+      "title": "ITF 線上旅展 全航線 85 折起",
+      "mode": "ongoing",
+      "auto": false,
+      "url": "https://www.starlux-airlines.com/zh-TW",
+      "covers": "unknown",
+      "status": "ongoing",
       "note": "官網直購，隨時可買。註明春節／過年期間不適用，2/3 回程可能剛好被排除。",
       "source": "https://news.tvbs.com.tw/life/4040292"
     },
     {
-      "id": "it-itf-2026", "start": "2026-11-05T10:00:00+08:00", "brand": "台灣虎航", "title": "ITF 旅展促銷：尊榮虎優先（預測）",
-      "mode": "open", "auto": false, "lead": 600, "url": "https://www.tigerairtw.com/zh-tw", "covers": "unknown", "status": "predicted",
-      "note": "去年是旅展前一天 10:00 尊榮虎先搶、隔天 10:00 全員開賣。今年 ITF 是 11/6–11/9，官方公布後雷達會改成確認並自動。",
+      "id": "it-itf-2026",
+      "start": "2026-11-05T10:00:00+08:00",
+      "brand": "台灣虎航",
+      "title": "ITF 旅展促銷：尊榮虎優先（預測）",
+      "mode": "open",
+      "auto": false,
+      "lead": 600,
+      "url": "https://www.tigerairtw.com/zh-tw",
+      "covers": "unknown",
+      "status": "predicted",
+      "note": "去年是旅展前一天 10:00 尊榮虎先搶、隔天 10:00 全員開賣。今年 ITF 是 11/6–11/9，截至 10/24 官方還沒公布，公布後雷達會改成確認並自動。尊榮虎資格要先加入 tigerclub 並登錄虎足跡。",
       "source": "https://www.tigerairtw.com/zh-TW/news/20251104"
     },
     {
-      "id": "it-itf-2026-all", "start": "2026-11-06T10:00:00+08:00", "brand": "台灣虎航", "title": "ITF 旅展促銷：全員開賣（預測）",
-      "mode": "open", "auto": false, "lead": 600, "url": "https://www.tigerairtw.com/zh-tw", "covers": "unknown", "status": "predicted",
+      "id": "it-itf-2026-all",
+      "start": "2026-11-06T10:00:00+08:00",
+      "brand": "台灣虎航",
+      "title": "ITF 旅展促銷：全員開賣（預測）",
+      "mode": "open",
+      "auto": false,
+      "lead": 600,
+      "url": "https://www.tigerairtw.com/zh-tw",
+      "covers": "unknown",
+      "status": "predicted",
       "note": "預測時間，等官方公告。去年旅展價東京成田／羽田單程未稅 1,799 元起。",
       "source": "https://www.tigerairtw.com/zh-TW/news/20251104"
     }
   ],
   "patterns": [
-    { "brand": "台灣虎航", "code": "IT", "routes": "桃園 ⇄ 成田／羽田、高雄 ⇄ 成田", "url": "https://www.tigerairtw.com/zh-tw",
-      "habit": "上午 10:00 開賣；尊榮虎／TeamMax 提前一天優先。每年兩次班表開賣（約 4 月開冬季、10 月開夏季），加上 5 月高雄旅展、11 月 ITF 旅展、不定期快閃。單程未稅價。" },
-    { "brand": "樂桃航空", "code": "MM", "routes": "桃園 ⇄ 羽田／成田（多紅眼班）", "url": "https://www.flypeach.com/tw",
-      "habit": "台灣時間 12:00 開賣、通常賣 4 天，大約每 3–5 週一波（最近 9/17、10/14）。下一波大概 11 月中。" },
-    { "brand": "捷星日本", "code": "GK", "routes": "桃園 ⇄ 成田（冬季每天 3 班）", "url": "https://www.jetstar.com/tw/zh",
-      "habit": "日本時間 12:00 或 17:00 開始（台灣 11:00／16:00），賣 3–4 天。Club Jetstar 會員折 ¥200、有時先行。" },
-    { "brand": "酷航", "code": "TR", "routes": "桃園 ⇄ 成田", "url": "https://www.flyscoot.com/zh-tw",
-      "habit": "上午 10:00 開賣的「全航線大促銷」一年幾次（今年 3、6、9 月），含稅價，賣 6 天左右。" },
-    { "brand": "星宇航空", "code": "JX", "routes": "桃園 ⇄ 成田", "url": "https://www.starlux-airlines.com/zh-TW",
-      "habit": "旅展檔期折扣（5 月、10–11 月）和聯名卡碼為主，很少秒殺。" },
-    { "brand": "長榮航空", "code": "BR", "routes": "桃園／松山 ⇄ 成田／羽田", "url": "https://www.evaair.com/zh-tw/index.html",
-      "habit": "旅展檔期折扣為主（今年 10/21–11/15），官網直購。" },
-    { "brand": "中華航空", "code": "CI", "routes": "桃園／松山 ⇄ 成田／羽田", "url": "https://www.china-airlines.com/tw/zh",
-      "habit": "旅展檔期折扣為主（今年 10/19–11/21），官網直購。" },
-    { "brand": "日本航空", "code": "JL", "routes": "桃園／松山 ⇄ 成田／羽田", "url": "https://www.jal.co.jp/tw/zhtw/",
-      "habit": "不定期官網優惠和信用卡專屬碼。官網台北–東京來回含稅參考價 TWD14,469 起。" },
-    { "brand": "全日空", "code": "NH", "routes": "桃園／松山 ⇄ 成田／羽田", "url": "https://www.ana.co.jp/zh/tw/",
-      "habit": "台灣出發國際線很少限時特價，多半是日本國內線促銷。" }
+    {
+      "brand": "台灣虎航",
+      "code": "IT",
+      "routes": "桃園 ⇄ 成田／羽田、高雄 ⇄ 成田",
+      "url": "https://www.tigerairtw.com/zh-tw",
+      "habit": "上午 10:00 開賣；尊榮虎／TeamMax 提前一天優先。每年兩次班表開賣（約 4 月開冬季、9 月底–10 月初開夏季：今年 10/1 尊榮虎、10/2 全員開 2027 夏季班表，搭乘 3/28 起，不含 1–2 月），加上 5 月台北旅展、11 月 ITF 旅展、不定期快閃。單程未稅價。"
+    },
+    {
+      "brand": "樂桃航空",
+      "code": "MM",
+      "routes": "桃園 ⇄ 羽田／成田（多紅眼班）",
+      "url": "https://www.flypeach.com/tw",
+      "habit": "台灣時間 12:00 開賣、通常賣 4 天，大約每 3–5 週一波（最近 9/17、10/14）。下一波大概 11 月中。"
+    },
+    {
+      "brand": "捷星日本",
+      "code": "GK",
+      "routes": "桃園 ⇄ 成田（冬季每天 3 班）",
+      "url": "https://www.jetstar.com/tw/zh",
+      "habit": "日本時間 12:00 或 17:00 開始（台灣 11:00／16:00），賣 3–4 天。Club Jetstar 會員折 ¥200、有時先行。"
+    },
+    {
+      "brand": "酷航",
+      "code": "TR",
+      "routes": "桃園 ⇄ 成田",
+      "url": "https://www.flyscoot.com/zh-tw",
+      "habit": "上午 10:00 開賣的「全航線大促銷」一年幾次（今年 3、6、9 月），含稅價，賣 6 天左右。"
+    },
+    {
+      "brand": "星宇航空",
+      "code": "JX",
+      "routes": "桃園 ⇄ 成田",
+      "url": "https://www.starlux-airlines.com/zh-TW",
+      "habit": "旅展檔期折扣（5 月、10–11 月）和聯名卡碼為主，很少秒殺。"
+    },
+    {
+      "brand": "長榮航空",
+      "code": "BR",
+      "routes": "桃園／松山 ⇄ 成田／羽田",
+      "url": "https://www.evaair.com/zh-tw/index.html",
+      "habit": "旅展檔期折扣為主（今年 10/21–11/15），官網直購。"
+    },
+    {
+      "brand": "中華航空",
+      "code": "CI",
+      "routes": "桃園／松山 ⇄ 成田／羽田",
+      "url": "https://www.china-airlines.com/tw/zh",
+      "habit": "旅展檔期折扣為主（今年 10/19–11/21），官網直購。"
+    },
+    {
+      "brand": "日本航空",
+      "code": "JL",
+      "routes": "桃園／松山 ⇄ 成田／羽田",
+      "url": "https://www.jal.co.jp/tw/zhtw/",
+      "habit": "不定期官網優惠和信用卡專屬碼。官網台北–東京來回含稅參考價 TWD14,469 起。"
+    },
+    {
+      "brand": "全日空",
+      "code": "NH",
+      "routes": "桃園／松山 ⇄ 成田／羽田",
+      "url": "https://www.ana.co.jp/zh/tw/",
+      "habit": "台灣出發國際線很少限時特價，主要是官網「ITF 線上旅展」（去年 11/4–11/16 購票）和「新春促銷」這類檔期，經濟艙來回含稅價、有禁搭日。"
+    },
+    {
+      "brand": "泰國獅航",
+      "code": "SL",
+      "routes": "桃園 ⇄ 成田（2026/8 開航）",
+      "url": "https://www.lionairthai.com/",
+      "habit": "不定期官網優惠碼促銷（例：7/14–7/26 優惠碼 LIONMEGASALE 最多折 17%、搭乘到 2027/3/31），燃油附加費另收。"
+    }
   ]
 }

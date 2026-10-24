@@ -17,6 +17,9 @@
 ## 在這台 Mac 上要做的（Rino 在旁邊，一步一步來）
 
 1. 確認 Xcode：`xcodebuild -version`。如果沒有，請 Rino 從 App Store 安裝。檔案很大，先告訴他大概多大再開始。
+   - 如果 Xcode 明明裝了，`xcodebuild` 卻說 requires Xcode，那是開發者工具還指在指令列工具。`setup-mac.sh` 會自動改用 `/Applications/Xcode.app`，但你自己下指令時要在前面加 `DEVELOPER_DIR=/Applications/Xcode.app/Contents/Developer`。
+   - 想永久改的話，請 Rino 自己執行 `sudo xcode-select -s /Applications/Xcode.app/Contents/Developer`，密碼由他輸入。
+   - 如果出現 license 字樣，請 Rino 打開 Xcode 按 Agree。
 2. 程式還不在 `~/代碼程式/小呆呆/ios` 的話，執行：
    `curl -fsSL https://raw.githubusercontent.com/da33/lin-yu-fan/main/%E5%B0%8F%E5%91%86%E5%91%86/ios/get.sh | bash`
    已經在的話，執行 `./setup-mac.sh`。這兩個都會下載模型、用 XcodeGen 產生專案、打開 Xcode。

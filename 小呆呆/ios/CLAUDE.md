@@ -20,15 +20,21 @@
 2. 程式還不在 `~/代碼程式/小呆呆/ios` 的話，執行：
    `curl -fsSL https://raw.githubusercontent.com/da33/lin-yu-fan/main/%E5%B0%8F%E5%91%86%E5%91%86/ios/get.sh | bash`
    已經在的話，執行 `./setup-mac.sh`。這兩個都會下載模型、用 XcodeGen 產生專案、打開 Xcode。
-3. 請 Rino 自己在 Xcode 登入 Apple ID（Settings → Accounts）。專案的 Signing & Capabilities 選 Team「(Personal Team)」。帳號密碼不要碰。
-4. 手機接線並信任這台電腦，打開「設定 → 隱私權與安全性 → 開發者模式」，在 Xcode 選手機按 ▶︎。
-   - Team 選好之後也可以用指令：`xcodebuild -project XiaoDaiDai.xcodeproj -scheme XiaoDaiDai -destination 'platform=iOS,name=<手機名稱>' -allowProvisioningUpdates build`
-5. 手機「設定 → 一般 → VPN 與裝置管理」信任開發者，打開 App、允許麥克風。
-6. 照 App 裡「怎麼測」做：
+3. 請 Rino 自己在 Xcode 登入 Apple ID（Settings → Accounts）。帳號密碼不要碰。
+4. 手機接線並信任這台電腦，打開「設定 → 隱私權與安全性 → 開發者模式」。
+5. **其餘盡量由你用指令代勞，Rino 不想在 Xcode 裡點來點去：**
+   - 找 Personal Team 的 Team ID：例如 `defaults read com.apple.dt.Xcode IDEProvisioningTeamByIdentifier`，或請 Rino 看 Xcode 的 Signing 畫面。
+   - 把 Team ID 寫進 `Local.xcconfig`（`DEVELOPMENT_TEAM = XXXXXXXXXX`），再執行 `xcodegen generate`。
+   - 用 `xcrun devicectl list devices` 找手機的 UDID。
+   - 編譯：`xcodebuild -project XiaoDaiDai.xcodeproj -scheme XiaoDaiDai -destination 'platform=iOS,id=<UDID>' -allowProvisioningUpdates -derivedDataPath build build`
+   - 安裝：`xcrun devicectl device install app --device <UDID> build/Build/Products/Debug-iphoneos/XiaoDaiDai.app`
+   - 指令不行時，退回 Xcode：Signing & Capabilities 選 Team「(Personal Team)」，選手機按 ▶︎。
+6. 手機「設定 → 一般 → VPN 與裝置管理」信任開發者，打開 App、允許麥克風。
+7. 照 App 裡「怎麼測」做：
    - 喊 10 次看叮幾次。
    - 放著 1 小時看誤醒和耗電。
    - 開關「AirPods 高品質收音」比較聽音樂的音質。
-7. Rino 按「分享測試紀錄」給你 CSV 後，算出：
+8. Rino 按「分享測試紀錄」給你 CSV 後，算出：
    - 叫醒率
    - 誤醒次數
    - 每小時耗電
@@ -36,7 +42,7 @@
 
    用白話回報。
 
-免費 Apple ID 裝的 App 每 7 天過期，回辦公室在 Xcode 按 ▶︎ 重裝就好。測試期間不花錢，不要建議買 99 美元的開發者帳號。
+免費 Apple ID 裝的 App 每 7 天過期，回辦公室接上手機，用上面的編譯、安裝指令重裝就好。Rino 考慮過 Sideloadly、AltStore、SideStore，最後選 Xcode（2026-10-24）。測試期間不花錢，不要建議買 99 美元的開發者帳號。
 
 ## 開發
 

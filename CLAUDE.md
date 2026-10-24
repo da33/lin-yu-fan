@@ -26,7 +26,7 @@ rino1133@gmail.com / IG @rinolin1133 / 0953-032-362 / LINE rinolin
 ## 其他工具（子資料夾）
 - `earlybird/`：早鳥報名學生端
 - `flight/`：東京搶票作戰室（私人工具，noindex）。只收航空公司官網的原生特價，不放 Trip.com、Kiwi 等第三方。`trip-grab.user.js` 是自動駕駛搶票的 Tampermonkey 腳本，改版記得把 `@version` 和 `VERSION` 加一；`sales.json` 是特價雷達排程（排程任務每天 07:51、20:51 更新，欄位見 flight/README.md）
-- `小呆呆/`：小呆呆語音助理（私人工具，原名 Jarvis，舊賈維斯已放棄）。喊「小呆呆」喚醒，iPhone App 聽／傳／播，辦公室 Mac 用 Claude（claude CLI、訂閱）執行。目前在評估階段：新專案先評估討論再動手，最新決定在 Notion Memory「小呆呆語音助理」，評估紀錄見 小呆呆/README.md。資料夾裡的 install-mac.sh 等是第一輪 claude-voice 舊方案，不要叫使用者執行。給使用者動手的步驟要先在雲端驗證
+- `小呆呆/`：小呆呆語音助理（私人工具，原名 Jarvis，舊賈維斯已放棄）。喊「小呆呆」喚醒，iPhone App 聽／傳／播，辦公室 Mac 用 Claude（claude CLI、訂閱）執行。目前做到第一個測試 App（小呆呆/ios：鎖屏聽喚醒詞，sherpa-onnx、XcodeGen，GitHub Actions 在 macOS 跑模擬器測試；交接說明在 小呆呆/ios/CLAUDE.md）。新功能先評估討論再動手，最新決定在 Notion Memory「小呆呆語音助理」，評估紀錄與辦公室安裝步驟見 小呆呆/README.md。小呆呆/ 根目錄的 install-mac.sh 等是第一輪 claude-voice 舊方案，不要叫使用者執行。給使用者動手的步驟要先在雲端驗證
 - `idgen/`：身分證字號產生器＋報名表測試資料（加密、白名單通行碼）。repo 裡只有加密檔，改版或增刪白名單用 `node idgen/build.mjs`（見 idgen/README.md）；主密碼向使用者索取，絕不寫入任何檔案或 commit
 
 ## 慣例

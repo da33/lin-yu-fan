@@ -6,6 +6,7 @@ on:
     branches: [main]
     paths:
       - '小呆呆/ios/**'
+      - '!小呆呆/ios/**/*.md'
       - '.github/workflows/xiaodaidai-ios.yml'
   workflow_dispatch:
 

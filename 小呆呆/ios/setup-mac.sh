@@ -41,11 +41,20 @@ fi
 
 # 記住你在 Xcode 選過的 Apple ID（Team），重新產生專案也不用再選
 team="$(grep -m1 -oE 'DEVELOPMENT_TEAM = [A-Z0-9]+' XiaoDaiDai.xcodeproj/project.pbxproj 2>/dev/null | awk '{print $3}' || true)"
-if [[ -n "$team" ]]; then
-  echo "DEVELOPMENT_TEAM = $team" >Local.xcconfig
-else
-  touch Local.xcconfig
+if [[ -z "$team" ]]; then
+  team="$(grep -m1 -oE '^DEVELOPMENT_TEAM = [A-Z0-9]+' Local.xcconfig 2>/dev/null | awk '{print $3}' || true)"
 fi
+# 這台 Mac 在 Tailscale 裡的名稱：App 預設連這裡
+host=""
+if command -v tailscale >/dev/null; then
+  host="$(tailscale status --json 2>/dev/null | python3 -c 'import json,sys; print(json.load(sys.stdin)["Self"]["DNSName"].rstrip("."))' 2>/dev/null || true)"
+fi
+if [[ -z "$host" ]]; then
+  host="$(grep -m1 -E '^XDD_MAC_HOST = ' Local.xcconfig 2>/dev/null | awk '{print $3}' || true)"
+fi
+: >Local.xcconfig
+if [[ -n "$team" ]]; then echo "DEVELOPMENT_TEAM = $team" >>Local.xcconfig; fi
+if [[ -n "$host" ]]; then echo "XDD_MAC_HOST = $host" >>Local.xcconfig; fi
 
 xcodegen generate --quiet
 if [[ -n "${XDD_NO_OPEN:-}" ]]; then

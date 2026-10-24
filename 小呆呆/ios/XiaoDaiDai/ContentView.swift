@@ -1,8 +1,9 @@
 import SwiftUI
 
-/// 小呆呆喚醒詞測試畫面：黑底、米白字、橘紅重點色
+/// 小呆呆：黑底、米白字、橘紅重點色
 struct ContentView: View {
     @StateObject private var listener = WakeListener()
+    @State private var hostDraft = ""
 
     var body: some View {
         ZStack {
@@ -28,6 +29,7 @@ struct ContentView: View {
         }
         .preferredColorScheme(.dark)
         .tint(Palette.accent)
+        .onAppear { hostDraft = listener.macHost }
     }
 
     private var header: some View {
@@ -35,9 +37,18 @@ struct ContentView: View {
             Text("小呆呆")
                 .font(.system(size: 44, weight: .black))
                 .foregroundStyle(Palette.text)
-            Text("喚醒詞測試 · 鎖著手機也會聽")
+            Text("鎖著手機也會聽 · 喊「小呆呆」問一句話")
                 .font(.subheadline)
                 .foregroundStyle(Palette.muted)
+        }
+    }
+
+    private var orbColor: Color {
+        guard listener.isListening else { return Palette.line }
+        switch listener.phase {
+        case .listening, .capturing: return Palette.accent
+        case .waiting: return Palette.muted
+        case .speaking: return Palette.text
         }
     }
 
@@ -48,7 +59,7 @@ struct ContentView: View {
                     .stroke(Palette.line, lineWidth: 1)
                     .frame(width: 180, height: 180)
                 Circle()
-                    .fill(listener.isListening ? Palette.accent : Palette.line)
+                    .fill(orbColor)
                     .frame(width: 92, height: 92)
                     .scaleEffect(listener.isListening ? 1 + CGFloat(listener.level) * 0.9 : 1)
                     .animation(.easeOut(duration: 0.12), value: listener.level)
@@ -83,7 +94,8 @@ struct ContentView: View {
     private var stats: some View {
         TimelineView(.periodic(from: .now, by: 1)) { context in
             LazyVGrid(columns: [GridItem(.flexible(), spacing: 12), GridItem(.flexible(), spacing: 12)], spacing: 12) {
-                StatCard(title: "叫醒次數", value: "\(listener.detections.count)")
+                StatCard(title: "電腦", value: macText)
+                StatCard(title: "叫醒／問了", value: "\(listener.detections.count)／\(listener.exchanges.count)")
                 StatCard(title: "已經聽了", value: elapsedText(now: context.date))
                 StatCard(title: "耗電", value: drainText(now: context.date))
                 StatCard(title: "麥克風", value: micText)
@@ -108,20 +120,78 @@ struct ContentView: View {
             Text("iOS 26 加 AirPods Pro 2 才有作用。可以開關比較：聽音樂時音質有沒有變差。")
                 .font(.footnote)
                 .foregroundStyle(Palette.muted)
+            phoneEarsRow
+            Text("電腦位址")
+                .foregroundStyle(Palette.text)
+            TextField("辦公室 Mac 在 Tailscale 裡的名稱", text: $hostDraft)
+                .textInputAutocapitalization(.never)
+                .autocorrectionDisabled()
+                .keyboardType(.URL)
+                .submitLabel(.done)
+                .onSubmit { listener.macHost = hostDraft }
+                .padding(12)
+                .background(Palette.card)
+                .clipShape(RoundedRectangle(cornerRadius: 10))
+                .foregroundStyle(Palette.text)
+            Text("iPhone 的 Tailscale 要打開，才連得到辦公室的 Mac。")
+                .font(.footnote)
+                .foregroundStyle(Palette.muted)
         }
     }
 
+    /// iPhone 自己聽懂你講的話：模型沒裝就給一個下載按鈕（從 Apple 下載，按了才下載）
+    @ViewBuilder private var phoneEarsRow: some View {
+        VStack(alignment: .leading, spacing: 6) {
+            Text("聽懂你講話：\(listener.phoneEngine == .speech ? "iPhone（新模型）" : "iPhone（聽寫）")")
+                .foregroundStyle(Palette.text)
+            switch listener.phoneModel {
+            case .needsDownload:
+                Button {
+                    Task { await listener.downloadPhoneModel() }
+                } label: {
+                    Text("從 Apple 下載台灣中文辨識模型\(sizeText)")
+                        .font(.subheadline.weight(.semibold))
+                }
+                Text("還沒下載之前，由辦公室的電腦聽。")
+                    .font(.footnote)
+                    .foregroundStyle(Palette.muted)
+            case .downloading(let fraction):
+                ProgressView(value: fraction)
+            case .unsupported, .failed:
+                Text("\(WakeListener.describe(listener.phoneModel))，改由辦公室的電腦聽。")
+                    .font(.footnote)
+                    .foregroundStyle(Palette.muted)
+            case .ready, nil:
+                Text("在手機上直接轉成字，不上傳。")
+                    .font(.footnote)
+                    .foregroundStyle(Palette.muted)
+            }
+        }
+    }
+
+    private var sizeText: String {
+        guard let bytes = listener.phoneModelSize else { return "" }
+        return "（約 \(max(1, bytes / 1_000_000)) MB）"
+    }
+
     private var recent: some View {
-        VStack(alignment: .leading, spacing: 10) {
-            SectionTitle("最近叫醒")
-            if listener.detections.isEmpty {
+        VStack(alignment: .leading, spacing: 14) {
+            SectionTitle("最近問答")
+            if listener.exchanges.isEmpty {
                 Text("還沒有")
                     .foregroundStyle(Palette.muted)
             } else {
-                ForEach(listener.detections.prefix(20)) { item in
-                    Text(item.date, format: .dateTime.hour().minute().second())
-                        .font(.body.monospacedDigit())
-                        .foregroundStyle(Palette.text)
+                ForEach(listener.exchanges.prefix(10)) { item in
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text(item.date, format: .dateTime.hour().minute())
+                            .font(.footnote.monospacedDigit())
+                            .foregroundStyle(Palette.muted)
+                        Text(item.question)
+                            .font(.headline)
+                            .foregroundStyle(Palette.text)
+                        Text(item.answer.isEmpty ? "…" : item.answer)
+                            .foregroundStyle(Palette.muted)
+                    }
                 }
             }
         }
@@ -143,11 +213,17 @@ struct ContentView: View {
     }
 
     private static let steps = [
-        "戴上 AirPods，按「開始聽」，然後鎖住手機放進口袋。",
-        "喊 10 次「小呆呆」，每次隔幾秒，數一數叮了幾次。",
-        "不要管它，照平常一樣過 1 小時（可以聽音樂、講話）。沒叫它卻叮一聲，就是誤醒。",
-        "回來看「叫醒次數」和「耗電」，再按「分享測試紀錄」傳給 Claude。",
+        "打開 iPhone 的 Tailscale，戴上 AirPods，按「開始聽」，鎖住手機放進口袋。",
+        "喊「小呆呆」，聽到「叮」就直接問，例如「一天有幾小時？」。",
+        "講完停一下，聽到「嘟」就是送出了，一般問題幾秒內回答。",
+        "要查比較久的，它會先說「收到，我去做」；做好會「叮」一聲再講。",
+        "怪怪的就按「分享測試紀錄」傳給 Claude，或回辦公室接上 Mac。",
     ]
+
+    private var macText: String {
+        guard listener.isListening else { return "—" }
+        return listener.macConnected ? "已連上" : "連不到"
+    }
 
     private var micText: String {
         guard listener.inputSampleRate > 0 else { return "—" }

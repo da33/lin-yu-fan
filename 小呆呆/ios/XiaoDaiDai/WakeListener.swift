@@ -2,17 +2,35 @@ import AVFoundation
 import UIKit
 
 /// 一直在背景聽「小呆呆」：手機鎖著、放口袋也照樣聽（靠 Info.plist 的 UIBackgroundModes = audio）。
-/// 聽到就「叮」一聲，並把每次叫醒、電量、被打斷、恢復都寫進測試紀錄。
+/// 叫醒後把你講的話邊講邊傳給辦公室的 Mac，再把 Mac 用美佳念的回答播出來。
+/// 每次叫醒、問答、電量、被打斷、恢復都寫進測試紀錄。
 @MainActor
 final class WakeListener: ObservableObject {
+    enum Phase: String {
+        case listening = "正在聽「小呆呆」"
+        case capturing = "你說，我在聽"
+        case waiting = "想一下…"
+        case speaking = "回答中"
+    }
+
     struct Detection: Identifiable {
         let id = UUID()
         let date: Date
     }
 
+    struct Exchange: Identifiable {
+        let id = UUID()
+        let date: Date
+        var question: String
+        var answer: String
+    }
+
     @Published private(set) var isListening = false
+    @Published private(set) var phase = Phase.listening
     @Published private(set) var status = "按下「開始聽」"
     @Published private(set) var detections: [Detection] = []
+    @Published private(set) var exchanges: [Exchange] = []
+    @Published private(set) var macConnected = false
     @Published private(set) var inputName = "—"
     @Published private(set) var inputSampleRate: Double = 0
     @Published private(set) var level: Float = 0
@@ -26,24 +44,93 @@ final class WakeListener: ObservableObject {
     @Published var highQualityBluetooth = true {
         didSet { if isListening && oldValue != highQualityBluetooth { restart(reason: highQualityBluetooth ? "開高品質收音" : "關高品質收音") } }
     }
+    /// iPhone 自己聽懂你講的話用哪一套、模型裝了沒
+    @Published private(set) var phoneEngine: PhoneEars.Engine?
+    @Published private(set) var phoneModel: PhoneEars.ModelState?
+    @Published private(set) var phoneModelSize: Int64?
+    /// 辦公室 Mac 在 Tailscale 裡的名稱
+    @Published var macHost: String {
+        didSet {
+            UserDefaults.standard.set(macHost, forKey: "macHost")
+            if isListening { link.connect(host: macHost) }
+        }
+    }
 
     let log = TestLog()
     private var engine = AVAudioEngine()
     private var player = AVAudioPlayerNode()
-    private let pipeline = KWSPipeline()
+    private let pipeline = AudioPipeline()
+    private let link = MacLink()
+    private let phoneEars = PhoneEars()
     private let chime = Chime.makeBuffer()
+    private let beep = Chime.beep()
+    private let noMac = SpeechAudio.bundled("no-mac")
+    private let noReply = SpeechAudio.bundled("no-reply")
     private var batteryTimer: Timer?
     private var restartTask: Task<Void, Never>?
+    private var replyTimeout: Task<Void, Never>?
     private var lastAudioStart = Date.distantPast
     private var observers: [NSObjectProtocol] = []
 
+    // 一輪問答播到哪
+    private var queued = 0             // 排進播放器、還沒播完的段數
+    private var playGeneration = 0     // 聲音重開時加一，舊的「播完了」通知就不算
+    private var turnOpen = false       // Mac 還沒說這一輪結束
+    private var reportPlaying = false
+    private var held: [MacLink.Event] = []  // 正在問問題或講電話時來的報告，晚點再播
+    private var interrupted = false
+
+    /// 沒講話就送出後，最多等 Mac 多久
+    static let replyTimeoutSeconds: UInt64 = 20
+
     init() {
+        macHost = UserDefaults.standard.string(forKey: "macHost") ?? Self.defaultHost
         UIDevice.current.isBatteryMonitoringEnabled = true
         battery = UIDevice.current.batteryLevel
+        let link = link
+        let ears = phoneEars
         pipeline.onDetect = { [weak self] in
-            Task { @MainActor in self?.didDetect() }
+            DispatchQueue.main.async { MainActor.assumeIsolated { self?.didDetect() } }
+        }
+        // 你講的話直接從聲音佇列送出去，不繞主執行緒，順序才不會亂。
+        // 同一份聲音也給 iPhone 自己聽；Mac 先把聲音存起來，之後拿來比較哪邊聽得準
+        pipeline.onCaptureStart = {
+            link.send(["type": "start", "sampleRate": 16000])
+            ears.begin()
+        }
+        pipeline.onCaptureAudio = {
+            link.send($0)
+            ears.feed($0)
+        }
+        pipeline.onCaptureEnd = { [weak self] result, speech in
+            if result == .finished {
+                Task {
+                    let heard = await ears.finish()
+                    var end: [String: Any] = ["type": "end"]
+                    if let heard {
+                        end["text"] = heard.text
+                        end["engine"] = heard.engine.rawValue
+                        end["phoneSeconds"] = (heard.seconds * 100).rounded() / 100
+                    }
+                    link.send(end)  // 手機沒聽到字就不帶 text，Mac 會自己聽
+                    DispatchQueue.main.async { MainActor.assumeIsolated { self?.didHearOnPhone(heard) } }
+                }
+            } else {
+                ears.cancel()
+                link.send(["type": "cancel"])
+            }
+            DispatchQueue.main.async { MainActor.assumeIsolated { self?.didFinishSpeaking(result, speech) } }
+        }
+        link.onEvent = { [weak self] event in
+            MainActor.assumeIsolated { self?.handle(event) }
         }
         observeSession()
+        Task { await preparePhoneEars() }
+    }
+
+    /// 預設的 Mac 名稱：setup-mac.sh 從這台 Mac 的 Tailscale 抓，寫在 Local.xcconfig（不放上 GitHub）
+    static var defaultHost: String {
+        (Bundle.main.object(forInfoDictionaryKey: "XDDMacHost") as? String) ?? ""
     }
 
     func toggle() async {
@@ -79,8 +166,10 @@ final class WakeListener: ObservableObject {
         startBattery = battery
         detections = []
         restarts = 0
-        status = "正在聽「小呆呆」"
-        log.add("開始", battery: battery, "麥克風：\(inputName)，\(Int(inputSampleRate)) Hz，靈敏度：\(sensitivity.rawValue)，高品質收音：\(highQualityBluetooth ? "開" : "關")")
+        resetTurn()
+        backToListening()
+        link.connect(host: macHost)
+        log.add("開始", battery: battery, "麥克風：\(inputName)，\(Int(inputSampleRate)) Hz，靈敏度：\(sensitivity.rawValue)，高品質收音：\(highQualityBluetooth ? "開" : "關")，電腦：\(macHost)")
         batteryTimer?.invalidate()
         batteryTimer = Timer.scheduledTimer(withTimeInterval: 60, repeats: true) { [weak self] _ in
             Task { @MainActor in self?.sampleBattery() }
@@ -91,7 +180,10 @@ final class WakeListener: ObservableObject {
         restartTask?.cancel()
         batteryTimer?.invalidate()
         batteryTimer = nil
+        link.disconnect()
         stopAudio()
+        resetTurn()
+        held.removeAll()
         pipeline.unload()
         try? AVAudioSession.sharedInstance().setActive(false, options: .notifyOthersOnDeactivation)
         if isListening {
@@ -99,6 +191,7 @@ final class WakeListener: ObservableObject {
         }
         isListening = false
         level = 0
+        phase = .listening
         status = "已停止"
     }
 
@@ -110,6 +203,239 @@ final class WakeListener: ObservableObject {
                 ok ? "靈敏度改成：\(sensitivity.rawValue)" : "換靈敏度時模型載入失敗")
     }
 
+    // MARK: - iPhone 自己聽
+
+    private func preparePhoneEars() async {
+        let (engine, state) = await phoneEars.prepare()
+        phoneEngine = engine
+        phoneModel = state
+        if state == .needsDownload { phoneModelSize = await phoneEars.downloadSize() }
+        log.add("iPhone 辨識", battery: UIDevice.current.batteryLevel,
+                "\(engine?.rawValue ?? "這支手機不支援台灣中文")，模型：\(Self.describe(state))")
+    }
+
+    /// 從 Apple 下載台灣中文辨識模型；畫面上按了才下載
+    func downloadPhoneModel() async {
+        phoneModel = .downloading(0)
+        do {
+            try await phoneEars.download { [weak self] fraction in
+                Task { @MainActor in
+                    if case .downloading = self?.phoneModel { self?.phoneModel = .downloading(fraction) }
+                }
+            }
+            phoneModel = .ready
+            log.add("iPhone 辨識", battery: UIDevice.current.batteryLevel, "模型下載好了")
+        } catch {
+            phoneModel = .failed(error.localizedDescription)
+            log.add("錯誤", battery: UIDevice.current.batteryLevel, "下載辨識模型失敗：\(error.localizedDescription)")
+        }
+    }
+
+    private func didHearOnPhone(_ heard: PhoneEars.Heard?) {
+        if let heard {
+            log.add("iPhone 聽成", battery: UIDevice.current.batteryLevel,
+                    String(format: "%@（%@，講完後 %.2f 秒）", heard.text, heard.engine.rawValue, heard.seconds))
+        } else {
+            log.add("iPhone 沒聽到", battery: UIDevice.current.batteryLevel, "交給電腦聽")
+        }
+    }
+
+    static func describe(_ state: PhoneEars.ModelState?) -> String {
+        switch state {
+        case nil: "檢查中"
+        case .unsupported: "不支援"
+        case .needsDownload: "還沒下載"
+        case .downloading(let fraction): "下載中 \(Int(fraction * 100))%"
+        case .ready: "好了"
+        case .failed(let reason): "失敗：\(reason)"
+        }
+    }
+
+    // MARK: - 一輪問答
+
+    private func didDetect() {
+        guard isListening else { return }
+        detections.insert(Detection(date: Date()), at: 0)
+        log.add("叫醒", battery: UIDevice.current.batteryLevel, "第 \(detections.count) 次")
+        guard link.isConnected else {
+            pipeline.pause()
+            say(noMac, status: "連不到電腦：確認 iPhone 的 Tailscale 有打開")
+            log.add("連不到電腦", battery: UIDevice.current.batteryLevel, "叫醒時沒連上 \(macHost)")
+            return
+        }
+        phase = .capturing
+        status = Phase.capturing.rawValue
+        sound(chime)
+    }
+
+    private func didFinishSpeaking(_ result: EndOfSpeech.Result, _ speech: EndOfSpeech) {
+        guard isListening, phase == .capturing else { return }
+        let detail = String(format: "講了 %.1f 秒，最大聲 %.3f，門檻 %.3f", speech.spoken, speech.loudest, speech.threshold)
+        guard result == .finished else {
+            log.add("沒講話", battery: UIDevice.current.batteryLevel, detail)
+            backToListening()
+            return
+        }
+        guard link.isConnected else {
+            say(noMac, status: "連不到電腦：確認 iPhone 的 Tailscale 有打開")
+            log.add("連不到電腦", battery: UIDevice.current.batteryLevel, "講完時沒連上；\(detail)")
+            return
+        }
+        phase = .waiting
+        status = Phase.waiting.rawValue
+        turnOpen = true
+        sound(beep)
+        exchanges.insert(Exchange(date: Date(), question: "…", answer: ""), at: 0)
+        if exchanges.count > 30 { exchanges.removeLast() }
+        log.add("問", battery: UIDevice.current.batteryLevel, detail)
+        replyTimeout?.cancel()
+        replyTimeout = Task { [weak self] in
+            try? await Task.sleep(nanoseconds: Self.replyTimeoutSeconds * 1_000_000_000)
+            guard let self, !Task.isCancelled, self.phase == .waiting else { return }
+            self.log.add("沒回應", battery: UIDevice.current.batteryLevel, "等了 \(Self.replyTimeoutSeconds) 秒")
+            self.turnOpen = false
+            self.say(self.noReply, status: "電腦沒有回應")
+        }
+    }
+
+    private func handle(_ event: MacLink.Event) {
+        switch event {
+        case .connected:
+            macConnected = true
+            log.add("連上電腦", battery: UIDevice.current.batteryLevel, macHost)
+        case .disconnected:
+            macConnected = false
+            log.add("跟電腦斷線", battery: UIDevice.current.batteryLevel, macHost)
+            if phase == .waiting {
+                replyTimeout?.cancel()
+                turnOpen = false
+                say(noMac, status: "連不到電腦")
+            } else if turnOpen && !reportPlaying {
+                turnOpen = false
+                if queued == 0 { finishTurn() }
+            }
+        case .heard(let text):
+            replyTimeout?.cancel()
+            if phase == .waiting, !exchanges.isEmpty {
+                exchanges[0].question = text.isEmpty ? "（沒聽清楚）" : text
+            }
+            log.add("聽成", battery: UIDevice.current.batteryLevel, text)
+        case .say(let speech) where speech.kind == "report":
+            handleReport(event)
+        case .say(let speech):
+            guard phase == .waiting || phase == .speaking, !reportPlaying else { return }  // 不是這一輪的
+            phase = .speaking
+            status = Phase.speaking.rawValue
+            if !exchanges.isEmpty { exchanges[0].answer += speech.text }
+            log.add(speech.kind == "ack" ? "收到" : "回答", battery: UIDevice.current.batteryLevel, speech.text)
+            enqueue(SpeechAudio.decode(speech.audio))
+        case .done(kind: "report"):
+            handleReport(event)
+        case .done:
+            guard !reportPlaying else { return }
+            turnOpen = false
+            if queued == 0 { finishTurn() }
+        }
+    }
+
+    /// 「做好了」的報告：先叮一聲再講；你正在問問題、講電話，或還在播別的，就等一下再播
+    private func handleReport(_ event: MacLink.Event) {
+        let busy = phase != .listening || interrupted
+        if !held.isEmpty || (busy && !reportPlaying) {
+            held.append(event)
+            return
+        }
+        switch event {
+        case .say(let speech):
+            if !reportPlaying {
+                reportPlaying = true
+                turnOpen = true
+                pipeline.pause()
+                phase = .speaking
+                status = "報告：\(speech.question)"
+                sound(chime)
+                if let index = exchanges.firstIndex(where: { $0.question == speech.question }) {
+                    exchanges[index].answer = ""
+                } else {
+                    exchanges.insert(Exchange(date: Date(), question: speech.question, answer: ""), at: 0)
+                }
+            }
+            if let index = exchanges.firstIndex(where: { $0.question == speech.question }) {
+                exchanges[index].answer += speech.text
+            }
+            log.add("報告", battery: UIDevice.current.batteryLevel, speech.text)
+            enqueue(SpeechAudio.decode(speech.audio))
+        case .done:
+            turnOpen = false
+            if queued == 0 { finishTurn() }
+        default:
+            break
+        }
+    }
+
+    /// 手機自己念一句（連不到電腦這類），念完回去聽
+    private func say(_ buffer: AVAudioPCMBuffer?, status text: String) {
+        pipeline.pause()
+        phase = .speaking
+        status = text
+        turnOpen = false
+        enqueue(buffer)
+    }
+
+    private func finishTurn() {
+        replyTimeout?.cancel()
+        reportPlaying = false
+        turnOpen = false
+        backToListening()
+        if !held.isEmpty && !interrupted {
+            let events = held
+            held = []
+            events.forEach(handleReport)
+        }
+    }
+
+    private func backToListening() {
+        guard isListening else { return }
+        phase = .listening
+        status = Phase.listening.rawValue
+        pipeline.listenForWakeWord()
+    }
+
+    private func resetTurn() {
+        replyTimeout?.cancel()
+        queued = 0
+        turnOpen = false
+        reportPlaying = false
+    }
+
+    // MARK: - 播放
+
+    /// 提示音，不算在回答裡
+    private func sound(_ buffer: AVAudioPCMBuffer) {
+        if !player.isPlaying { player.play() }
+        player.scheduleBuffer(buffer, at: nil, options: [])
+    }
+
+    /// 回答的一段聲音；全部播完、Mac 也說結束了，就回去聽「小呆呆」
+    private func enqueue(_ buffer: AVAudioPCMBuffer?) {
+        guard let buffer else {
+            if queued == 0 && !turnOpen { finishTurn() }
+            return
+        }
+        queued += 1
+        let generation = playGeneration
+        if !player.isPlaying { player.play() }
+        player.scheduleBuffer(buffer, completionCallbackType: .dataPlayedBack) { [weak self] _ in
+            DispatchQueue.main.async { MainActor.assumeIsolated { self?.played(generation) } }
+        }
+    }
+
+    private func played(_ generation: Int) {
+        guard generation == playGeneration, queued > 0 else { return }
+        queued -= 1
+        if queued == 0 && !turnOpen { finishTurn() }
+    }
+
     // MARK: - 聲音
 
     private func startAudio() throws {
@@ -117,7 +443,7 @@ final class WakeListener: ObservableObject {
         // mixWithOthers：小呆呆在聽的時候，你照樣可以用別的 App 聽音樂
         var options: AVAudioSession.CategoryOptions = [.mixWithOthers, .allowBluetooth, .allowBluetoothA2DP]
         #if compiler(>=6.2)
-        if #available(iOS 26.0, *), highQualityBluetooth {
+        if highQualityBluetooth {
             options.insert(.bluetoothHighQualityRecording) // iOS 26 + AirPods Pro 2：AirPods 高品質收音
         }
         #endif
@@ -140,7 +466,7 @@ final class WakeListener: ObservableObject {
         input.installTap(onBus: 0, bufferSize: 4096, format: format,
                          block: Self.makeTap(pipeline: pipeline, sampleRate: Int(format.sampleRate), onLevel: onLevel))
         engine.attach(player)
-        engine.connect(player, to: engine.mainMixerNode, format: chime.format)
+        engine.connect(player, to: engine.mainMixerNode, format: Chime.format)
         engine.prepare()
         try engine.start()
         lastAudioStart = Date()
@@ -148,39 +474,33 @@ final class WakeListener: ObservableObject {
     }
 
     private func stopAudio() {
+        playGeneration += 1  // 還沒播完的就不等了
+        queued = 0
         engine.inputNode.removeTap(onBus: 0)
         player.stop()
         engine.stop()
     }
 
     /// 聲音執行緒上跑的部分：不能碰主執行緒的東西，只把聲音丟給背景佇列
-    nonisolated private static func makeTap(pipeline: KWSPipeline, sampleRate: Int,
+    nonisolated private static func makeTap(pipeline: AudioPipeline, sampleRate: Int,
                                             onLevel: @escaping @Sendable (Float) -> Void) -> AVAudioNodeTapBlock {
         return { buffer, _ in
             guard let channel = buffer.floatChannelData?[0], buffer.frameLength > 0 else { return }
             let samples = Array(UnsafeBufferPointer(start: channel, count: Int(buffer.frameLength)))
             pipeline.feed(samples, sampleRate: sampleRate)
-            var sum: Float = 0
-            for sample in samples { sum += sample * sample }
-            onLevel(min(1, sqrt(sum / Float(samples.count)) * 10))
+            onLevel(min(1, AudioPipeline.rms(samples) * 10))
         }
     }
 
-    private func didDetect() {
-        guard isListening else { return }
-        detections.insert(Detection(date: Date()), at: 0)
-        if !player.isPlaying { player.play() }
-        player.scheduleBuffer(chime, at: nil, options: .interrupts)
-        log.add("叫醒", battery: UIDevice.current.batteryLevel, "第 \(detections.count) 次")
-    }
-
     private func restart(reason: String) {
+        if phase == .capturing { link.send(["type": "cancel"]) }  // 講到一半換了麥克風，這句不算
         stopAudio()
         do {
             try startAudio()
             restarts += 1
-            status = "正在聽「小呆呆」"
             log.add("恢復", battery: UIDevice.current.batteryLevel, "\(reason)；麥克風：\(inputName)，\(Int(inputSampleRate)) Hz")
+            resetTurn()
+            finishTurn()  // 回去聽，順便播講電話時留著的報告
         } catch {
             status = "恢復失敗，5 秒後再試：\(error.localizedDescription)"
             log.add("錯誤", battery: UIDevice.current.batteryLevel, "\(reason)後恢復失敗：\(error.localizedDescription)")
@@ -241,20 +561,17 @@ final class WakeListener: ObservableObject {
     private func handleInterruption(began: Bool) {
         guard isListening else { return }
         if began {
+            interrupted = true
             status = "被打斷（例如來電），結束後會自己恢復"
             log.add("打斷", battery: UIDevice.current.batteryLevel, "例如來電、Siri、別的 App 獨占麥克風")
         } else {
+            interrupted = false
             scheduleRestart(reason: "打斷結束")
         }
     }
 
     private static func requestMicrophone() async -> Bool {
-        if #available(iOS 17.0, *) {
-            return await AVAudioApplication.requestRecordPermission()
-        }
-        return await withCheckedContinuation { continuation in
-            AVAudioSession.sharedInstance().requestRecordPermission { continuation.resume(returning: $0) }
-        }
+        await AVAudioApplication.requestRecordPermission()
     }
 }
 
@@ -262,60 +579,6 @@ enum ListenerError: LocalizedError {
     case noMicrophone
 
     var errorDescription: String? { "找不到可以用的麥克風" }
-}
-
-/// 在背景佇列上跑喚醒詞偵測，不卡住聲音執行緒
-final class KWSPipeline: @unchecked Sendable {
-    private let queue = DispatchQueue(label: "tw.rino.xiaodaidai.kws", qos: .userInitiated)
-    private var detector: WakeWordDetector?
-    /// 開始聽之前設定一次；聽到「小呆呆」時在背景佇列呼叫
-    var onDetect: (@Sendable () -> Void)?
-
-    func load(modelDirectory: URL, sensitivity: WakeWordDetector.Sensitivity) async -> Bool {
-        await withCheckedContinuation { continuation in
-            queue.async {
-                self.detector = WakeWordDetector(modelDirectory: modelDirectory, sensitivity: sensitivity)
-                continuation.resume(returning: self.detector != nil)
-            }
-        }
-    }
-
-    func feed(_ samples: [Float], sampleRate: Int) {
-        queue.async {
-            guard let detector = self.detector else { return }
-            if !detector.process(samples, sampleRate: sampleRate).isEmpty {
-                self.onDetect?()
-            }
-        }
-    }
-
-    func unload() {
-        queue.async { self.detector = nil }
-    }
-}
-
-/// 「叮」：兩個短音，聽到小呆呆時播
-enum Chime {
-    static func makeBuffer() -> AVAudioPCMBuffer {
-        let rate = 44_100.0
-        let format = AVAudioFormat(standardFormatWithSampleRate: rate, channels: 1)!
-        let notes: [(frequency: Double, seconds: Double)] = [(880, 0.11), (1318.5, 0.2)]
-        let total = notes.reduce(0) { $0 + Int($1.seconds * rate) }
-        let buffer = AVAudioPCMBuffer(pcmFormat: format, frameCapacity: AVAudioFrameCount(total))!
-        buffer.frameLength = AVAudioFrameCount(total)
-        let out = buffer.floatChannelData![0]
-        var index = 0
-        for note in notes {
-            let count = Int(note.seconds * rate)
-            for i in 0..<count {
-                let t = Double(i) / rate
-                let envelope = min(1, t / 0.005) * exp(-t * 9) // 快速起音、自然衰減
-                out[index] = Float(sin(2 * .pi * note.frequency * t) * envelope * 0.5)
-                index += 1
-            }
-        }
-        return buffer
-    }
 }
 
 /// 測試紀錄：CSV，可以在 App 裡按「分享測試紀錄」，或在「檔案 › 我的 iPhone › 小呆呆」找到
@@ -336,7 +599,7 @@ final class TestLog {
 
     func add(_ event: String, battery: Float, _ detail: String = "") {
         let percent = battery < 0 ? "" : String(Int((battery * 100).rounded()))
-        let line = "\(formatter.string(from: Date())),\(event),\(percent),\(detail.replacingOccurrences(of: ",", with: "，"))\n"
+        let line = "\(formatter.string(from: Date())),\(event),\(percent),\(detail.replacingOccurrences(of: ",", with: "，").replacingOccurrences(of: "\n", with: " "))\n"
         guard let data = line.data(using: .utf8), let handle = try? FileHandle(forWritingTo: url) else { return }
         handle.seekToEndOfFile()
         handle.write(data)

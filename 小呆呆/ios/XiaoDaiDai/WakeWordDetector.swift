@@ -71,4 +71,9 @@ final class WakeWordDetector {
         }
         return found
     }
+
+    /// 回答完、回到聽「小呆呆」時重來一次，免得還記著上一段聲音
+    func reset() {
+        spotter.reset()
+    }
 }

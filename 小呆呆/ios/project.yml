@@ -4,7 +4,7 @@ name: XiaoDaiDai
 options:
   bundleIdPrefix: tw.rino
   deploymentTarget:
-    iOS: "16.0"
+    iOS: "26.0"
   createIntermediateGroups: true
 packages:
   SherpaOnnx:
@@ -35,10 +35,20 @@ targets:
         CFBundleVersion: $(CURRENT_PROJECT_VERSION)
         UILaunchScreen: {}
         UISupportedInterfaceOrientations: [UIInterfaceOrientationPortrait]
-        NSMicrophoneUsageDescription: 小呆呆要用麥克風聽你喊「小呆呆」。聲音只在手機上處理，不會上傳。
+        NSMicrophoneUsageDescription: 小呆呆要用麥克風聽你喊「小呆呆」。叫醒後你講的話會傳到你自己辦公室的 Mac，不會傳給別人。
+        NSSpeechRecognitionUsageDescription: 小呆呆用 iPhone 內建的語音辨識，在手機上把你講的話轉成字。
         UIBackgroundModes: [audio]
         UIFileSharingEnabled: true
         LSSupportsOpeningDocumentsInPlace: true
+        # 辦公室 Mac 在 Tailscale 裡的名稱，setup-mac.sh 自動寫進 Local.xcconfig（不放上 GitHub）
+        XDDMacHost: $(XDD_MAC_HOST)
+        # 連 Mac 用 ws://（沒加密），但走的是 Tailscale，本身就加密了
+        NSAppTransportSecurity:
+          NSAllowsLocalNetworking: true
+          NSExceptionDomains:
+            ts.net:
+              NSIncludesSubdomains: true
+              NSExceptionAllowsInsecureHTTPLoads: true
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: tw.rino.xiaodaidai

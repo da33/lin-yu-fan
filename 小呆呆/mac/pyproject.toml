@@ -1,0 +1,22 @@
+[project]
+name = "xiaodaidai-mac"
+version = "0.1.0"
+description = "小呆呆的 Mac 服務：收手機傳來的聲音，聽懂、問 Claude、用美佳念回去"
+requires-python = ">=3.11,<3.13"
+dependencies = [
+    # 跟語音輸入.app 同一版，模型直接共用 ~/.cache/voice-type 裡壓縮好的那份
+    "mlx-qwen3-asr==0.4.4",
+    "numpy",
+    "opencc-python-reimplemented",
+    "websockets>=13",
+]
+
+[dependency-groups]
+dev = ["pytest>=8"]
+
+[tool.uv]
+package = false
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]

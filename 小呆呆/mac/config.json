@@ -1,0 +1,14 @@
+{
+  "port": 8787,
+  "asr": "phone",
+  "asr_model": "~/.cache/voice-type/Qwen3-ASR-1.7B-8bit",
+  "asr_context": "常用詞：小呆呆、Claude、Rino、萬能科大",
+  "keep_warm_seconds": 10,
+  "claude": "",
+  "claude_model": "sonnet",
+  "claude_tools": ["WebSearch", "WebFetch"],
+  "voice": "Meijia",
+  "voice_rate": 0,
+  "ack_after_seconds": 3,
+  "max_task_seconds": 300
+}

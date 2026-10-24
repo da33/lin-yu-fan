@@ -2,13 +2,15 @@
 
 TPE ⇄ TYO 2027/1/17 去、2/3 回，任何航空。私人工具，noindex。
 
-- 作戰頁：`https://da33.github.io/lin-yu-fan/flight/`（主戰場倒數、特價雷達、安裝步驟、作戰清單、行情、比價）
-- 搶票腳本：`trip-grab.user.js`（Tampermonkey，跑在自己已登入的電腦版 Chrome／Edge）
-- 排程：`sales.json`（特價雷達每天 07:51、20:51 自動掃描後更新）
+**只收航空公司官網自己的特價**：不收 Trip.com、Kiwi、Skyscanner、Klook、KKday、易遊網、雄獅這類第三方（會多抽一筆）。
+
+- 作戰頁：`https://da33.github.io/lin-yu-fan/flight/`（最要緊的倒數、官網特價雷達、各家開賣習慣、官網特價參考價、安裝步驟、作戰清單）
+- 搶票腳本：`trip-grab.user.js`（Tampermonkey，跑在自己已登入的電腦版 Chrome／Edge；只在航空公司官網和作戰頁上執行）
+- 排程：`sales.json`（特價雷達每天 07:51、20:51 自動掃描後更新；`patterns` 是各家開賣習慣）
 
 ## 全自動流程
 
-1. **雷達**：排程任務每天兩次搜尋各家航空和訂票網站的特價，把「幾點開搶、活動網址、關鍵字、有沒有涵蓋 1/17–2/3」寫進 `sales.json`，push 上線。
+1. **雷達**：排程任務每天兩次搜尋各家航空官網的特價，把「幾點開賣、官網網址、關鍵字、有沒有涵蓋 1/17–2/3」寫進 `sales.json`，push 上線。
 2. **自動駕駛**：作戰頁開著時，腳本每 20 分鐘讀一次排程；`auto: true` 的場次在開搶前 `lead` 秒（預設 180）自動打開活動頁。
 3. **活動頁接手**：新分頁自己武裝、校時（伺服器 `Date` 標頭錯開相位取交集，約 ±0.1 秒），盯住目標卡片。
 4. **開搶**：按鈕一能按就點（開搶後 0.15 秒）；沒開就重整（最多 25 次、每次隔 4 秒）；遇到 Queue-it 排隊不重整；出現安全驗證就停手叫人。
@@ -19,8 +21,8 @@ TPE ⇄ TYO 2027/1/17 去、2/3 回，任何航空。私人工具，noindex。
 
 | mode | 用在 | 時間到做什麼 |
 |---|---|---|
-| `grab` | Trip.com 這類「一張卡＋搶購鈕」的秒殺頁 | 找同時含 `place` 和 `price` 的卡片，按下卡片裡的搶購鈕 |
-| `code` | 每日 00:00 發的優惠碼 | 按「領取／複製」，把新出現的碼複製到剪貼簿並記在面板紀錄 |
+| `grab` | 官網「一張卡＋立即訂購」的促銷頁 | 找含 `place`（和 `price`）的卡片，按下卡片裡的訂購鈕；沒設價格就看按鈕是不是已經能按 |
+| `code` | 官網定時發的優惠碼 | 按「領取／複製」，把新出現的碼複製到剪貼簿並記在面板紀錄 |
 | `open` | 航空公司官網（虎航、樂桃…） | 準時打開官網、還在倒數就重整、排隊不重整，開賣就叫人；訂位自己選 |
 | `ongoing` | 旅展折扣這類隨時可買的 | 只列在作戰頁，不自動 |
 
@@ -28,20 +30,20 @@ TPE ⇄ TYO 2027/1/17 去、2/3 回，任何航空。私人工具，noindex。
 
 ```json
 {
-  "id": "tc-1027-tyo999",            // 唯一代號，改了會被當成新場次
-  "start": "2026-10-27T12:00:00+08:00",
+  "id": "it-itf-2026",               // 唯一代號，改了會被當成新場次
+  "start": "2026-11-05T10:00:00+08:00",
   "end": null,                       // ongoing 才需要
-  "brand": "Trip.com",
-  "title": "東京機票 999",
-  "mode": "grab",                    // grab | code | open | ongoing
+  "brand": "台灣虎航",
+  "title": "ITF 旅展促銷",
+  "mode": "open",                    // grab | code | open | ongoing
   "auto": true,                      // 自動駕駛要不要接手
-  "lead": 180,                       // 提前幾秒打開
+  "lead": 600,                       // 提前幾秒打開（官網常要排隊，提早 10 分鐘）
   "place": "東京|成田|羽田",          // 地點關鍵字，| 隔開
-  "price": "999",                    // 價格數字（可留空）
-  "url": "https://tw.trip.com/t/JTUkYr9zpW2",
+  "price": "",                       // 價格數字（可留空）
+  "url": "https://www.tigerairtw.com/zh-tw",
   "covers": "unknown",               // yes | partial | no | unknown：有沒有涵蓋 1/17–2/3
   "status": "confirmed",             // confirmed | predicted | ongoing | ended
-  "main": true,                      // 作戰頁大倒數用這場
+  "main": true,                      // 作戰頁大倒數用這場（ongoing 就倒數截止）
   "note": "…",
   "source": "https://…"              // 消息來源
 }

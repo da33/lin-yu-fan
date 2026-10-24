@@ -1,10 +1,9 @@
 // ==UserScript==
-// @name         東京搶票助手 · 全自動
+// @name         東京搶票助手 · 航空官網
 // @namespace    https://da33.github.io/lin-yu-fan/flight/
-// @version      2.0.0
-// @description  雷達排程＋自動駕駛：開搶前自動打開活動頁、校時、盯盤，時間到馬上按；沒開就重整；排隊不重整；每日優惠碼自動領。登入、驗證、付款由你本人完成。
+// @version      2.1.0
+// @description  只盯航空公司官網的原生特價：雷達排程＋自動駕駛，開賣前自動打開官網、校時，時間到馬上按；倒數中就重整；排隊不重整。登入、驗證、付款由你本人完成。
 // @author       Rino
-// @match        https://*.trip.com/*
 // @match        https://da33.github.io/lin-yu-fan/flight/*
 // @match        https://*.tigerairtw.com/*
 // @match        https://*.flypeach.com/*
@@ -15,6 +14,7 @@
 // @match        https://*.jal.co.jp/*
 // @match        https://*.ana.co.jp/*
 // @match        https://*.flyscoot.com/*
+// @match        https://*.lionairthai.com/*
 // @match        https://*.queue-it.net/*
 // @run-at       document-idle
 // @noframes
@@ -34,20 +34,16 @@
 (() => {
   'use strict';
 
-  const VERSION = '2.0.0';
+  const VERSION = '2.1.0';
   const SCHEDULE_URL = 'https://da33.github.io/lin-yu-fan/flight/sales.json';
   // 作戰頁＝自動駕駛控制台；其他頁＝活動頁／航空公司頁
   const IS_CMD = /\/lin-yu-fan\/flight\/(index\.html)?$/.test(location.pathname);
   const DEV = /^(localhost|127\.0\.0\.1)$/.test(location.hostname);
 
-  // 排程抓不到時的備用場次（台灣時間）
-  const FALLBACK = [
-    { id: 'tc-1027-tyo999', start: '2026-10-27T12:00:00+08:00', brand: 'Trip.com', title: '東京機票 999', mode: 'grab', place: '東京|成田|羽田', price: '999', url: 'https://tw.trip.com/t/JTUkYr9zpW2', auto: true },
-    { id: 'tc-1026-oka4999', start: '2026-10-26T12:00:00+08:00', brand: 'Trip.com', title: '沖繩來回 4,999（彩排）', mode: 'grab', place: '沖繩|那霸', price: '4999', url: 'https://tw.trip.com/t/JTUkYr9zpW2', auto: true },
-    { id: 'tc-1029-kix6999', start: '2026-10-29T12:00:00+08:00', brand: 'Trip.com', title: '星宇 大阪來回 6,999', mode: 'grab', place: '大阪|關西', price: '6999', url: 'https://tw.trip.com/t/JTUkYr9zpW2', auto: false },
-  ];
+  // 只收航空公司官網的場次；排程讀不到時就沒有自動場次，手動武裝照樣能用
+  const FALLBACK = [];
   const DEFAULTS = {
-    preset: 'tc-1027-tyo999', at: '2026-10-27 12:00:00', place: '東京|成田|羽田', price: '999', mode: 'grab',
+    preset: 'custom', at: '', place: '東京|成田|羽田', price: '', mode: 'grab',
     trip: '去 2027/1/17・回 2027/2/3', autoClick: true, autoReload: true, sameTab: true, pin: null,
   };
   const MAX_RELOADS = 25;
@@ -160,7 +156,7 @@
 
   // ---------- 排程 ----------
   let sched = load('sched', null); // { updated, sales: [...] }
-  const salesList = () => (sched && Array.isArray(sched.sales) && sched.sales.length ? sched.sales : FALLBACK);
+  const salesList = () => (sched && Array.isArray(sched.sales) ? sched.sales : FALLBACK);
   const startOf = s => Date.parse(s.start);
   function fetchSchedule() {
     const url = IS_CMD ? new URL('sales.json', location.href).href : SCHEDULE_URL;
@@ -303,7 +299,8 @@
     if (r.btn && (WAIT_RE.test(bt) || isDisabled(r.btn))) return 'waiting';
     if (!r.hasPrice && WAIT_RE.test(r.text)) return 'waiting';
     if (r.hasPrice && SOLD_RE.test(r.text) && r.text.length < 160) return 'soldout';
-    return r.hasPrice ? 'ready' : 'maybe';
+    // 沒設定價格的話，就看按鈕本身：是「立即訂購」這種、不是「即將開賣」，就算開了
+    return r.hasPrice || (!priceRe() && r.kind === 'buy') ? 'ready' : 'maybe';
   }
   const STATE_TEXT = {
     notfound: '❓ 找不到方案（檢查關鍵字，或用 🎯 指定按鈕）',
@@ -484,10 +481,12 @@
     $('off').textContent = offsetErr == null && !offset ? '尚未校時'
       : `本機${offset >= 0 ? '慢' : '快'} ${(Math.abs(offset) / 1000).toFixed(2)}s` + (offsetErr == null ? '' : ` ±${(offsetErr / 1000).toFixed(2)}`);
   }
+  // 航空官網平常只露一條橘色標題，不擋你訂位；有任務時才展開
+  const MIN_KEY = IS_CMD ? 'min' : 'minSale';
   function mountPanel() {
     (document.body || document.documentElement).appendChild(host);
-    if (load('min', false)) panel.classList.add('min');
-    $('hd').onclick = () => { panel.classList.toggle('min'); save('min', panel.classList.contains('min')); };
+    if (!active() && load(MIN_KEY, !IS_CMD && !DEV)) panel.classList.add('min');
+    $('hd').onclick = () => { panel.classList.toggle('min'); save(MIN_KEY, panel.classList.contains('min')); };
     $('log').textContent = logs.slice().reverse().join('\n');
   }
 
@@ -603,10 +602,9 @@
   // 活動頁／航空公司頁
   // =====================================================================
   function salePage() {
-    const onTrip = /(^|\.)trip\.com$/.test(location.hostname);
     const inQueueHost = /(^|\.)queue-it\.net$/.test(location.hostname);
-    // 不是 Trip.com、也沒有這個網站的任務，就不打擾你平常上網
-    if (!onTrip && !DEV && !(active() && (hostOk(run) || inQueueHost))) return;
+    // Queue-it 是很多網站共用的排隊系統，只有在我們的任務排隊時才出現
+    if (inQueueHost && !DEV && !active()) return;
     mountPanel();
 
     // 換頁＝進入下單流程（或領券後跳頁），交棒給你
@@ -682,7 +680,7 @@
       if (active()) { run = null; saveRun(); mark(null); setStatus('已解除武裝'); log('已解除武裝'); renderArm(); return; }
       readForm();
       const target = drill ? now() + 30000 : parseTaipei(cfg.at);
-      if (!target) { setStatus('⚠️ 開搶時間格式要像 2026-10-27 12:00:00'); return; }
+      if (!target) { setStatus('⚠️ 先到「設定」填開賣時間，格式像 2026-11-06 10:00:00'); $('set').open = true; return; }
       if (now() - target > 60000) { setStatus('⚠️ 這個時間已經過了，請到「設定」換場次'); return; }
       run = {
         target, url: location.href, host: baseDomain(location.hostname), page: location.pathname, phase: 'armed', reloads: 0, clicks: 0, drill: !!drill,
@@ -848,7 +846,7 @@
         finish('done', `演練完成：${STATE_TEXT[s].replace(/^\S+\s/, '')}，${what}`, false);
         return;
       }
-      if (s === 'soldout') { finish('soldout', run.mode === 'code' ? '今天的優惠碼已領完' : '方案已售完，改打備案（作戰頁的比價連結）', true); return; }
+      if (s === 'soldout') { finish('soldout', run.mode === 'code' ? '今天的優惠碼已領完' : '這個方案售完了，改看作戰頁上其他航空', true); return; }
 
       if (((s === 'ready' && dt >= CLICK_DELAY) || (s === 'maybe' && dt > 1500 && r.kind === 'buy')) && r.btn) {
         if (!run.autoClick) { if (!run.clicks) { run.clicks = -1; saveRun(); alarm('開搶了！快按綠色框', true); } return; }

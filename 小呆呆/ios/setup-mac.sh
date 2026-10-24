@@ -19,14 +19,17 @@ if ! version="$(xcodebuild -version 2>&1)"; then
   if grep -qi "license" <<<"$version"; then
     echo "✖ Xcode 還沒同意授權條款：打開 Xcode，按「Agree」，等它裝完元件，再貼一次同一行指令。" >&2
   elif [[ -n "${DEVELOPER_DIR:-}" ]]; then
-    echo "✖ 找到 Xcode（$DEVELOPER_DIR）但還不能用：先打開 Xcode 一次、同意條款、勾 iOS 讓它裝完，再貼一次同一行指令。" >&2
+    echo "✖ 找到 Xcode（${DEVELOPER_DIR}）但還不能用：先打開 Xcode 一次、同意條款、勾 iOS 讓它裝完，再貼一次同一行指令。" >&2
     echo "  Xcode 說：$(head -2 <<<"$version")" >&2
   else
     echo "✖ /Applications 裡找不到 Xcode。到 App Store 搜尋「Xcode」免費下載（檔案很大），裝好打開一次再跑這個指令。" >&2
   fi
   exit 1
 fi
-echo "✔ $(head -1 <<<"$version")${DEVELOPER_DIR:+（$DEVELOPER_DIR）}"
+# 變數後面緊接中文時一定要用 ${…} 包起來：macOS 內建的 bash 3.2 會把中文字的位元組當成變數名稱的一部分
+where=""
+if [[ -n "${DEVELOPER_DIR:-}" ]]; then where="（${DEVELOPER_DIR}）"; fi
+echo "✔ $(head -1 <<<"$version")${where}"
 
 if ! command -v xcodegen >/dev/null; then
   if [[ -x /opt/homebrew/bin/brew ]]; then eval "$(/opt/homebrew/bin/brew shellenv)"; fi
@@ -45,5 +48,9 @@ else
 fi
 
 xcodegen generate --quiet
-echo "✔ Xcode 專案好了，正在打開…"
-open XiaoDaiDai.xcodeproj
+if [[ -n "${XDD_NO_OPEN:-}" ]]; then
+  echo "✔ Xcode 專案好了：$(pwd)/XiaoDaiDai.xcodeproj"
+else
+  echo "✔ Xcode 專案好了，正在打開…"
+  open XiaoDaiDai.xcodeproj
+fi

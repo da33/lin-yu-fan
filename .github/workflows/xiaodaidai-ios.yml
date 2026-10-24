@@ -18,6 +18,30 @@ permissions:
   contents: read
 
 jobs:
+  # 照 Rino 在 Mac 上的做法完整跑一次安裝指令：macOS 內建 bash 3.2、開發者工具指在指令列工具
+  install-like-rino:
+    runs-on: macos-latest
+    timeout-minutes: 20
+    steps:
+      - name: 把開發者工具設成跟 Rino 的 Mac 一樣（指在指令列工具）
+        run: |
+          sudo xcode-select -s /Library/Developer/CommandLineTools
+          xcode-select -p
+          /bin/bash --version | head -1
+          if xcodebuild -version; then echo "預期 xcodebuild 找不到 Xcode，但它找到了"; fi
+
+      - name: 貼上 README 裡的那一行（用 macOS 內建 bash）
+        run: |
+          export PATH="/bin:/usr/bin:$PATH"
+          curl -fsSL https://raw.githubusercontent.com/da33/lin-yu-fan/main/%E5%B0%8F%E5%91%86%E5%91%86/ios/get.sh | XDD_NO_OPEN=1 /bin/bash
+          ls "$HOME/代碼程式/小呆呆/ios/Model"
+          test -f "$HOME/代碼程式/小呆呆/ios/XiaoDaiDai.xcodeproj/project.pbxproj"
+
+      - name: 再貼一次（第二次要能更新、不重複下載）
+        run: |
+          export PATH="/bin:/usr/bin:$PATH"
+          curl -fsSL https://raw.githubusercontent.com/da33/lin-yu-fan/main/%E5%B0%8F%E5%91%86%E5%91%86/ios/get.sh | XDD_NO_OPEN=1 /bin/bash
+
   build-and-test:
     runs-on: macos-latest
     timeout-minutes: 45

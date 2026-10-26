@@ -1,5 +1,5 @@
 {
-  "updated": "2026-10-24T09:25:43+08:00",
+  "updated": "2026-10-26T20:58:44+08:00",
   "trip": {
     "from": "TPE",
     "to": "TYO",
@@ -8,21 +8,6 @@
   },
   "policy": "只收航空公司官網自己的特價，不收 Trip.com、Kiwi、Skyscanner、Klook、KKday、易遊網、雄獅等第三方。",
   "sales": [
-    {
-      "id": "gk-sss-2610",
-      "start": "2026-10-23T11:00:00+08:00",
-      "end": "2026-10-26T15:59:00+08:00",
-      "brand": "捷星日本",
-      "title": "スーパースターセール（超級巨星促銷）",
-      "mode": "ongoing",
-      "auto": false,
-      "main": true,
-      "url": "https://www.jetstar.com/tw/zh",
-      "covers": "unknown",
-      "status": "ongoing",
-      "note": "現在就在賣，10/26 15:59（台灣時間，日本 16:59）截止、賣完為止。已確認台北線在名單上：成田⇄桃園 ¥9,290 起（Starter 票價，稅金、行李、選位另計，免燃油附加費）。亞洲線搭乘 11/2–2027/2/28，日期上涵蓋 1/17 和 2/3，但連假、年末年始有除外日，下單前用官網低價月曆確認這兩天有沒有特價。Club Jetstar 會員再折 ¥200。",
-      "source": "https://sky-budget.com/2026/10/22/jetstar-sale-oct2026/"
-    },
     {
       "id": "itf-ci",
       "start": "2026-10-19T00:00:00+08:00",
@@ -77,7 +62,8 @@
       "covers": "unknown",
       "status": "predicted",
       "note": "去年是旅展前一天 10:00 尊榮虎先搶、隔天 10:00 全員開賣。今年 ITF 是 11/6–11/9，截至 10/24 官方還沒公布，公布後雷達會改成確認並自動。尊榮虎資格要先加入 tigerclub 並登錄虎足跡。",
-      "source": "https://www.tigerairtw.com/zh-TW/news/20251104"
+      "source": "https://www.tigerairtw.com/zh-TW/news/20251104",
+      "main": true
     },
     {
       "id": "it-itf-2026-all",
